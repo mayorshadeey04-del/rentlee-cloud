@@ -1,0 +1,369 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    background: #f5f6f8;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.container {
+    background: #fff;
+    width: 100%;
+    max-width: 600px;
+    padding: 30px 50px;
+    border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+/* Logo */
+.logo {
+    margin-bottom: 15px;
+}
+
+.logo img {
+    height: 40px;
+    width: auto;
+}
+
+/* Icon */
+.icon-box {
+    width: 70px;
+    height: 70px;
+    margin: 0 auto 20px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 10px 30px rgba(59, 130, 246, 0.3);
+}
+
+.icon-box i {
+    font-size: 35px;
+    color: white;
+}
+
+h1 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 10px;
+}
+
+.subtitle {
+    font-size: 13px;
+    color: #64748b;
+    line-height: 1.5;
+    margin-bottom: 25px;
+}
+
+.subtitle strong {
+    color: #3b82f6;
+    font-weight: 600;
+}
+
+/* OTP Input */
+.otp-input-container {
+    margin-bottom: 12px;
+}
+
+.otp-input {
+    width: 100%;
+    max-width: 320px;
+    margin: 0 auto;
+    display: block;
+    height: 55px;
+    text-align: center;
+    font-size: 26px;
+    font-weight: 600;
+    border: 2px solid #cbd5e1;
+    border-radius: 12px;
+    outline: none;
+    transition: all 0.3s ease;
+    font-family: 'Poppins', sans-serif;
+    color: #0f172a;
+    letter-spacing: 8px;
+    padding: 0 20px;
+}
+
+.otp-input::placeholder {
+    color: #cbd5e1;
+    letter-spacing: 8px;
+}
+
+.otp-input:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+    transform: scale(1.02);
+}
+
+.otp-input.filled {
+    border-color: #10b981;
+    background: #f0fdf4;
+}
+
+.otp-input.error {
+    border-color: #ef4444;
+    background: #fef2f2;
+    animation: shake 0.3s;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-10px); }
+    75% { transform: translateX(10px); }
+}
+
+.error {
+    color: #ef4444;
+    font-size: 11px;
+    min-height: 16px;
+    display: block;
+    margin-bottom: 8px;
+}
+
+/* Button */
+button[type="submit"] {
+    width: 100%;
+    background: #3b82f6;
+    border: none;
+    color: white;
+    padding: 13px;
+    font-size: 15px;
+    font-weight: 600;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 8px;
+}
+
+button[type="submit"]:hover {
+    background: #2563eb;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);
+}
+
+button[type="submit"]:active {
+    transform: translateY(0);
+}
+
+button[type="submit"]:disabled {
+    background: #cbd5e1;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Resend Section */
+.resend-section {
+    margin-top: 22px;
+    padding-top: 20px;
+    border-top: 1px solid #e2e8f0;
+}
+
+.resend-section p {
+    font-size: 12px;
+    color: #64748b;
+    margin-bottom: 8px;
+}
+
+.resend-btn {
+    background: transparent;
+    border: 2px solid #3b82f6;
+    color: #3b82f6;
+    padding: 9px 22px;
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.resend-btn:hover:not(:disabled) {
+    background: #3b82f6;
+    color: white;
+}
+
+.resend-btn:disabled {
+    border-color: #cbd5e1;
+    color: #94a3b8;
+    cursor: not-allowed;
+}
+
+#timer {
+    font-weight: 400;
+}
+
+/* Back Link */
+.back-link {
+    margin-top: 18px;
+}
+
+.back-link a {
+    color: #64748b;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 500;
+    transition: color 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.back-link a:hover {
+    color: #3b82f6;
+}
+
+/* ================= POPUP NOTIFICATIONS ================= */
+.popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+    animation: fadeIn 0.3s ease;
+}
+
+.popup.show {
+    display: flex;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.popup-content {
+    background: white;
+    padding: 35px;
+    border-radius: 20px;
+    max-width: 420px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: slideUp 0.4s ease;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.popup-icon {
+    width: 75px;
+    height: 75px;
+    margin: 0 auto 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: scaleIn 0.5s ease 0.2s backwards;
+}
+
+@keyframes scaleIn {
+    from { transform: scale(0); }
+    to { transform: scale(1); }
+}
+
+.success-icon {
+    background: linear-gradient(135deg, #10b981, #059669);
+}
+
+.error-icon {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+}
+
+.info-icon {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+}
+
+.popup-icon i {
+    font-size: 35px;
+    color: white;
+}
+
+.popup-content h3 {
+    font-size: 22px;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 12px;
+}
+
+.popup-content p {
+    font-size: 14px;
+    color: #64748b;
+    line-height: 1.6;
+    margin-bottom: 25px;
+}
+
+.popup-btn {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    color: white;
+    border: none;
+    padding: 13px 35px;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+}
+
+.popup-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+}
+
+.popup-btn:active {
+    transform: translateY(0);
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 600px) {
+    body {
+        padding: 10px;
+    }
+
+    .container {
+        padding: 25px 30px;
+    }
+
+    .otp-input {
+        max-width: 100%;
+        font-size: 22px;
+        height: 50px;
+        letter-spacing: 6px;
+    }
+
+    h1 {
+        font-size: 20px;
+    }
+
+    .subtitle {
+        font-size: 12px;
+    }
+
+    .popup-content {
+        padding: 30px 25px;
+    }
+}

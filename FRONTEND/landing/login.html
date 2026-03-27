@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rentlee | Login</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <!-- Your CSS -->
+    <link rel="stylesheet" href="../css/login.css">
+</head>
+
+<body>
+
+<div class="container">
+    
+    <!-- Logo -->
+    <div class="logo">
+        <img src="../image/logo.png" alt="Rentlee Logo">
+    </div>
+
+    <h1>Welcome Back</h1>
+    <h2>Please login in to your account below</h2>
+
+    <form id="loginForm" novalidate>
+
+        <div class="input-box">
+            <label>Email</label>
+            <input type="email" id="email" placeholder="johndoe@mail.com" required>
+            <small class="error"></small>
+        </div>
+
+        <div class="input-box">
+            <label>Password</label>
+            <input type="password" id="password" placeholder="********" required>
+            <i class="fa fa-eye toggle" onclick="togglePassword()"></i>
+            <small class="error"></small>
+        </div>
+
+        <button type="submit">Login</button>
+
+    </form>
+
+    <div class="forgot">
+        <a href="forgot-password.html?type=landlord">Forgot Password?</a>
+    </div>
+
+    <div class="signup-link">
+        Don't have an account? <a href="signup.html">Sign Up</a>
+    </div>
+
+</div>
+
+<!-- JavaScript -->
+<script src="../js/login.js"></script>
+
+</body>
+</html>

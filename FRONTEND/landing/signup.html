@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rentlee | Sign Up</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <!-- Your CSS -->
+    <link rel="stylesheet" href="../css/signup.css">
+</head>
+
+<body>
+
+<div class="container">
+    
+    <!-- Logo -->
+    <div class="logo">
+        <img src="../image/logo.png" alt="Rentlee Logo">
+    </div>
+
+    <h1>Create a new account</h1>
+    <h2>It's quick and easy.</h2>
+
+    <form id="signupForm" novalidate>
+
+        <div class="form-grid">
+
+            <div class="input-box">
+                <label>First Name</label>
+                <input type="text" id="firstName" placeholder="John" required>
+                <small class="error"></small>
+            </div>
+
+            <div class="input-box">
+                <label>Last Name</label>
+                <input type="text" id="lastName" placeholder="Doe" required>
+                <small class="error"></small>
+            </div>
+
+            <div class="input-box">
+                <label>Email</label>
+                <input type="email" id="email" placeholder="johndoe@mail.com" required>
+                <small class="error"></small>
+            </div>
+
+            <div class="input-box">
+                <label>Phone No.</label>
+                <input type="tel" id="phone" placeholder="0712345678" required>
+                <small class="error"></small>
+            </div>
+
+            <div class="input-box full">
+                <label>Password</label>
+                <input type="password" id="password" placeholder="********" required>
+                <i class="fa fa-eye toggle" onclick="togglePassword('password', this)"></i>
+                <small class="error"></small>
+            </div>
+
+            <div class="input-box full">
+                <label>Confirm Password</label>
+                <input type="password" id="confirm" placeholder="********" required>
+                <i class="fa fa-eye toggle" onclick="togglePassword('confirm', this)"></i>
+                <small class="error"></small>
+            </div>
+
+        </div>
+
+        <button type="submit">Sign Up</button>
+
+    </form>
+
+    <div class="login-link">
+        Already have an account? <a href="login.html">Login as a landlord</a>
+    </div>
+
+</div>
+
+<!-- Success Popup Notification -->
+<div class="success-popup" id="successPopup">
+    <div class="success-popup-content">
+        <div class="success-icon">
+            <i class="fa-solid fa-check"></i>
+        </div>
+        <h3>Account Created Successfully!</h3>
+        <p>A 6-digit verification code has been sent to:</p>
+        <p class="email-highlight" id="popupEmail"></p>
+        <p class="note">Please check your email and enter the code on the next page.</p>
+        <button class="success-popup-btn" onclick="closeSuccessPopup()">Continue to Verification</button>
+    </div>
+</div>
+
+<!-- JavaScript -->
+<script src="../js/signup.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,62 @@
+/* CSS variables — used by all management pages */
+:root {
+    --navy-900: #0A1628;
+    --navy-800: #162844;
+    --navy-700: #1E3A5F;
+    --blue-500: #3B82F6;
+    --blue-400: #60A5FA;
+    --cyan-400: #22D3EE;
+    --emerald-400: #34D399;
+    --amber-400: #FBBF24;
+    --rose-400:  #FB7185;
+    --slate-100: #F1F5F9;
+    --slate-200: #E2E8F0;
+    --slate-300: #CBD5E1;
+    --slate-400: #94A3B8;
+    --slate-500: #64748B;
+    --white:     #FFFFFF;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+    font-family: 'DM Sans', sans-serif;
+    background: linear-gradient(135deg, var(--slate-100) 0%, #E8EDF5 100%);
+    color: var(--navy-900);
+}
+
+/* ── Shell ── */
+.management-layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* ── Right side (navbar + content) ── */
+.management-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    margin-left: 240px;
+    transition: margin-left 0.3s ease;
+    min-width: 0;
+}
+
+.management-main.expanded {
+    margin-left: 80px;
+}
+
+/* ── Scrollable content area — this is where pages render ── */
+.management-content {
+    flex: 1;
+    padding: 2rem;
+    min-width: 0;
+    overflow: hidden;
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+    .management-main {
+        margin-left: 0 !important;
+    }
+}

@@ -1,0 +1,56 @@
+.tenant-my-unit { width: 100%; height: 100%; overflow-y: auto; }
+
+.unit-page-header { margin-bottom: 2rem; }
+.unit-page-title { font-family: 'Darker Grotesque', sans-serif; font-size: 2rem; font-weight: 700; color: var(--navy-900); }
+.unit-page-sub   { font-size: 0.938rem; color: var(--slate-400); margin-top: 0.25rem; }
+
+.unit-loading { display: flex; justify-content: center; padding: 4rem; font-size: 1.5rem; color: var(--blue-500); }
+
+.unit-empty { display: flex; flex-direction: column; align-items: center; gap: 1rem; padding: 4rem; color: var(--slate-400); }
+.unit-empty i { font-size: 3rem; color: var(--slate-300); }
+
+.unit-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+
+.unit-card {
+  background: var(--white); border-radius: 16px;
+  border: 2px solid var(--slate-200); overflow: hidden;
+}
+.unit-card-header {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--slate-200);
+}
+.unit-card-title { font-family: 'Darker Grotesque', sans-serif; font-size: 1.125rem; font-weight: 700; color: var(--navy-900); }
+.unit-card-body  { padding: 1.5rem; }
+
+.unit-big-id {
+  font-family: 'Darker Grotesque', sans-serif;
+  font-size: 3.5rem; font-weight: 800; color: var(--blue-500);
+  margin-bottom: 1.5rem; line-height: 1;
+}
+
+.unit-detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.unit-detail-item { display: flex; flex-direction: column; gap: 0.25rem; }
+.unit-detail-label { font-size: 0.75rem; color: var(--slate-400); font-weight: 600; display: flex; align-items: center; gap: 0.375rem; }
+.unit-detail-value { font-size: 0.938rem; font-weight: 600; color: var(--navy-900); }
+
+/* Tenancy Details List */
+.tenancy-detail-list { display: flex; flex-direction: column; gap: 1.25rem; }
+.tenancy-item { display: flex; align-items: center; gap: 1rem; }
+
+.tenancy-icon {
+  width: 44px; height: 44px; border-radius: 12px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; font-size: 1.125rem;
+}
+.tenancy-icon.blue    { background: rgba(59,130,246,0.1);  color: var(--blue-500);    }
+.tenancy-icon.emerald { background: rgba(52,211,153,0.1);  color: var(--emerald-400); }
+.tenancy-icon.amber   { background: rgba(251,191,36,0.1);  color: var(--amber-400);   }
+.tenancy-icon.rose    { background: rgba(251,113,133,0.1); color: var(--rose-400);    }
+
+.tenancy-label { font-size: 0.75rem; color: var(--slate-400); font-weight: 600; margin-bottom: 0.2rem; }
+.tenancy-value { font-size: 0.938rem; font-weight: 700; color: var(--navy-900); }
+
+.status-badge { display: inline-block; padding: 0.3rem 0.75rem; border-radius: 8px; font-size: 0.75rem; font-weight: 600; }
+.status-badge.occupied { background: rgba(52,211,153,0.1); color: #059669; }
+.status-badge.vacant   { background: rgba(251,191,36,0.1); color: #D97706; }
+
+@media (max-width: 768px) { .unit-grid { grid-template-columns: 1fr; } }
