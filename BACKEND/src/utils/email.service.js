@@ -3,7 +3,8 @@ import {
   verificationEmailTemplate,
   passwordSetupEmailTemplate,
   passwordResetEmailTemplate,
-  emailChangeVerificationTemplate
+  emailChangeVerificationTemplate,
+  tenantNotificationTemplate
 } from './email.templates.js';
 
 // ============================================
@@ -122,9 +123,34 @@ export const sendEmailChangeVerification = async (email, code, firstName) => {
   }
 };
 
+// ============================================
+// SEND DYNAMIC TENANT EMAIL (MAIL MERGE)
+// Used in: tenants.controller.js - sendEmailNotice()
+// ============================================
+export const sendDynamicTenantEmail = async (email, subject, htmlBody) => {
+  try {
+    const template = tenantNotificationTemplate(subject, htmlBody);
+
+    const mailOptions = {
+      from: process.env.SENDER_EMAIL || 'Rentlee <noreply@rentlee.com>',
+      to: email,
+      subject: subject,
+      html: template.html,
+      text: template.text
+    };
+
+    const info = await transporter.sendMail(mailOptions);
+    return info;
+  } catch (error) {
+    console.error(`Failed to send dynamic email to ${email}:`, error);
+    // We don't throw an error here so the loop doesn't crash if one email fails!
+  }
+};
+
 export default {
   sendVerificationEmail,
   sendPasswordSetupEmail,
   sendPasswordResetEmail,
-  sendEmailChangeVerification
+  sendEmailChangeVerification,
+  sendDynamicTenantEmail
 };

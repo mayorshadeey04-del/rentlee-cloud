@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { useAuth } from '../../context/AuthContext'
+import jsPDF from 'jspdf'
+import autoTable from 'jspdf-autotable'
 import './TenantPayments.css'
 
 const API_URL = 'http://localhost:5001/api'
@@ -25,7 +27,6 @@ export default function TenantPayments() {
       try {
         setLoading(true)
         
-        // Fetch current balance from dashboard endpoint, and full payment list from payments endpoint
         const [dashRes, paymentsRes] = await Promise.all([
           fetch(`${API_URL}/tenant-dashboard`, { headers: authHeaders() }),
           fetch(`${API_URL}/payments`, { headers: authHeaders() })
@@ -38,7 +39,7 @@ export default function TenantPayments() {
 
         setInfo({ balance: dashData.data.info.balance })
 
-        // Format raw backend data
+        // ✅ Updated: Now capturing tenant name, property, unit, and type for the receipt
         const formattedPayments = (paymentsData.data || []).map(p => {
           const dateObj = new Date(p.payment_date)
           return {
@@ -46,8 +47,12 @@ export default function TenantPayments() {
             amount: p.amount,
             date: dateObj.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
             month: dateObj.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' }),
-            status: p.status, // Uses 'confirmed' or 'failed' natively from DB
-            reference: p.mpesa_ref || '—'
+            status: p.status, 
+            reference: p.mpesa_ref || '—',
+            tenantName: p.tenant_name,
+            propertyName: p.property_name,
+            unitNumber: p.unit_id, // backend aliases un.unit_number as unit_id
+            paymentType: p.payment_type
           }
         })
 
@@ -100,10 +105,8 @@ export default function TenantPayments() {
       })
 
       const data = await res.json()
-      
       if (!res.ok) throw new Error(data.message)
 
-      // Simulate STK processing UX
       setTimeout(() => {
         setIsProcessing(false)
         setPaymentSuccess(true)
@@ -112,14 +115,18 @@ export default function TenantPayments() {
           setPaymentSuccess(false)
           setShowModal(false)
           
-          // Optimistically update the UI to reflect a confirmed payment
           const newPayment = {
             id: Date.now(),
             amount: Number(paymentAmount),
             date: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
             month: new Date().toLocaleDateString('en-GB', { month: 'long', year: 'numeric' }),
             status: 'confirmed',
-            reference: 'Processing...'
+            reference: 'Processing...',
+            // Fallback info for optimistically added payment
+            tenantName: user?.name,
+            propertyName: 'Your Property',
+            unitNumber: 'Your Unit',
+            paymentType: 'rent'
           }
           
           setPayments(prev => [newPayment, ...prev])
@@ -134,7 +141,82 @@ export default function TenantPayments() {
     }
   }
 
-  // Uses 'confirmed' matching our DB schema
+  // ✅ RECEIPT GENERATOR FUNCTION
+  const downloadReceipt = (payment) => {
+    const doc = new jsPDF()
+
+    const generateContent = () => {
+      // Header
+      doc.setFontSize(16)
+      doc.setTextColor(51, 65, 85)
+      doc.text('Official Payment Receipt', 105, 38, { align: 'center' })
+
+      // Receipt Details
+      doc.setFontSize(10)
+      doc.setTextColor(15, 23, 42)
+      
+      // Left side details
+      doc.text(`Receipt No: ${payment.reference}`, 14, 50)
+      doc.text(`Date: ${payment.date}`, 14, 56)
+      doc.text(`Status: ${payment.status.toUpperCase()}`, 14, 62)
+
+      // Right side details
+      doc.text(`Tenant: ${payment.tenantName || user?.name || 'Valued Tenant'}`, 120, 50)
+      doc.text(`Apartment: ${payment.propertyName || 'N/A'}`, 120, 56)
+      doc.text(`Unit: ${payment.unitNumber || 'N/A'}`, 120, 62)
+
+      // Line break
+      doc.setDrawColor(226, 232, 240)
+      doc.line(14, 68, 196, 68)
+
+      // Payment Breakdown (using autoTable for clean alignment)
+      const pType = payment.paymentType ? payment.paymentType.charAt(0).toUpperCase() + payment.paymentType.slice(1) : 'Rent'
+      
+      autoTable(doc, {
+        startY: 74,
+        head: [['Description', 'Amount']],
+        body: [
+          [`${pType} Payment (M-Pesa)`, `Ksh ${Number(payment.amount).toLocaleString()}`]
+        ],
+        theme: 'plain',
+        headStyles: { fillColor: [248, 250, 252], textColor: [100, 116, 139], fontStyle: 'bold' },
+        styles: { fontSize: 11, cellPadding: 6 },
+        columnStyles: {
+          1: { halign: 'right', fontStyle: 'bold', textColor: [15, 23, 42] }
+        }
+      })
+
+      // Total Row
+      const finalY = doc.lastAutoTable.finalY
+      doc.line(14, finalY + 2, 196, finalY + 2)
+      doc.setFontSize(12)
+      doc.setFont("helvetica", "bold")
+      doc.text('Total Paid:', 14, finalY + 12)
+      doc.text(`Ksh ${Number(payment.amount).toLocaleString()}`, 196, finalY + 12, { align: 'right' })
+
+      doc.setFontSize(10)
+      doc.setFont("helvetica", "normal")
+      doc.setTextColor(100, 116, 139)
+      doc.text('Thank you for choosing Rentlee.', 105, finalY + 30, { align: 'center' })
+
+      doc.save(`Rentlee_Receipt_${payment.reference}_${payment.date.replace(/ /g, '_')}.pdf`)
+    }
+
+    // Load the logo
+    const logo = new Image()
+    logo.src = '/logo.png'
+    logo.onload = () => {
+      doc.addImage(logo, 'PNG', 82.5, 15, 45, 12)
+      generateContent()
+    }
+    logo.onerror = () => {
+      doc.setFontSize(22)
+      doc.setTextColor(30, 58, 138)
+      doc.text('Rentlee', 105, 25, { align: 'center' })
+      generateContent()
+    }
+  }
+
   const totalPaid = payments.filter(p => p.status === 'confirmed').reduce((sum, p) => sum + Number(p.amount), 0)
 
   const overlayStyle = { position: 'fixed', inset: 0, background: 'rgba(10,22,40,0.6)', zIndex: 9999, overflowY: 'auto', WebkitOverflowScrolling: 'touch' }
@@ -196,7 +278,8 @@ export default function TenantPayments() {
         ) : !loading && (
           <table className="payments-table">
             <thead>
-              <tr><th>Reference</th><th>Month</th><th>Date</th><th>Amount</th><th>Status</th></tr>
+              {/* ✅ Added Action column for Receipt */}
+              <tr><th>Reference</th><th>Month</th><th>Date</th><th>Amount</th><th>Status</th><th style={{textAlign: 'center'}}>Receipt</th></tr>
             </thead>
             <tbody>
               {payments.map(p => (
@@ -210,6 +293,20 @@ export default function TenantPayments() {
                       {p.status.charAt(0).toUpperCase() + p.status.slice(1)}
                     </span>
                   </td>
+                  {/* ✅ Added Receipt Button */}
+                  <td style={{textAlign: 'center'}}>
+                    {p.status === 'confirmed' ? (
+                      <button 
+                        onClick={() => downloadReceipt(p)}
+                        className="btn-receipt"
+                        title="Download Receipt"
+                      >
+                        <i className="fas fa-download"></i>
+                      </button>
+                    ) : (
+                      <span style={{ color: 'var(--slate-300)' }}>—</span>
+                    )}
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -217,7 +314,7 @@ export default function TenantPayments() {
         )}
       </div>
 
-      {/* M-PESA STK PUSH MODAL */}
+      {/* M-PESA STK PUSH MODAL (Unchanged) */}
       {showModal && createPortal(
         <div style={overlayStyle} onClick={() => !isProcessing && setShowModal(false)}>
           <div style={wrapperStyle}>

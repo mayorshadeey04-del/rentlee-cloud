@@ -285,9 +285,50 @@ The RentCare Team
   };
 };
 
+// ============================================
+// DYNAMIC TENANT NOTIFICATION TEMPLATE
+// Used in: tenants.controller.js - sendEmailNotice()
+// ============================================
+export const tenantNotificationTemplate = (subject, htmlBody) => {
+  return {
+    html: `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <style>
+          body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; background-color: #f4f7f6; }
+          .container { max-width: 600px; margin: 40px auto; background: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+          /* ✅ BRANDED BLUE GRADIENT HEADER */
+          .header { background: linear-gradient(135deg, #3B82F6 0%, #22D3EE 100%); color: white; padding: 30px 40px; text-align: left; }
+          .header h1 { margin: 0; font-size: 22px; font-weight: 600; letter-spacing: 0.5px; }
+          .content { padding: 40px; color: #334155; font-size: 16px; }
+          .content p { margin: 0 0 20px 0; }
+          .footer { background-color: #f8fafc; padding: 20px 40px; text-align: center; color: #64748b; font-size: 13px; border-top: 1px solid #e2e8f0; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>${subject}</h1>
+          </div>
+          <div class="content">
+            ${htmlBody}
+          </div>
+          <div class="footer">
+            <p>&copy; ${new Date().getFullYear()} Rentlee Property Management. All rights reserved.</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `,
+    text: htmlBody.replace(/<br>/g, '\n').replace(/<[^>]*>?/gm, '')
+  };
+};
+
 export default {
   verificationEmailTemplate,
   passwordSetupEmailTemplate,
   passwordResetEmailTemplate,
-  emailChangeVerificationTemplate
+  emailChangeVerificationTemplate,
+  tenantNotificationTemplate
 };

@@ -1,6 +1,6 @@
 import crypto from 'crypto';
 import db from '../config/db.js';
-import { sendPasswordSetupEmail } from '../utils/email.service.js';
+import { sendPasswordSetupEmail, sendDynamicTenantEmail } from '../utils/email.service.js';
 
 // ============================================
 // @desc    Get All Tenants
@@ -33,7 +33,7 @@ export const getTenants = async (req, res) => {
       return res.json({ success: true, data: [] });
     }
 
-    // ✅ FIXED: Joins unit_types and tenancies to get correct rent, computes live balance
+    // ✅ FIXED: Ledger math now includes all confirmed payments (rent + move-in + deposit)
     const result = await db.query(
       `SELECT t.id, 
               u.first_name, 
@@ -48,8 +48,8 @@ export const getTenants = async (req, res) => {
               un.unit_number, 
               ut.name as unit_type, 
               tc.agreed_rent as rent_amount,
-              (COALESCE((SELECT SUM(amount_due) FROM rent_periods rp WHERE rp.tenant_id = t.id AND rp.status != 'paid'), 0) -
-               COALESCE((SELECT SUM(amount) FROM payments py WHERE py.tenant_id = t.id AND py.payment_type = 'rent' AND py.status = 'confirmed'), 0)) as balance,
+              (COALESCE((SELECT SUM(amount_due) FROM rent_periods rp WHERE rp.tenant_id = t.id), 0) -
+               COALESCE((SELECT SUM(amount) FROM payments py WHERE py.tenant_id = t.id AND py.status = 'confirmed'), 0)) as balance,
               t.status, 
               t.created_at
        FROM tenants t
@@ -102,8 +102,8 @@ export const getTenant = async (req, res) => {
               un.unit_number, 
               ut.name as unit_type, 
               tc.agreed_rent as rent_amount,
-              (COALESCE((SELECT SUM(amount_due) FROM rent_periods rp WHERE rp.tenant_id = t.id AND rp.status != 'paid'), 0) -
-               COALESCE((SELECT SUM(amount) FROM payments py WHERE py.tenant_id = t.id AND py.payment_type = 'rent' AND py.status = 'confirmed'), 0)) as balance,
+              (COALESCE((SELECT SUM(amount_due) FROM rent_periods rp WHERE rp.tenant_id = t.id), 0) -
+               COALESCE((SELECT SUM(amount) FROM payments py WHERE py.tenant_id = t.id AND py.status = 'confirmed'), 0)) as balance,
               t.status, 
               t.created_at
        FROM tenants t
@@ -264,7 +264,7 @@ export const createTenant = async (req, res) => {
     );
     const tenantId = tenantResult.rows[0].id;
 
-    // 4. Create the official Tenancy Contract (Notice the RETURNING id)
+    // 4. Create the official Tenancy Contract
     const tenancyResult = await db.query(
       `INSERT INTO tenancies (tenant_id, unit_id, landlord_id, agreed_rent, deposit_amount, start_date)
        VALUES ($1, $2, $3, $4, $5, CURRENT_DATE)
@@ -273,7 +273,7 @@ export const createTenant = async (req, res) => {
     );
     const tenancyId = tenancyResult.rows[0].id;
 
-    // ✅ 5. CREATE INITIAL INVOICE (This fixes the Ksh 0 balance!)
+    // 5. CREATE INITIAL INVOICE
     const totalMoveInCost = Number(defaultRent) + Number(depositAmount || 0);
     await db.query(
       `INSERT INTO rent_periods (tenancy_id, tenant_id, period_name, amount_due, due_date, status)
@@ -284,8 +284,25 @@ export const createTenant = async (req, res) => {
     // ── COMMIT TRANSACTION ──
     await db.query('COMMIT');
 
-    // ✅ FIRE AND FORGET EMAIL (This fixes the "Sending Invite..." hang!)
-    // We removed the 'await' keyword so the server doesn't freeze waiting for the email.
+    // ✅ NEW: CREATE A NOTIFICATION 
+    try {
+        const propRes = await db.query('SELECT name FROM properties WHERE id = $1', [propertyId]);
+        const unitRes = await db.query('SELECT unit_number FROM units WHERE id = $1', [unitId]);
+        const propName = propRes.rows[0]?.name || 'Property';
+        const unitNum = unitRes.rows[0]?.unit_number || 'Unit';
+
+        const title = 'New Tenant Added';
+        const message = `${firstName} ${lastName} has been assigned to ${propName} (Unit ${unitNum}).`;
+
+        await db.query(
+            `INSERT INTO notifications (user_id, title, message, type) VALUES ($1, $2, $3, 'tenant')`,
+            [landlordId, title, message]
+        );
+    } catch(err) {
+        console.error('Failed to create tenant notification:', err);
+    }
+
+    // FIRE AND FORGET EMAIL
     sendPasswordSetupEmail(email, activationToken, firstName, 'tenant').catch(err => {
       console.error('Background email failed to send:', err);
     });
@@ -418,7 +435,7 @@ export const updateTenant = async (req, res) => {
       [firstName, lastName, email, phone, tenant.user_id]
     );
 
-    // ✅ Update tenant info (balance removed)
+    // Update tenant info
     const result = await db.query(
       `UPDATE tenants
        SET id_number = COALESCE($1, id_number),
@@ -494,11 +511,7 @@ export const deleteTenant = async (req, res) => {
     // ✅ STAGE 2: PERMANENT DELETE (If already inactive)
     if (tenant.status === 'inactive') {
       
-      // Deleting the user triggers the ON DELETE CASCADE for the tenants table
-      // which in turn fires the database trigger to ensure the unit is marked vacant.
       await db.query('DELETE FROM users WHERE id = $1', [tenant.user_id]);
-
-      console.log(`✅ Tenant ${id} and User ${tenant.user_id} permanently erased.`);
 
       return res.json({
         success: true,
@@ -510,21 +523,17 @@ export const deleteTenant = async (req, res) => {
     else {
       await db.query('BEGIN');
 
-      // 1. Soft delete the tenant (Updates status)
       await db.query(
         "UPDATE tenants SET status = 'inactive' WHERE id = $1",
         [id]
       );
 
-      // 2. Soft delete the user (Blocks login and sets timestamp)
       await db.query(
         "UPDATE users SET is_active = false, deleted_at = NOW() WHERE id = $1",
         [tenant.user_id]
       );
 
       await db.query('COMMIT');
-
-      console.log(`✅ Tenant ${id} soft deleted (status set to inactive).`);
 
       return res.json({
         success: true,
@@ -533,11 +542,10 @@ export const deleteTenant = async (req, res) => {
     }
 
   } catch (error) {
-    // Only rollback if we were in the middle of the Stage 1 transaction
     if (req.body?.status !== 'inactive') {
       try {
         await db.query('ROLLBACK');
-      } catch(e) { /* ignore rollback errors if no transaction was active */ }
+      } catch(e) {}
     }
     
     console.error('Delete tenant error:', error);
@@ -548,10 +556,98 @@ export const deleteTenant = async (req, res) => {
   }
 };
 
+// ============================================
+// @desc    Send Bulk/Dynamic Emails to Tenants (Fast Background Processing)
+// @route   POST /api/tenants/send-email
+// @access  Private (Landlord, Caretaker)
+// ============================================
+export const sendEmailNotice = async (req, res) => {
+  try {
+    const { recipients, propertyId, subject, message } = req.body;
+    const userId = req.user.id;
+    const role = req.user.role;
+    const landlordId = role === 'landlord' ? userId : req.user.landlord_id;
+
+    if (!recipients || !subject || !message) {
+      return res.status(400).json({ success: false, message: 'Missing required fields' });
+    }
+
+    // 1. Build the query to get ACTIVE tenants
+    let queryStr = `
+      SELECT t.id, u.first_name, u.last_name, u.email, un.unit_number, p.name as property_name,
+        (COALESCE((SELECT SUM(amount_due) FROM rent_periods rp WHERE rp.tenant_id = t.id), 0) -
+         COALESCE((SELECT SUM(amount) FROM payments py WHERE py.tenant_id = t.id AND py.status = 'confirmed'), 0)) as balance
+      FROM tenants t
+      JOIN users u ON t.user_id = u.id
+      JOIN units un ON t.unit_id = un.id
+      JOIN properties p ON t.property_id = p.id
+      WHERE t.status = 'active' AND p.landlord_id = $1
+    `;
+    const queryParams = [landlordId];
+
+    if (recipients === 'property' && propertyId) {
+      queryParams.push(propertyId);
+      queryStr += ` AND p.id = $2`;
+    }
+
+    const result = await db.query(queryStr, queryParams);
+    let targetTenants = result.rows;
+
+    if (recipients === 'arrears') {
+      targetTenants = targetTenants.filter(t => Number(t.balance) > 0);
+    }
+
+    if (targetTenants.length === 0) {
+      return res.status(404).json({ success: false, message: 'No active tenants found matching criteria.' });
+    }
+
+    // ✅ INSTANT RESPONSE: Tell the frontend success immediately so the modal closes!
+    res.json({ 
+      success: true, 
+      count: targetTenants.length, 
+      message: `Emails are being dispatched to ${targetTenants.length} tenants.` 
+    });
+
+    // ✅ BACKGROUND WORKER: Send the emails silently in the background
+    (async () => {
+      for (const tenant of targetTenants) {
+        try {
+          const fullName = `${tenant.first_name} ${tenant.last_name}`;
+          const balanceStr = Number(tenant.balance).toLocaleString();
+          const unitStr = tenant.unit_number || 'your unit';
+
+          // Inject Variables
+          let personalizedSubject = subject
+            .replace(/\{\{firstName\}\}/gi, tenant.first_name)
+            .replace(/\{\{fullName\}\}/gi, fullName);
+
+          let personalizedMessage = message
+            .replace(/\{\{firstName\}\}/gi, tenant.first_name)
+            .replace(/\{\{fullName\}\}/gi, fullName)
+            .replace(/\{\{balance\}\}/gi, balanceStr)
+            .replace(/\{\{unit\}\}/gi, unitStr);
+
+          const htmlMessage = personalizedMessage.replace(/\n/g, '<br>');
+
+          // Fire the email
+          await sendDynamicTenantEmail(tenant.email, personalizedSubject, htmlMessage);
+        } catch (emailErr) {
+          console.error(`Background email failed for ${tenant.email}:`, emailErr);
+        }
+      }
+    })();
+
+  } catch (error) {
+    console.error('Send bulk email error:', error);
+    res.status(500).json({ success: false, message: 'Failed to process email dispatch.' });
+  }
+};
+
 export default {
   getTenants,
   getTenant,
   createTenant,
   updateTenant,
-  deleteTenant
+  deleteTenant,
+  sendEmailNotice
 };

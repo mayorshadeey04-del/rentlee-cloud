@@ -4,7 +4,8 @@ import {
   getTenant,
   createTenant,
   updateTenant,
-  deleteTenant
+  deleteTenant,
+  sendEmailNotice
 } from '../controllers/tenants.controller.js';
 import { auth, authorize } from '../middleware/auth.middleware.js';
 
@@ -27,5 +28,7 @@ router.put('/:id', authorize('landlord', 'caretaker'), updateTenant);
 
 // Delete tenant
 router.delete('/:id', authorize('landlord', 'caretaker'), deleteTenant);
+
+router.post('/send-email', authorize('landlord', 'caretaker'), sendEmailNotice);
 
 export default router;

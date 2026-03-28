@@ -37,6 +37,13 @@ export default function TenantDashboard() {
       setInfo(data.data.info)
       setPayments(data.data.payments)
       setRequests(data.data.requests)
+      
+      // Auto-fill phone number if available on user object
+      if (user?.phone) {
+          const rawPhone = user.phone.replace(/\D/g, '');
+          setPaymentPhone(rawPhone.length > 9 ? rawPhone.slice(-9) : rawPhone);
+      }
+      
     } catch (err) {
       console.error(err)
       setPageError(err.message || 'Failed to load dashboard data.')
@@ -87,8 +94,6 @@ export default function TenantDashboard() {
       if (!res.ok) throw new Error(data.message)
 
       // The STK Push was successfully triggered on their phone!
-      // In a real app, you would wait for a websocket or poll the server.
-      // For now, we simulate the UX success flow.
       setTimeout(() => {
         setIsProcessing(false)
         setPaymentSuccess(true)
@@ -114,13 +119,8 @@ export default function TenantDashboard() {
     }
   }
 
-  if (loading) {
-    return <div style={{ padding: '3rem', textAlign: 'center', color: '#64748b' }}>Loading dashboard...</div>
-  }
-
-  if (pageError) {
-    return <div style={{ padding: '3rem', textAlign: 'center', color: '#ef4444' }}>{pageError}</div>
-  }
+  if (loading) return <div style={{ padding: '3rem', textAlign: 'center', color: '#64748b' }}>Loading dashboard...</div>
+  if (pageError) return <div style={{ padding: '3rem', textAlign: 'center', color: '#ef4444' }}>{pageError}</div>
 
   // ============================================================================
   // PHASE 1: THE MOVE-IN GATEWAY (Locked Portal)
@@ -156,7 +156,7 @@ export default function TenantDashboard() {
             <div className="tenant-payment-success animation-fade-in">
               <div className="success-icon"><i className="fas fa-check-circle"></i></div>
               <h3>Payment Initiated!</h3>
-              <p>Once you enter your M-Pesa PIN, your lease will activate.</p>
+              <p>Check your phone to enter your PIN to activate your lease.</p>
             </div>
           ) : (
             <form onSubmit={handleMpesaPayment} className="tenant-gateway-form animation-fade-in">
@@ -194,7 +194,6 @@ export default function TenantDashboard() {
   // ============================================================================
   // PHASE 2: THE ACTIVE DASHBOARD
   // ============================================================================
-  
   const overlayStyle = { position: 'fixed', inset: 0, background: 'rgba(10,22,40,0.6)', zIndex: 9999, overflowY: 'auto', WebkitOverflowScrolling: 'touch' }
   const wrapperStyle = { display: 'flex', alignItems: 'flex-start', justifyContent: 'center', minHeight: '100%', padding: '3rem 1rem', boxSizing: 'border-box' }
   const contentStyle = { position: 'relative', background: '#fff', borderRadius: '24px', width: '100%', maxWidth: '480px', margin: 'auto', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)', overflow: 'hidden', display: 'flex', flexDirection: 'column' }

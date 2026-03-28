@@ -26,6 +26,7 @@ import TenantPayments    from './pages/tenant/TenantPayments'
 import TenantMaintenance from './pages/tenant/TenantMaintenance'
 import TenantProfile     from './pages/tenant/TenantProfile'
 import TenantNotifications from './pages/tenant/TenantNotifications'
+import TenantLedger from './pages/tenant/TenantLedger'
 
 // ── Guards ────────────────────────────────────────────────────────────────────
 
@@ -95,6 +96,7 @@ export default function App() {
           <Route path="maintenance" element={<TenantMaintenance />} />
           <Route path="profile"     element={<TenantProfile />} />
           <Route path="notifications" element={<TenantNotifications />} />
+          <Route path="/tenant/ledger" element={<TenantLedger />} />
         </Route>
 
         <Route path="*" element={<RootRedirect />} />

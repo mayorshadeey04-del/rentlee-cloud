@@ -13,7 +13,7 @@ export const getTenantDashboardData = async (req, res) => {
       return res.status(403).json({ success: false, message: 'Access denied. Tenant only.' });
     }
 
-    // 1. Get Core Tenant & Tenancy Info + Live Balance via Ledger
+// 1. Get Core Tenant Info + Live Balance + Real Due Date + Payment Count
     const tenantQuery = `
       SELECT 
         t.id as tenant_id,
@@ -26,13 +26,19 @@ export const getTenantDashboardData = async (req, res) => {
           COALESCE((SELECT SUM(amount_due) FROM rent_periods rp WHERE rp.tenant_id = t.id), 0) -
           COALESCE((SELECT SUM(amount) FROM payments py WHERE py.tenant_id = t.id AND py.status = 'confirmed'), 0)
         ) as balance,
-        (SELECT COUNT(*) FROM maintenance_requests mr WHERE mr.tenant_id = t.id AND mr.status IN ('open', 'in_progress')) as maintenance_count
+        (SELECT COUNT(*) FROM maintenance_requests mr WHERE mr.tenant_id = t.id AND mr.status IN ('open', 'in_progress')) as maintenance_count,
+        
+        -- ✅ FIXED: Grab the MAXIMUM (latest) due date generated for this tenant
+        (SELECT TO_CHAR(MAX(rp.due_date), 'DD Mon YYYY') FROM rent_periods rp WHERE rp.tenant_id = t.id) as next_due_date,
+        
+        (SELECT COUNT(*) FROM payments py WHERE py.tenant_id = t.id AND py.status = 'confirmed') as confirmed_payments_count
       FROM tenants t
       JOIN properties p ON t.property_id = p.id
       JOIN units u ON t.unit_id = u.id
       LEFT JOIN tenancies tc ON tc.tenant_id = t.id AND tc.status = 'active'
       WHERE t.user_id = $1
     `;
+
     const tenantResult = await db.query(tenantQuery, [userId]);
 
     if (tenantResult.rows.length === 0) {
@@ -44,14 +50,11 @@ export const getTenantDashboardData = async (req, res) => {
     const agreedRent = parseFloat(tInfo.agreed_rent) || 0;
     const depositAmount = parseFloat(tInfo.deposit_amount) || 0;
 
-    // If status is 'pending', they are fresh from the Wizard and haven't paid move-in yet.
-    const requiresMoveInPayment = tInfo.tenant_status === 'pending';
+    // ✅ FIXED: If they have NEVER made a successful payment, lock them in the Move-In Gateway
+    const requiresMoveInPayment = parseInt(tInfo.confirmed_payments_count) === 0;
 
-    // Calculate a simple "Next Due Date" (e.g., 5th of next month)
-    const nextMonth = new Date();
-    nextMonth.setMonth(nextMonth.getMonth() + 1);
-    nextMonth.setDate(5);
-    const nextDueDate = nextMonth.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+    // ✅ FIXED: Get the REAL due date from the bulk rent invoices
+    const nextDueDate = tInfo.next_due_date || 'No pending invoice';
 
     const info = {
       unitId: tInfo.unit_number,

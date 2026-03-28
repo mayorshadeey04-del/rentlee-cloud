@@ -35,6 +35,7 @@ export default function Tenants() {
   const [emailForm, setEmailForm]       = useState(EMPTY_EMAIL)
   const [error, setError]               = useState('')
   const [emailError, setEmailError]     = useState('')
+  const [isSendingEmail, setIsSendingEmail] = useState(false)
   const [filters, setFilters]           = useState(EMPTY_FILTERS)
   const [activeFilters, setActiveFilters] = useState(EMPTY_FILTERS)
   const [toasts, setToasts]             = useState([])
@@ -268,12 +269,32 @@ export default function Tenants() {
     }
   }
 
-  const submitEmail = () => {
+  // ✅ LIVE SEND EMAIL LOGIC
+  const submitEmail = async () => {
     if (!emailForm.recipients || !emailForm.subject || !emailForm.message) return setEmailError('Fill all required fields.')
     if (emailForm.recipients === 'property' && !emailForm.propertyId) return setEmailError('Select a property.')
-    setEmailForm(EMPTY_EMAIL)
-    setShowEmail(false)
-    showToast('success', 'Email Sent', 'Your message has been sent successfully.')
+    
+    setIsSendingEmail(true)
+    setEmailError('')
+
+    try {
+      const res = await fetch(`${API_URL}/tenants/send-email`, {
+        method: 'POST',
+        headers: authHeaders(),
+        body: JSON.stringify(emailForm)
+      })
+      const data = await res.json()
+
+      if (!res.ok) throw new Error(data.message || 'Failed to send emails')
+
+      setEmailForm(EMPTY_EMAIL)
+      setShowEmail(false)
+      showToast('success', 'Emails Sent!', `Successfully sent to ${data.count} tenants.`)
+    } catch (err) {
+      setEmailError(err.message)
+    } finally {
+      setIsSendingEmail(false)
+    }
   }
 
   const overlayStyle = { position: 'fixed', inset: 0, background: 'rgba(10,22,40,0.6)', zIndex: 9999, overflowY: 'auto', WebkitOverflowScrolling: 'touch' }
@@ -429,47 +450,76 @@ export default function Tenants() {
         </div>
       , document.body)}
 
+      {/* ✅ UPDATED EMAIL MODAL WITH DYNAMIC TEMPLATE HINTS */}
       {showEmail && createPortal(
-        <div style={overlayStyle} onClick={() => setShowEmail(false)}>
+        <div style={overlayStyle} onClick={() => !isSendingEmail && setShowEmail(false)}>
           <div style={wrapperStyle}>
             <div style={contentStyle} onClick={e => e.stopPropagation()}>
               <div style={headerStyle}>
-                <h3 className="modal-title">Send Email</h3>
-                <button style={closeStyle} onClick={() => setShowEmail(false)}><i className="fas fa-times" /></button>
+                <h3 className="modal-title">Send Email Notice</h3>
+                <button style={closeStyle} onClick={() => setShowEmail(false)} disabled={isSendingEmail}><i className="fas fa-times" /></button>
               </div>
               
               <div style={{ padding: '2rem' }}>
                 {emailError && <p className="form-error">{emailError}</p>}
+                
                 <div className="form-group full-width">
                   <label className="form-label">Recipients <span>*</span></label>
-                  <select className="form-select" name="recipients" value={emailForm.recipients} onChange={handleEmailChange}>
+                  <select className="form-select" name="recipients" value={emailForm.recipients} onChange={handleEmailChange} disabled={isSendingEmail}>
                     <option value="">Choose recipients</option>
-                    <option value="all">All Tenants</option>
-                    <option value="property">By Property</option>
+                    <option value="all">All Active Tenants</option>
+                    <option value="property">By Specific Property</option>
+                    <option value="arrears">Tenants with Arrears (Balance &gt; 0)</option>
                   </select>
                 </div>
+
                 {emailForm.recipients === 'property' && (
                   <div className="form-group full-width">
                     <label className="form-label">Select Property <span>*</span></label>
-                    <select className="form-select" name="propertyId" value={emailForm.propertyId} onChange={handleEmailChange}>
+                    <select className="form-select" name="propertyId" value={emailForm.propertyId} onChange={handleEmailChange} disabled={isSendingEmail}>
                       <option value="">Choose a property</option>
                       {properties.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
                     </select>
                   </div>
                 )}
+
                 <div className="form-group full-width">
-                  <label className="form-label">Subject <span>*</span></label>
-                  <input className="form-input" name="subject" value={emailForm.subject} onChange={handleEmailChange} placeholder="e.g., Monthly Rent Reminder" />
+                  <label className="form-label" style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span>Subject <span>*</span></span>
+                    <span style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 'normal' }}>Variables: {'{{firstName}}'}, {'{{fullName}}'}</span>
+                  </label>
+                  <input 
+                    className="form-input" 
+                    name="subject" 
+                    value={emailForm.subject} 
+                    onChange={handleEmailChange} 
+                    placeholder="e.g., Rent Reminder for {{fullName}}" 
+                    disabled={isSendingEmail}
+                  />
                 </div>
+
                 <div className="form-group full-width" style={{ marginBottom: 0 }}>
-                  <label className="form-label">Message <span>*</span></label>
-                  <textarea className="form-textarea" name="message" value={emailForm.message} onChange={handleEmailChange} rows="5" placeholder="Enter your message here..." />
+                  <label className="form-label" style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span>Message <span>*</span></span>
+                    <span style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 'normal' }}>Variables: {'{{firstName}}'}, {'{{fullName}}'}, {'{{balance}}'}, {'{{unit}}'}</span>
+                  </label>
+                  <textarea 
+                    className="form-textarea" 
+                    name="message" 
+                    value={emailForm.message} 
+                    onChange={handleEmailChange} 
+                    rows="6" 
+                    placeholder="Dear {{firstName}}, this is a reminder that you have an outstanding balance of Ksh {{balance}} for {{unit}}. Please pay immediately." 
+                    disabled={isSendingEmail}
+                  />
                 </div>
               </div>
 
               <div className="modal-footer" style={{ flexShrink: 0, borderTop: '1px solid #e2e8f0' }}>
-                <button className="btn-cancel" onClick={() => setShowEmail(false)}>Cancel</button>
-                <button className="btn-submit" onClick={submitEmail}>Send Email</button>
+                <button className="btn-cancel" onClick={() => setShowEmail(false)} disabled={isSendingEmail}>Cancel</button>
+                <button className="btn-submit" onClick={submitEmail} disabled={isSendingEmail}>
+                  {isSendingEmail ? <><i className="fas fa-spinner fa-spin"></i> Sending...</> : 'Send Emails'}
+                </button>
               </div>
             </div>
           </div>

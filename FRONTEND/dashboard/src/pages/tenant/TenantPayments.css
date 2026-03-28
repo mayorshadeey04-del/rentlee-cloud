@@ -72,3 +72,26 @@
   border-color: #10b981 !important;
   box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
 }
+
+/* Receipt Download Button */
+.btn-receipt {
+  width: 34px; 
+  height: 34px; 
+  border-radius: 8px;
+  border: 1.5px solid var(--slate-200); 
+  background: var(--white);
+  color: var(--blue-500); 
+  cursor: pointer;
+  display: inline-flex; 
+  align-items: center; 
+  justify-content: center;
+  transition: all 0.2s ease;
+  font-size: 0.875rem;
+}
+
+.btn-receipt:hover {
+  background: rgba(59,130,246,0.1); 
+  border-color: var(--blue-500);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(59,130,246,0.15);
+}

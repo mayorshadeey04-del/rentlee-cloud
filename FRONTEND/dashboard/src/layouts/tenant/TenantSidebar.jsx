@@ -1,52 +1,97 @@
-import { NavLink } from 'react-router-dom'
+import { useState } from 'react'
+import { NavLink, useLocation } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import './TenantSidebar.css'
 
 const NAV_ITEMS = [
   { path: '/tenant/dashboard',    icon: 'fas fa-th-large',        label: 'Dashboard'    },
   { path: '/tenant/my-unit',      icon: 'fas fa-home',            label: 'My Unit'      },
-  { path: '/tenant/payments',     icon: 'fas fa-money-bill-wave', label: 'Payments'     },
   { path: '/tenant/maintenance',  icon: 'fas fa-wrench',          label: 'Maintenance'  },
   { path: '/tenant/profile',      icon: 'fas fa-user',            label: 'Profile'      },
 ]
 
 export default function TenantSidebar({ collapsed }) {
+  const location = useLocation();
+  const isFinancialActive = location.pathname.includes('/tenant/payments') || location.pathname.includes('/tenant/ledger');
+  const [financialsOpen, setFinancialsOpen] = useState(isFinancialActive);
+
   return (
     <aside className={`tenant-sidebar ${collapsed ? 'collapsed' : ''}`}>
 
       {/* Logo */}
       <div className="sidebar-logo">
         <svg className="sidebar-logo-icon" viewBox="0 0 98 89" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path
-            d="M9.81982 42.5871V65.0695C9.81982 69.7779 9.81982 72.1321 10.8827 73.9356C11.8188 75.5162 13.3059 76.8026 15.144 77.6056C17.2259 78.522 19.9562 78.522 25.4071 78.522H72.242C77.693 78.522 80.4184 78.522 82.5003 77.6056C84.3361 76.8013 85.8295 75.5166 86.7664 73.9356C87.8293 72.1363 87.8293 69.7863 87.8293 65.0864V42.5871C87.8293 40.3422 87.8293 39.2198 87.5124 38.173C87.2318 37.2478 86.7701 36.3706 86.1472 35.5792C85.4403 34.6838 84.4652 33.9397 82.5003 32.4641L59.0975 14.8077C55.4603 12.0626 53.6368 10.6879 51.589 10.1666C49.7851 9.70422 47.8641 9.70422 46.0552 10.1666C44.0075 10.6879 42.1938 12.0584 38.5566 14.7993L15.1488 32.4641C13.1889 33.9439 12.2089 34.6838 11.5068 35.575C10.8817 36.3674 10.4184 37.246 10.1367 38.173C9.81982 39.2156 9.81982 40.3422 9.81982 42.5871Z"
-            stroke="#3B82F6" strokeWidth="9.81979" strokeLinecap="round" strokeLinejoin="round"
-          />
+          <path d="M9.81982 42.5871V65.0695C9.81982 69.7779 9.81982 72.1321 10.8827 73.9356C11.8188 75.5162 13.3059 76.8026 15.144 77.6056C17.2259 78.522 19.9562 78.522 25.4071 78.522H72.242C77.693 78.522 80.4184 78.522 82.5003 77.6056C84.3361 76.8013 85.8295 75.5166 86.7664 73.9356C87.8293 72.1363 87.8293 69.7863 87.8293 65.0864V42.5871C87.8293 40.3422 87.8293 39.2198 87.5124 38.173C87.2318 37.2478 86.7701 36.3706 86.1472 35.5792C85.4403 34.6838 84.4652 33.9397 82.5003 32.4641L59.0975 14.8077C55.4603 12.0626 53.6368 10.6879 51.589 10.1666C49.7851 9.70422 47.8641 9.70422 46.0552 10.1666C44.0075 10.6879 42.1938 12.0584 38.5566 14.7993L15.1488 32.4641C13.1889 33.9439 12.2089 34.6838 11.5068 35.575C10.8817 36.3674 10.4184 37.246 10.1367 38.173C9.81982 39.2156 9.81982 40.3422 9.81982 42.5871Z" stroke="#3B82F6" strokeWidth="9.81979" strokeLinecap="round" strokeLinejoin="round"/>
         </svg>
         <div className="sidebar-logo-text-wrapper">
-          <span className="sidebar-logo-text">
-            <span className="logo-rent">Rent</span>
-            <span className="logo-lee">lee</span>
-          </span>
+          <span className="sidebar-logo-text"><span className="logo-rent">Rent</span><span className="logo-lee">lee</span></span>
         </div>
       </div>
 
       {/* Nav */}
       <nav className="sidebar-nav">
         <ul className="sidebar-menu">
-          {NAV_ITEMS.map(item => (
-            <li key={item.path} className="sidebar-nav-item">
-              <NavLink
-                to={item.path}
-                className={({ isActive }) => `sidebar-nav-link ${isActive ? 'active' : ''}`}
-              >
-                <span className="sidebar-nav-icon"><i className={item.icon}></i></span>
-                <span className="sidebar-nav-text">{item.label}</span>
-              </NavLink>
-            </li>
-          ))}
+          
+          <li className="sidebar-nav-item">
+            <NavLink to="/tenant/dashboard" className={({ isActive }) => `sidebar-nav-link ${isActive ? 'active' : ''}`}>
+              <span className="sidebar-nav-icon"><i className="fas fa-th-large"></i></span>
+              <span className="sidebar-nav-text">Dashboard</span>
+            </NavLink>
+          </li>
+
+          <li className="sidebar-nav-item">
+            <NavLink to="/tenant/my-unit" className={({ isActive }) => `sidebar-nav-link ${isActive ? 'active' : ''}`}>
+              <span className="sidebar-nav-icon"><i className="fas fa-home"></i></span>
+              <span className="sidebar-nav-text">My Unit</span>
+            </NavLink>
+          </li>
+
+          {/* ✅ THE NEW FINANCIALS DROPDOWN */}
+          <li className="sidebar-nav-item dropdown-container">
+            <div 
+              className={`sidebar-nav-link dropdown-toggle ${isFinancialActive ? 'active-parent' : ''}`} 
+              onClick={() => setFinancialsOpen(!financialsOpen)}
+              style={{ cursor: 'pointer' }}
+            >
+              <span className="sidebar-nav-icon"><i className="fas fa-money-bill-wave"></i></span>
+              <span className="sidebar-nav-text">Financials</span>
+            </div>
+            
+            {/* Dropdown Items */}
+            {!collapsed && financialsOpen && (
+              <ul className="sidebar-dropdown-menu" style={{ listStyle: 'none', padding: 0, margin: '0.25rem 0 0 0', display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                <li>
+                  <NavLink to="/tenant/payments" className={({ isActive }) => `sidebar-nav-link sub-link ${isActive ? 'active' : ''}`}>
+                    <span className="sidebar-nav-icon" style={{ width: '20px' }}></span> {/* Invisible spacer so text aligns perfectly */}
+                    <span className="sidebar-nav-text">Payment</span>
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink to="/tenant/ledger" className={({ isActive }) => `sidebar-nav-link sub-link ${isActive ? 'active' : ''}`}>
+                    <span className="sidebar-nav-icon" style={{ width: '20px' }}></span>
+                    <span className="sidebar-nav-text">Ledger Statement</span>
+                  </NavLink>
+                </li>
+              </ul>
+            )}
+          </li>
+
+          <li className="sidebar-nav-item">
+            <NavLink to="/tenant/maintenance" className={({ isActive }) => `sidebar-nav-link ${isActive ? 'active' : ''}`}>
+              <span className="sidebar-nav-icon"><i className="fas fa-wrench"></i></span>
+              <span className="sidebar-nav-text">Maintenance</span>
+            </NavLink>
+          </li>
+
+          <li className="sidebar-nav-item">
+            <NavLink to="/tenant/profile" className={({ isActive }) => `sidebar-nav-link ${isActive ? 'active' : ''}`}>
+              <span className="sidebar-nav-icon"><i className="fas fa-user"></i></span>
+              <span className="sidebar-nav-text">Profile</span>
+            </NavLink>
+          </li>
+
         </ul>
       </nav>
-
     </aside>
   )
 }

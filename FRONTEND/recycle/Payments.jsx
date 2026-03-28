@@ -60,7 +60,7 @@ export default function Payments() {
   // ─── Generate & Reverse State ───
   const [showGenerateModal, setShowGenerateModal] = useState(false)
   const [showReverseModal, setShowReverseModal]   = useState(false)
-  const [genForm, setGenForm]                     = useState({ dueDate: '' })
+  const [genForm, setGenForm]                     = useState({ periodName: '', dueDate: '' })
   const [reversePeriod, setReversePeriod]         = useState('')
   const [isGenerating, setIsGenerating]           = useState(false)
   const [isReversing, setIsReversing]             = useState(false)
@@ -127,30 +127,23 @@ export default function Payments() {
 
   // ✅ GENERATE RENT
   async function handleGenerateRent() {
-    if (!genForm.dueDate) {
-      return showToast('error', 'Missing Field', 'Please select a due date.')
+    if (!genForm.periodName || !genForm.dueDate) {
+      return showToast('error', 'Missing Fields', 'Please fill in all fields.')
     }
     
     setIsGenerating(true)
-    
     try {
-      const dateObj = new Date(genForm.dueDate);
-      const month = dateObj.toLocaleString('en-US', { month: 'long' }); 
-      const year = dateObj.getFullYear(); 
-      const autoPeriodName = `${month} ${year}`; 
-
       const res = await fetch(`${API_URL}/payments/generate-rent`, {
         method: 'POST',
         headers: authHeaders(),
-        body: JSON.stringify({ periodName: autoPeriodName, dueDate: genForm.dueDate })
+        body: JSON.stringify({ periodName: genForm.periodName, dueDate: genForm.dueDate })
       })
       const data = await res.json()
-      
       if (!res.ok) throw new Error(data.message || 'Failed to generate rent invoices')
 
-      showToast('success', 'Rent Generated', `${data.count} invoices created for ${autoPeriodName}.`)
+      showToast('success', 'Rent Generated', `${data.count} invoices created for ${genForm.periodName}.`)
       setShowGenerateModal(false)
-      setGenForm({ dueDate: '' })
+      setGenForm({ periodName: '', dueDate: '' })
     } catch (error) {
       showToast('error', 'Generation Failed', error.message)
     } finally {
@@ -158,29 +151,23 @@ export default function Payments() {
     }
   }
 
-  // ✅ REVERSE (UNDO) RENT (WITH AUTO-DERIVED MONTH PICKER)
+  // ✅ REVERSE (UNDO) RENT
   async function handleReverseRent() {
     if (!reversePeriod) {
-      return showToast('error', 'Missing Field', 'Please select a month to reverse.')
+      return showToast('error', 'Missing Field', 'Please enter the exact period name.')
     }
 
     setIsReversing(true)
     try {
-      // Convert "YYYY-MM" (e.g., "2026-11") to "Month YYYY" (e.g., "November 2026")
-      const [year, monthNum] = reversePeriod.split('-');
-      const dateObj = new Date(year, parseInt(monthNum) - 1);
-      const formattedPeriodName = `${dateObj.toLocaleString('en-US', { month: 'long' })} ${year}`;
-
       const res = await fetch(`${API_URL}/payments/reverse-rent`, {
         method: 'POST',
         headers: authHeaders(),
-        body: JSON.stringify({ periodName: formattedPeriodName })
+        body: JSON.stringify({ periodName: reversePeriod })
       })
       const data = await res.json()
-      
       if (!res.ok) throw new Error(data.message || 'Failed to reverse rent invoices')
 
-      showToast('success', 'Rent Reversed', `Successfully removed ${data.count} unpaid invoices for ${formattedPeriodName}.`)
+      showToast('success', 'Rent Reversed', `Successfully removed ${data.count} unpaid invoices for ${reversePeriod}.`)
       setShowReverseModal(false)
       setReversePeriod('')
     } catch (error) {
@@ -193,8 +180,6 @@ export default function Payments() {
   const overlayStyle = { position: 'fixed', inset: 0, background: 'rgba(10,22,40,0.6)', zIndex: 9999, overflowY: 'auto', WebkitOverflowScrolling: 'touch' }
   const wrapperStyle = { display: 'flex', alignItems: 'flex-start', justifyContent: 'center', minHeight: '100%', padding: '3rem 1rem', boxSizing: 'border-box' }
   const contentStyle = { position: 'relative', background: '#fff', borderRadius: '24px', width: '100%', maxWidth: '520px', margin: 'auto', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)', overflow: 'hidden', display: 'flex', flexDirection: 'column' }
-  
-  const today = new Date().toISOString().split('T')[0];
 
   return (
     <div className="payments-page">
@@ -207,6 +192,7 @@ export default function Payments() {
             <i className="fas fa-file-invoice-dollar" /> Generate Rent
           </button>
           
+          {/* New Reverse/Undo Button */}
           <button 
             style={{ padding: '0.625rem 1.125rem', borderRadius: '10px', background: 'transparent', border: '1.5px solid #fca5a5', color: '#ef4444', fontFamily: "'DM Sans', sans-serif", fontWeight: '600', cursor: 'pointer', transition: 'all 0.2s', display: 'flex', alignItems: 'center', gap: '0.5rem' }} 
             onClick={() => setShowReverseModal(true)}
@@ -339,14 +325,8 @@ export default function Payments() {
             <div style={contentStyle} onClick={e => e.stopPropagation()}>
               
               <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', padding:'1.5rem 2rem', borderBottom:'1.5px solid #f1f5f9'}}>
-                <h3 className="page-title" style={{ fontSize: '1.5rem', margin: 0 }}>
-                  Generate Rent Invoices
-                </h3>
-                <button 
-                  onClick={() => setShowGenerateModal(false)} 
-                  disabled={isGenerating}
-                  style={{width:'34px',height:'34px',borderRadius:'50%',border:'1.5px solid #e2e8f0',background:'#fff',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'0.875rem',flexShrink:0}}
-                >
+                <h3 className="page-title" style={{ fontSize: '1.5rem', margin: 0 }}>Generate Rent Invoices</h3>
+                <button onClick={() => setShowGenerateModal(false)} disabled={isGenerating} style={{width:'34px',height:'34px',borderRadius:'50%',border:'1.5px solid #e2e8f0',background:'#fff',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'0.875rem',flexShrink:0}}>
                   <i className="fas fa-times" />
                 </button>
               </div>
@@ -354,19 +334,19 @@ export default function Payments() {
               <div style={{ padding: '1.5rem 2rem' }}>
                 <div className="info-banner" style={{ marginBottom: '1.5rem', padding: '1rem', background: 'rgba(59,130,246,0.1)', color: 'var(--blue-600)', borderRadius: '8px', fontSize: '0.938rem', display: 'flex', gap: '0.5rem', alignItems: 'flex-start' }}>
                   <i className="fas fa-info-circle" style={{ marginTop: '0.2rem' }}></i>
-                  <span>This will automatically create a rent invoice for <strong>every active tenant</strong> based on their monthly rent. The invoice period will be generated automatically based on your selected due date.</span>
+                  <span>This will automatically create a rent invoice for <strong>every active tenant</strong>.</span>
+                </div>
+                
+                <div className="form-group" style={{ marginBottom: '1.25rem' }}>
+                  <label className="filter-label" style={{ display: 'block', marginBottom: '0.5rem' }}>Period Name <span style={{color: '#f87171'}}>*</span></label>
+                  <input type="text" className="filter-input" style={{ width: '100%', boxSizing: 'border-box' }}
+                    placeholder="e.g., April 2026" value={genForm.periodName} onChange={e => setGenForm(f => ({ ...f, periodName: e.target.value }))} />
                 </div>
 
                 <div className="form-group">
-                  <label className="filter-label" style={{ display: 'block', marginBottom: '0.5rem' }}>Select Due Date <span style={{color: '#f87171'}}>*</span></label>
-                  <input 
-                    type="date" 
-                    className="filter-input" 
-                    style={{ width: '100%', boxSizing: 'border-box' }}
-                    min={today}
-                    value={genForm.dueDate} 
-                    onChange={e => setGenForm(f => ({ ...f, dueDate: e.target.value }))} 
-                  />
+                  <label className="filter-label" style={{ display: 'block', marginBottom: '0.5rem' }}>Due Date <span style={{color: '#f87171'}}>*</span></label>
+                  <input type="date" className="filter-input" style={{ width: '100%', boxSizing: 'border-box' }}
+                    value={genForm.dueDate} onChange={e => setGenForm(f => ({ ...f, dueDate: e.target.value }))} />
                 </div>
               </div>
 
@@ -382,7 +362,7 @@ export default function Payments() {
         </div>
       , document.body)}
 
-      {/* ✅ REVERSE RENT MODAL (UPDATED) */}
+      {/* ✅ REVERSE RENT MODAL */}
       {showReverseModal && createPortal(
         <div style={overlayStyle} onClick={() => !isReversing && setShowReverseModal(false)}>
           <div style={wrapperStyle}>
@@ -398,19 +378,13 @@ export default function Payments() {
               <div style={{ padding: '1.5rem 2rem' }}>
                 <div className="info-banner" style={{ marginBottom: '1.5rem', padding: '1rem', background: 'rgba(239, 68, 68, 0.1)', color: '#e11d48', borderRadius: '8px', fontSize: '0.938rem', display: 'flex', gap: '0.5rem', alignItems: 'flex-start' }}>
                   <i className="fas fa-exclamation-triangle" style={{ marginTop: '0.2rem' }}></i>
-                  <span>This will permanently delete all <strong>UNPAID</strong> invoices matching the exact period you select below. Paid invoices cannot be reversed.</span>
+                  <span>This will permanently delete all <strong>UNPAID</strong> invoices matching the exact period name you provide. Paid invoices cannot be reversed.</span>
                 </div>
                 
                 <div className="form-group">
-                  <label className="filter-label" style={{ display: 'block', marginBottom: '0.5rem' }}>Select Month to Reverse <span style={{color: '#f87171'}}>*</span></label>
-                  {/* ✅ THE MONTH PICKER: Outputs YYYY-MM */}
-                  <input 
-                    type="month" 
-                    className="filter-input" 
-                    style={{ width: '100%', boxSizing: 'border-box', cursor: 'pointer' }}
-                    value={reversePeriod} 
-                    onChange={e => setReversePeriod(e.target.value)} 
-                  />
+                  <label className="filter-label" style={{ display: 'block', marginBottom: '0.5rem' }}>Period Name to Reverse <span style={{color: '#f87171'}}>*</span></label>
+                  <input type="text" className="filter-input" style={{ width: '100%', boxSizing: 'border-box' }}
+                    placeholder="e.g., April 2026" value={reversePeriod} onChange={e => setReversePeriod(e.target.value)} />
                 </div>
               </div>
 

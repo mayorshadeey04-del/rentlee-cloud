@@ -5,7 +5,9 @@ import {
   getPaymentStats,
   mpesaCallback,
   initiatePayment,
-  generateRentInvoices
+  generateRentInvoices,
+  reverseRentInvoices,
+  getTenantLedger
 } from '../controllers/payments.controller.js';
 import { auth, authorize } from '../middleware/auth.middleware.js';
 
@@ -18,19 +20,25 @@ router.post('/callback', mpesaCallback);
 // ─── All routes below require authentication ─────────────────────────────────
 router.use(auth);
 
-// Get payment summary stats (total collected, this month, failed count)
+// Get payment summary stats
 router.get('/stats', authorize('landlord', 'caretaker'), getPaymentStats);
 
-// ✅ FIXED: Added 'tenant' so the Tenant Dashboard can fetch their own payment history!
+// Get ALL payments
 router.get('/', authorize('landlord', 'caretaker', 'tenant'), getPayments);
 
-// Get single payment
+// ✅ MOVE THIS HERE: Specific text routes must go BEFORE dynamic /:id routes
+router.get('/ledger', authorize('tenant'), getTenantLedger);
+
+// Get single payment (dynamic ID goes AFTER specific routes)
 router.get('/:id', authorize('landlord', 'caretaker'), getPayment);
 
-// Initiate STK Push payment (tenant only)
+// Initiate STK Push payment
 router.post('/initiate', authorize('tenant'), initiatePayment);
 
 // Generate bulk rent invoices
 router.post('/generate-rent', authorize('landlord'), generateRentInvoices);
+
+// Reverse rent
+router.post('/reverse-rent', authorize('landlord', 'caretaker'), reverseRentInvoices);
 
 export default router;
