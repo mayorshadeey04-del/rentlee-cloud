@@ -157,3 +157,22 @@
     overflow: hidden;
     display: none;
 }
+
+/* --- Dropdown Styles --- */
+.sidebar-nav-link.dropdown-toggle {
+    justify-content: space-between;
+}
+
+.sidebar-nav-link.active-parent {
+    color: var(--white);
+    background: rgba(59,130,246,0.15);
+}
+
+.sidebar-nav-link.sub-link {
+    padding: 0.75rem 1.125rem;
+    font-size: 0.875rem; 
+}
+
+.sidebar-nav-link.sub-link.active {
+    box-shadow: none; 
+}

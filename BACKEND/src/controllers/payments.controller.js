@@ -560,6 +560,69 @@ export const getTenantLedger = async (req, res) => {
   }
 };
 
+// ============================================
+// @desc    Get Admin Ledger Statement for specific tenant
+// @route   GET /api/payments/ledger/:tenantId
+// @access  Private (Landlord, Caretaker)
+// ============================================
+export const getAdminTenantLedger = async (req, res) => {
+  try {
+    const { tenantId } = req.params;
+    const userId = req.user.id;
+    const role   = req.user.role;
+
+    // 1. Verify access and get Tenant details
+    const accessQuery = `
+      SELECT t.id, u.first_name || ' ' || u.last_name as full_name, un.unit_number, p.name as property_name, p.landlord_id, p.id as property_id
+      FROM tenants t
+      JOIN users u ON t.user_id = u.id
+      JOIN units un ON t.unit_id = un.id
+      JOIN properties p ON t.property_id = p.id
+      WHERE t.id = $1
+    `;
+    const tenantRes = await db.query(accessQuery, [tenantId]);
+    
+    if (tenantRes.rows.length === 0) return res.status(404).json({ success: false, message: 'Tenant not found.' });
+    
+    const tenantInfo = tenantRes.rows[0];
+
+    // 2. Security Check: Does this admin own/manage this property?
+    if (role === 'landlord' && tenantInfo.landlord_id !== userId) {
+        return res.status(403).json({ success: false, message: 'Access denied.' });
+    } else if (role === 'caretaker') {
+        const ctCheck = await db.query('SELECT 1 FROM caretaker_properties WHERE caretaker_id = $1 AND property_id = $2 AND status = $3', [userId, tenantInfo.property_id, 'active']);
+        if (ctCheck.rows.length === 0) return res.status(403).json({ success: false, message: 'Access denied.' });
+    }
+
+    // 3. The Master Union Query
+    const ledgerQuery = `
+      SELECT 
+        'invoice' AS transaction_type, id AS ref_id, period_name AS description, amount_due AS charge, 0 AS payment, due_date AS transaction_date, created_at
+      FROM rent_periods WHERE tenant_id = $1
+      UNION ALL
+      SELECT 
+        'payment' AS transaction_type, id AS ref_id, 'M-Pesa Ref: ' || COALESCE(mpesa_ref, 'Pending') AS description, 0 AS charge, amount AS payment, payment_date AS transaction_date, created_at
+      FROM payments WHERE tenant_id = $1 AND status = 'confirmed'
+      ORDER BY transaction_date ASC, created_at ASC;
+    `;
+
+    const result = await db.query(ledgerQuery, [tenantId]);
+
+    // 4. Calculate Running Balance
+    let currentBalance = 0;
+    const formattedLedger = result.rows.map(row => {
+      currentBalance = currentBalance + Number(row.charge) - Number(row.payment);
+      return { ...row, running_balance: currentBalance };
+    });
+
+    res.json({ success: true, data: formattedLedger, tenantInfo });
+
+  } catch (error) {
+    console.error('Admin Ledger fetch error:', error);
+    res.status(500).json({ success: false, message: 'Failed to fetch ledger statement' });
+  }
+};
+
 export default {
   getPayments,
   getPayment,
@@ -568,5 +631,6 @@ export default {
   initiatePayment,
   generateRentInvoices,
   reverseRentInvoices,
-  getTenantLedger
+  getTenantLedger,
+  getAdminTenantLedger
 };

@@ -20,7 +20,8 @@ function timeAgo(dateStr) {
   return `${Math.floor(diff / 86400)}d ago`
 }
 
-export default function TenantNavbar({ onToggleSidebar }) {
+// ✅ Added hideMenuBtn to the props
+export default function TenantNavbar({ onToggleSidebar, hideMenuBtn }) {
   const { user, logout, authHeaders } = useAuth()
   const navigate = useNavigate()
 
@@ -87,9 +88,12 @@ export default function TenantNavbar({ onToggleSidebar }) {
     <header className="tenant-navbar">
 
       <div className="navbar-left">
-        <button type="button" className="navbar-toggle-btn" onClick={onToggleSidebar} aria-label="Toggle sidebar">
-          <i className="fas fa-bars"></i>
-        </button>
+        {/* ✅ Wrapped the button in a condition so it vanishes when locked */}
+        {!hideMenuBtn && (
+          <button type="button" className="navbar-toggle-btn" onClick={onToggleSidebar} aria-label="Toggle sidebar">
+            <i className="fas fa-bars"></i>
+          </button>
+        )}
       </div>
 
       <div className="navbar-right">

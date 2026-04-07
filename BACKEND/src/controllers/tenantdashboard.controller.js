@@ -28,10 +28,14 @@ export const getTenantDashboardData = async (req, res) => {
         ) as balance,
         (SELECT COUNT(*) FROM maintenance_requests mr WHERE mr.tenant_id = t.id AND mr.status IN ('open', 'in_progress')) as maintenance_count,
         
-        -- ✅ FIXED: Grab the MAXIMUM (latest) due date generated for this tenant
+        -- Grab the MAXIMUM (latest) due date generated for this tenant
         (SELECT TO_CHAR(MAX(rp.due_date), 'DD Mon YYYY') FROM rent_periods rp WHERE rp.tenant_id = t.id) as next_due_date,
         
-        (SELECT COUNT(*) FROM payments py WHERE py.tenant_id = t.id AND py.status = 'confirmed') as confirmed_payments_count
+        (SELECT COUNT(*) FROM payments py WHERE py.tenant_id = t.id AND py.status = 'confirmed') as confirmed_payments_count,
+
+        -- ✅ NEW: Checks if we actually generated a move-in invoice for them
+        (SELECT COUNT(*) FROM rent_periods rp WHERE rp.tenant_id = t.id AND rp.period_name = 'Move-in Charges') as has_movein_invoice
+
       FROM tenants t
       JOIN properties p ON t.property_id = p.id
       JOIN units u ON t.unit_id = u.id
@@ -50,10 +54,10 @@ export const getTenantDashboardData = async (req, res) => {
     const agreedRent = parseFloat(tInfo.agreed_rent) || 0;
     const depositAmount = parseFloat(tInfo.deposit_amount) || 0;
 
-    // ✅ FIXED: If they have NEVER made a successful payment, lock them in the Move-In Gateway
-    const requiresMoveInPayment = parseInt(tInfo.confirmed_payments_count) === 0;
+    // ✅ FIXED: Only lock them if they have 0 payments AND a Move-In invoice actually exists!
+    const requiresMoveInPayment = parseInt(tInfo.has_movein_invoice) > 0 && parseInt(tInfo.confirmed_payments_count) === 0;
 
-    // ✅ FIXED: Get the REAL due date from the bulk rent invoices
+    // Get the REAL due date from the bulk rent invoices
     const nextDueDate = tInfo.next_due_date || 'No pending invoice';
 
     const info = {

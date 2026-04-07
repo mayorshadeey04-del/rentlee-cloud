@@ -46,10 +46,10 @@ export default function TenantSidebar({ collapsed }) {
             </NavLink>
           </li>
 
-          {/* ✅ THE NEW FINANCIALS DROPDOWN */}
+          {/* ✅ THE NEW FINANCIALS DROPDOWN (Fixed alignment) */}
           <li className="sidebar-nav-item dropdown-container">
             <div 
-              className={`sidebar-nav-link dropdown-toggle ${isFinancialActive ? 'active-parent' : ''}`} 
+              className={`sidebar-nav-link ${isFinancialActive ? 'active-parent' : ''}`} 
               onClick={() => setFinancialsOpen(!financialsOpen)}
               style={{ cursor: 'pointer' }}
             >
@@ -62,13 +62,13 @@ export default function TenantSidebar({ collapsed }) {
               <ul className="sidebar-dropdown-menu" style={{ listStyle: 'none', padding: 0, margin: '0.25rem 0 0 0', display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
                 <li>
                   <NavLink to="/tenant/payments" className={({ isActive }) => `sidebar-nav-link sub-link ${isActive ? 'active' : ''}`}>
-                    <span className="sidebar-nav-icon" style={{ width: '20px' }}></span> {/* Invisible spacer so text aligns perfectly */}
+                    <span className="sidebar-nav-icon" style={{ width: '20px' }}></span> {/* Invisible spacer */}
                     <span className="sidebar-nav-text">Payment</span>
                   </NavLink>
                 </li>
                 <li>
                   <NavLink to="/tenant/ledger" className={({ isActive }) => `sidebar-nav-link sub-link ${isActive ? 'active' : ''}`}>
-                    <span className="sidebar-nav-icon" style={{ width: '20px' }}></span>
+                    <span className="sidebar-nav-icon" style={{ width: '20px' }}></span> {/* Invisible spacer */}
                     <span className="sidebar-nav-text">Ledger Statement</span>
                   </NavLink>
                 </li>

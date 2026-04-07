@@ -173,9 +173,15 @@ export default function Tenants() {
     setShowEdit(true)
   }
 
-  const handleWizardSuccess = (newTenant) => {
+const handleWizardSuccess = (newTenant) => {
     fetchData() 
-    showToast('success', 'Invite Sent!', `${newTenant.firstName} has been invited. Their portal is locked pending payment.`)
+    
+    // ✅ Check if it was a migration or a brand new tenant
+    if (newTenant.isExisting) {
+      showToast('success', 'Tenant Migrated!', `${newTenant.firstName}'s ledger is synced and their portal is fully unlocked.`)
+    } else {
+      showToast('success', 'Invite Sent!', `${newTenant.firstName} has been invited. Their portal is locked pending payment.`)
+    }
   }
 
   // ✅ STRICT FORMAT VALIDATION BEFORE SUBMITTING EDIT

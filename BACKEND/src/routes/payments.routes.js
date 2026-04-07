@@ -7,7 +7,8 @@ import {
   initiatePayment,
   generateRentInvoices,
   reverseRentInvoices,
-  getTenantLedger
+  getTenantLedger,
+  getAdminTenantLedger
 } from '../controllers/payments.controller.js';
 import { auth, authorize } from '../middleware/auth.middleware.js';
 
@@ -28,6 +29,9 @@ router.get('/', authorize('landlord', 'caretaker', 'tenant'), getPayments);
 
 // ✅ MOVE THIS HERE: Specific text routes must go BEFORE dynamic /:id routes
 router.get('/ledger', authorize('tenant'), getTenantLedger);
+
+// ✅ Add this right below your /ledger (tenant) route, and ABOVE the /:id route!
+router.get('/ledger/admin/:tenantId', authorize('landlord', 'caretaker'), getAdminTenantLedger);
 
 // Get single payment (dynamic ID goes AFTER specific routes)
 router.get('/:id', authorize('landlord', 'caretaker'), getPayment);

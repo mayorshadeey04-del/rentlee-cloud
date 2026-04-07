@@ -1,29 +1,14 @@
 import { createPortal } from 'react-dom'
 
-/**
- * ConfirmDialog — replaces window.confirm with a styled modal
- *
- * Usage:
- *   const [confirm, setConfirm] = useState(null) // { message, onConfirm }
- *
- *   // Trigger it:
- *   setConfirm({
- *     title: 'Delete Property',         // optional — defaults to 'Confirm Delete'
- *     message: 'This will delete...',
- *     onConfirm: () => { ... your delete logic ... }
- *   })
- *
- *   // Render it:
- *   {confirm && (
- *     <ConfirmDialog
- *       title={confirm.title}
- *       message={confirm.message}
- *       onConfirm={() => { confirm.onConfirm(); setConfirm(null) }}
- *       onCancel={() => setConfirm(null)}
- *     />
- *   )}
- */
-export default function ConfirmDialog({ title = 'Confirm Delete', message, onConfirm, onCancel }) {
+export default function ConfirmDialog({ title = 'Confirm Action', message, onConfirm, onCancel, confirmText = 'Confirm', type = 'danger' }) {
+  
+  const isDanger = type === 'danger';
+  const colorHex = isDanger ? '#ef4444' : '#10b981';
+  const gradient = isDanger ? 'linear-gradient(135deg, #ef4444, #dc2626)' : 'linear-gradient(135deg, #10b981, #059669)';
+  const iconBg   = isDanger ? 'rgba(239,68,68,0.08)' : 'rgba(16,185,129,0.08)';
+  const iconBorder = isDanger ? 'rgba(239,68,68,0.15)' : 'rgba(16,185,129,0.15)';
+  const iconClass = isDanger ? 'fas fa-exclamation-triangle' : 'fas fa-check-circle';
+
   return createPortal(
     <div style={{
       position: 'fixed', top: 0, left: 0,
@@ -40,19 +25,18 @@ export default function ConfirmDialog({ title = 'Confirm Delete', message, onCon
         overflow: 'hidden',
         animation: 'confirmSlideIn 0.25s cubic-bezier(0.34,1.56,0.64,1)'
       }}>
-        {/* Red top stripe */}
-        <div style={{ height: '4px', background: 'linear-gradient(90deg, #f87171, #ef4444)' }} />
+        {/* Top stripe */}
+        <div style={{ height: '4px', background: gradient }} />
 
         <div style={{ padding: '1.75rem 2rem' }}>
           {/* Icon */}
           <div style={{
             width: '52px', height: '52px', borderRadius: '50%',
-            background: 'rgba(239,68,68,0.08)',
-            border: '2px solid rgba(239,68,68,0.15)',
+            background: iconBg, border: `2px solid ${iconBorder}`,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            marginBottom: '1rem', fontSize: '1.25rem', color: '#ef4444'
+            marginBottom: '1rem', fontSize: '1.25rem', color: colorHex
           }}>
-            <i className="fas fa-trash-alt" />
+            <i className={iconClass} />
           </div>
 
           {/* Title */}
@@ -83,12 +67,12 @@ export default function ConfirmDialog({ title = 'Confirm Delete', message, onCon
           }}>Cancel</button>
           <button onClick={onConfirm} style={{
             padding: '0.75rem 1.5rem',
-            background: 'linear-gradient(135deg, #ef4444, #dc2626)',
+            background: gradient,
             color: '#fff', border: 'none', borderRadius: '10px',
             fontWeight: 600, fontSize: '0.9rem', cursor: 'pointer',
             fontFamily: "'DM Sans', sans-serif",
-            boxShadow: '0 4px 12px rgba(239,68,68,0.3)'
-          }}>Delete</button>
+            boxShadow: `0 4px 12px ${iconBorder}`
+          }}>{confirmText}</button>
         </div>
       </div>
 

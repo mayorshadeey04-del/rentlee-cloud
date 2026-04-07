@@ -1,0 +1,302 @@
+/* ── Main Layout ── */
+.platform-dashboard { 
+  width: 100%; 
+  min-height: 100%;
+}
+
+.platform-header { margin-bottom: 2rem; }
+.platform-title  { font-family: 'Darker Grotesque', sans-serif; font-size: 2rem; font-weight: 700; color: var(--navy-900); }
+.platform-sub    { font-size: 0.938rem; color: var(--slate-400); margin-top: 0.25rem; }
+
+.platform-error { 
+  padding: 12px 20px; 
+  background: #fee2e2; 
+  border: 1px solid #fca5a5; 
+  border-radius: 8px; 
+  margin-bottom: 20px; 
+  color: #991b1b; 
+}
+
+/* ── Global Summary Cards ── */
+.platform-summary { 
+  display: grid; 
+  grid-template-columns: repeat(3, 1fr); 
+  gap: 1.5rem; 
+  margin-bottom: 2rem; 
+}
+.summary-card { 
+  background: var(--white); 
+  border-radius: 14px; 
+  border: 2px solid var(--slate-200); 
+  padding: 1.25rem 1.5rem; 
+  display: flex; 
+  align-items: center; 
+  gap: 1rem; 
+}
+.summary-icon { 
+  width: 44px; 
+  height: 44px; 
+  border-radius: 12px; 
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+  font-size: 1.125rem; 
+  flex-shrink: 0; 
+}
+.summary-icon.blue    { background: rgba(59,130,246,0.1);  color: var(--blue-500); }
+.summary-icon.emerald { background: rgba(52,211,153,0.1);  color: var(--emerald-400); }
+.summary-icon.amber   { background: rgba(251,191,36,0.1);  color: var(--amber-400); }
+.summary-label { 
+  font-size: 0.75rem; 
+  font-weight: 600; 
+  color: var(--slate-400); 
+  margin-bottom: 0.25rem; 
+  text-transform: uppercase; 
+  letter-spacing: 0.5px;
+}
+.summary-value { 
+  font-family: 'Darker Grotesque', sans-serif; 
+  font-size: 1.75rem; 
+  font-weight: 700; 
+  color: var(--navy-900); 
+  line-height: 1; 
+}
+
+/* ── Tabs Navigation ── */
+.platform-tabs {
+  display: flex;
+  gap: 0.5rem;
+  background: var(--white);
+  padding: 0.5rem;
+  border-radius: 12px;
+  border: 2px solid var(--slate-200);
+  margin-bottom: 1.5rem;
+  width: fit-content;
+}
+
+.platform-tab {
+  padding: 0.75rem 1.5rem;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.938rem;
+  font-weight: 600;
+  color: var(--slate-500);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.platform-tab:hover {
+  color: var(--navy-900);
+  background: var(--slate-50);
+}
+
+.platform-tab.active {
+  background: rgba(59, 130, 246, 0.1);
+  color: var(--blue-600);
+}
+
+/* Tab Content Area (Prevents Layout Jumping) */
+.platform-tab-content {
+  min-height: 60vh;
+}
+
+.fade-in {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Main Landlords Table ── */
+.platform-table-card { 
+  background: var(--white); 
+  border-radius: 16px; 
+  border: 2px solid var(--slate-200); 
+  overflow: hidden; 
+}
+.table-header-bar { 
+  padding: 1.25rem 1.5rem; 
+  border-bottom: 2px solid var(--slate-200); 
+  background: var(--slate-50); 
+}
+.table-header-bar h3 { 
+  margin: 0; 
+  font-size: 1.125rem; 
+  color: var(--navy-900); 
+  font-family: 'Darker Grotesque', sans-serif; 
+}
+
+.platform-table { width: 100%; border-collapse: collapse; }
+.platform-table th { 
+  text-align: left; 
+  padding: 1rem 1.5rem; 
+  font-size: 0.75rem; 
+  font-weight: 700; 
+  color: var(--slate-400); 
+  text-transform: uppercase; 
+  border-bottom: 2px solid var(--slate-200); 
+  background: var(--slate-50); 
+}
+.platform-table td { 
+  padding: 1.25rem 1.5rem; 
+  border-bottom: 1px solid var(--slate-200); 
+  vertical-align: middle; 
+}
+.platform-table tbody tr:hover { background: var(--slate-50); }
+
+.user-name { font-weight: 700; color: var(--navy-900); font-size: 0.938rem; }
+.user-date { font-size: 0.75rem; color: var(--slate-400); margin-top: 0.25rem; }
+.user-email { color: var(--navy-900); font-size: 0.875rem; font-weight: 500;}
+.user-phone { color: var(--slate-400); font-size: 0.813rem; margin-top: 0.25rem; }
+.metric-cell { font-family: 'Darker Grotesque', sans-serif; font-size: 1.25rem; font-weight: 700; color: var(--navy-900); }
+
+.platform-empty { 
+  padding: 4rem; 
+  text-align: center; 
+  color: var(--slate-400); 
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── Badges & Buttons ── */
+.status-badge { 
+  display: inline-block; 
+  padding: 0.3rem 0.75rem; 
+  border-radius: 8px; 
+  font-size: 0.75rem; 
+  font-weight: 700; 
+  text-transform: uppercase; 
+  letter-spacing: 0.5px;
+}
+.status-badge.active { background: rgba(52,211,153,0.1); color: #059669; }
+.status-badge.suspended { background: rgba(251,113,133,0.1); color: #DC2626; }
+
+.btn-action { 
+  padding: 0.5rem 1rem; 
+  border-radius: 8px; 
+  font-weight: 600; 
+  font-size: 0.813rem; 
+  cursor: pointer; 
+  transition: all 0.2s; 
+  border: none; 
+  display: flex; 
+  align-items: center; 
+  gap: 0.5rem; 
+  font-family: 'DM Sans', sans-serif;
+}
+.btn-suspend { background: #fee2e2; color: #dc2626; }
+.btn-suspend:hover { background: #fecaca; }
+.btn-activate { background: #d1fae5; color: #059669; }
+.btn-activate:hover { background: #a7f3d0; }
+
+/* ── Audit & Logs Cards (Tabs 2 & 3) ── */
+.audit-card {
+  background: var(--white);
+  border-radius: 16px;
+  border: 2px solid var(--slate-200);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.audit-header {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 2px solid var(--slate-200);
+  background: var(--slate-50);
+}
+
+.audit-header h3 {
+  margin: 0;
+  font-size: 1.125rem;
+  color: var(--navy-900);
+  font-family: 'Darker Grotesque', sans-serif;
+  display: flex;
+  align-items: center;
+}
+
+.audit-list {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.audit-item {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--slate-100);
+  transition: background 0.2s;
+}
+
+.audit-item:hover {
+  background: var(--slate-50);
+}
+
+.audit-item:last-child {
+  border-bottom: none;
+}
+
+.audit-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, var(--blue-500), var(--cyan-400));
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.938rem;
+  flex-shrink: 0;
+}
+
+.audit-icon-wrap {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.audit-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.audit-title {
+  font-weight: 700;
+  color: var(--navy-900);
+  font-size: 1rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.audit-text {
+  font-size: 0.875rem;
+  color: var(--slate-500);
+  margin-top: 0.2rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.audit-time {
+  font-size: 0.875rem;
+  color: var(--slate-400);
+  white-space: nowrap;
+  font-weight: 500;
+}

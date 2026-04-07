@@ -159,7 +159,7 @@ export const getTenant = async (req, res) => {
 };
 
 // ============================================
-// @desc    Create Tenant
+// @desc    Create Tenant (Handles New & Existing Migrations)
 // @route   POST /api/tenants
 // @access  Private (Landlord, Caretaker)
 // ============================================
@@ -172,7 +172,10 @@ export const createTenant = async (req, res) => {
     idNumber,
     propertyId,
     unitId,
-    depositAmount
+    depositAmount,
+    isExisting,         // ✅ NEW: Migration flag
+    historicalDeposit,  // ✅ NEW: Past deposit
+    currentArrears      // ✅ NEW: Past debt
   } = req.body;
 
   try {
@@ -265,33 +268,60 @@ export const createTenant = async (req, res) => {
     const tenantId = tenantResult.rows[0].id;
 
     // 4. Create the official Tenancy Contract
+    // Uses historical deposit if existing, otherwise uses standard deposit amount
+    const contractDeposit = isExisting ? (historicalDeposit || 0) : (depositAmount || 0);
     const tenancyResult = await db.query(
       `INSERT INTO tenancies (tenant_id, unit_id, landlord_id, agreed_rent, deposit_amount, start_date)
        VALUES ($1, $2, $3, $4, $5, CURRENT_DATE)
        RETURNING id`,
-      [tenantId, unitId, landlordId, defaultRent, depositAmount || 0]
+      [tenantId, unitId, landlordId, defaultRent, contractDeposit]
     );
     const tenancyId = tenancyResult.rows[0].id;
 
-    // 5. CREATE INITIAL INVOICE
-    const totalMoveInCost = Number(defaultRent) + Number(depositAmount || 0);
-    await db.query(
-      `INSERT INTO rent_periods (tenancy_id, tenant_id, period_name, amount_due, due_date, status)
-       VALUES ($1, $2, $3, $4, CURRENT_DATE, 'unpaid')`,
-      [tenancyId, tenantId, 'Move-in Charges', totalMoveInCost]
-    );
+    // 5. ── FINANCIAL SETUP BRANCHING ──
+    if (isExisting) {
+      
+      // A. MIGRATION: Record historical deposit directly to ledger without invoicing
+      if (historicalDeposit > 0) {
+        await db.query(
+          `INSERT INTO deposits (tenancy_id, tenant_id, amount, paid_on, status)
+           VALUES ($1, $2, $3, CURRENT_DATE, 'held')`,
+          [tenancyId, tenantId, historicalDeposit]
+        );
+      }
+
+      // B. MIGRATION: Invoice current arrears (if any)
+      if (currentArrears > 0) {
+        await db.query(
+          `INSERT INTO rent_periods (tenancy_id, tenant_id, period_name, amount_due, due_date, status)
+           VALUES ($1, $2, $3, $4, CURRENT_DATE, 'unpaid')`,
+          [tenancyId, tenantId, 'Historical Arrears', currentArrears]
+        );
+      }
+
+    } else {
+      
+      // C. NEW TENANT: Standard Move-in invoice (Rent + Deposit)
+      const totalMoveInCost = Number(defaultRent) + Number(depositAmount || 0);
+      await db.query(
+        `INSERT INTO rent_periods (tenancy_id, tenant_id, period_name, amount_due, due_date, status)
+         VALUES ($1, $2, $3, $4, CURRENT_DATE, 'unpaid')`,
+        [tenancyId, tenantId, 'Move-in Charges', totalMoveInCost]
+      );
+      
+    }
 
     // ── COMMIT TRANSACTION ──
     await db.query('COMMIT');
 
-    // ✅ NEW: CREATE A NOTIFICATION 
+    // Create Notification 
     try {
         const propRes = await db.query('SELECT name FROM properties WHERE id = $1', [propertyId]);
         const unitRes = await db.query('SELECT unit_number FROM units WHERE id = $1', [unitId]);
         const propName = propRes.rows[0]?.name || 'Property';
         const unitNum = unitRes.rows[0]?.unit_number || 'Unit';
 
-        const title = 'New Tenant Added';
+        const title = isExisting ? 'Tenant Migrated' : 'New Tenant Added';
         const message = `${firstName} ${lastName} has been assigned to ${propName} (Unit ${unitNum}).`;
 
         await db.query(

@@ -96,19 +96,19 @@ const exportToPDF = (title, columns, rows, propertyLabel = 'All Properties', use
       })
     })
 
-    autoTable(doc, {
+   autoTable(doc, {
       startY: headerHeight + 8,
       head: [columns],
       body: plainRows,
       theme: 'grid',
+      // ✅ CHANGED: Blue background with white text!
       headStyles: {
-        fillColor: [248, 250, 252],
-        textColor: [100, 116, 139],
+        fillColor: [59, 130, 246], // Rentlee Blue (#3B82F6)
+        textColor: [255, 255, 255], // White Text
         fontStyle: 'bold',
-        fontSize: 8,
-        lineWidth: 0.3,
-        lineColor: [203, 213, 225],
-        cellPadding: { top: 6, bottom: 6, left: 5, right: 5 }
+        fontSize: 9,
+        lineWidth: 0, // Removed header borders for a cleaner, modern look
+        cellPadding: { top: 7, bottom: 7, left: 5, right: 5 }
       },
       alternateRowStyles: { fillColor: [248, 250, 252] },
       bodyStyles: {

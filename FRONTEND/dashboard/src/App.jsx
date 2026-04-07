@@ -3,6 +3,10 @@ import { useAuth } from './context/AuthContext'
 
 import AuthCallback     from './pages/AuthCallback'
 
+// ✅ Platform Admin (NEW)
+import PlatformLayout    from './layouts/platform/PlatformLayout'
+import PlatformDashboard from './pages/admin/PlatformDashboard'
+
 // Management
 import ManagementLayout from './layouts/management/ManagementLayout'
 import Dashboard        from './pages/management/Dashboard'
@@ -12,11 +16,12 @@ import Units            from './pages/management/Units'
 import Tenants          from './pages/management/Tenants'
 import Payments         from './pages/management/Payments'
 import Maintenance      from './pages/management/Maintenance'
-import MaintenanceDetail from './pages/management/MaintenanceDetail' // ✅ NEW IMPORT
+import MaintenanceDetail from './pages/management/MaintenanceDetail'
 import Reports          from './pages/management/Reports'
 import Settings         from './pages/management/Settings'
 import Notifications    from './pages/management/Notifications'
 import Profile          from './pages/management/Profile'
+import ManagementLedger from './pages/management/ManagementLedger'
 
 // Tenant
 import TenantLayout      from './layouts/tenant/TenantLayout'
@@ -26,28 +31,38 @@ import TenantPayments    from './pages/tenant/TenantPayments'
 import TenantMaintenance from './pages/tenant/TenantMaintenance'
 import TenantProfile     from './pages/tenant/TenantProfile'
 import TenantNotifications from './pages/tenant/TenantNotifications'
-import TenantLedger from './pages/tenant/TenantLedger'
+import TenantLedger      from './pages/tenant/TenantLedger'
 
 // ── Guards ────────────────────────────────────────────────────────────────────
 
 function ProtectedRoute({ children, allowedRoles }) {
   const { user } = useAuth()
+  
   if (!user) {
     window.location.replace('http://127.0.0.1:5501/FRONTEND/landing/login.html')
     return null
   }
+  
   if (!allowedRoles.includes(user.role)) {
-    return <Navigate to={user.role === 'tenant' ? '/tenant/dashboard' : '/management/dashboard'} replace />
+    // ✅ Secure fallback: Bounce unauthorized users to their correct dashboard
+    if (user.role === 'platform_admin') return <Navigate to="/platform/dashboard" replace />
+    if (user.role === 'tenant') return <Navigate to="/tenant/dashboard" replace />
+    return <Navigate to="/management/dashboard" replace />
   }
+  
   return children
 }
 
 function RootRedirect() {
   const { user } = useAuth()
+  
   if (!user) {
     window.location.replace('http://127.0.0.1:5501/FRONTEND/landing/login.html')
     return null
   }
+  
+  // ✅ Route users to their specific domains upon login
+  if (user.role === 'platform_admin') return <Navigate to="/platform/dashboard" replace />
   if (user.role === 'tenant') return <Navigate to="/tenant/dashboard" replace />
   return <Navigate to="/management/dashboard" replace />
 }
@@ -64,6 +79,13 @@ export default function App() {
 
         <Route path="/" element={<RootRedirect />} />
 
+        {/* ── ✅ Platform Admin Routes ── */}
+        <Route path="/platform"
+          element={<ProtectedRoute allowedRoles={['platform_admin']}><PlatformLayout /></ProtectedRoute>}>
+          <Route index element={<Navigate to="dashboard" replace />} />
+          <Route path="dashboard" element={<PlatformDashboard />} />
+        </Route>
+
         {/* ── Management (landlord + caretaker) ── */}
         <Route path="/management"
           element={<ProtectedRoute allowedRoles={['landlord', 'caretaker']}><ManagementLayout /></ProtectedRoute>}>
@@ -74,8 +96,8 @@ export default function App() {
           <Route path="units"         element={<Units />} />
           <Route path="tenants"       element={<Tenants />} />
           <Route path="payments"      element={<Payments />} />
+          <Route path="/management/ledger" element={<ManagementLedger />} />
           
-          {/* ✅ UPDATED MAINTENANCE ROUTES */}
           <Route path="maintenance"     element={<Maintenance />} />
           <Route path="maintenance/maintenancedetail" element={<MaintenanceDetail />} /> 
           

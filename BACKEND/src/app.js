@@ -17,6 +17,7 @@ import maintenanceRoutes from './routes/maintenance.routes.js';
 import notificationRoutes from './routes/notifications.routes.js';
 import reportsRoutes from './routes/reports.routes.js';
 import profileRoutes from './routes/profile.routes.js';
+import adminRoutes from './routes/admin.routes.js';
 
 
 const app = express();
@@ -47,6 +48,7 @@ app.use('/api/maintenance', maintenanceRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/reports', reportsRoutes);
 app.use('/api/profile', profileRoutes);
+app.use('/api/admin', adminRoutes);
 
 // Health check route
 app.get("/", (req, res) => {

@@ -1,0 +1,50 @@
+/* ── Global Resets for Platform Admin ── */
+* { 
+    margin: 0; 
+    padding: 0; 
+    box-sizing: border-box; 
+}
+
+/* 👇 THIS IS THE FIX: Forces the scrollbar to always show, preventing layout jumps! */
+html { 
+    height: 100%; 
+    overflow-y: scroll; 
+}
+
+body { 
+    min-height: 100%; 
+    font-family: 'DM Sans', sans-serif;
+    background: linear-gradient(135deg, var(--slate-100) 0%, #E8EDF5 100%);
+    color: var(--navy-900);
+}
+
+/* ── Layout Structure ── */
+.platform-layout { 
+    display: flex; 
+    min-height: 100vh; 
+}
+
+.platform-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    margin-left: 240px;
+    transition: margin-left 0.3s ease;
+    min-width: 0;
+}
+
+.platform-main.expanded { 
+    margin-left: 80px; 
+}
+
+.platform-content {
+    flex: 1;
+    padding: 2rem;
+    min-width: 0;
+    overflow: visible;
+}
+
+@media (max-width: 768px) {
+    .platform-main { margin-left: 0 !important; }
+}
