@@ -4,7 +4,7 @@ import { useAuth } from '../../context/AuthContext'
 import { can } from '../../utils/permissions'
 import './MaintenanceDetail.css'
 
-const API_URL = 'http://localhost:5001/api'
+const API_URL = 'import.meta.env.VITE_API_URL'
 
 // Mapped directly to your Database ENUM values
 const STATUS_MAP = {

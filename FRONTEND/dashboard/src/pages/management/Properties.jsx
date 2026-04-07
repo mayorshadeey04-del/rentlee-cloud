@@ -7,7 +7,7 @@ import Toast from '../../components/Toast'
 import ConfirmDialog from '../../components/ConfirmDialog'
 import './Properties.css'
 
-const API_URL = 'http://localhost:5001/api'
+const API_URL = 'import.meta.env.VITE_API_URL'
 const EMPTY_FORM = { name: '', location: '', totalUnits: '' }
 
 export default function Properties() {

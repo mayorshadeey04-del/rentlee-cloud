@@ -135,7 +135,7 @@ async function resetPassword() {
         submitBtn.disabled = true;
         
         // Make the actual call to your backend
-        const response = await fetch('http://localhost:5001/api/signup/setup-password', {
+        const response = await fetch('import.meta.env.VITE_API_URL/signup/setup-password', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({

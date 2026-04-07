@@ -16,7 +16,7 @@ export default function Dashboard() {
   const [loading,         setLoading]         = useState(true)
   const [error,           setError]           = useState(null)
 
-  const API_URL = 'http://localhost:5001/api'
+  const API_URL = 'import.meta.env.VITE_API_URL'
 
   // ✅ Format currency with commas
   const formatCurrency = (amount) => {

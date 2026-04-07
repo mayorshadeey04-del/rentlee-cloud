@@ -5,7 +5,7 @@ import Toast from '../../components/Toast'
 import ConfirmDialog from '../../components/ConfirmDialog'
 import './TenantMaintenance.css'
 
-const API_URL = 'http://localhost:5001/api'
+const API_URL = 'import.meta.env.VITE_API_URL'
 const CATEGORIES = ['Plumbing', 'Electrical', 'HVAC', 'General', 'Painting', 'Pest Control', 'Security']
 
 // Mapped directly to your Database ENUM values

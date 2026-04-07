@@ -6,7 +6,7 @@ import Toast from '../../components/Toast'
 import ConfirmDialog from '../../components/ConfirmDialog'
 import './Maintenance.css'
 
-const API_URL = 'http://localhost:5001/api'
+const API_URL = 'import.meta.env.VITE_API_URL'
 const EMPTY_FILTERS = { propertyId: '', status: '', priority: '', category: '' }
 const PRIORITIES    = ['Low', 'Medium', 'High', 'Urgent']
 const STATUSES      = ['Open', 'In Progress', 'Completed']

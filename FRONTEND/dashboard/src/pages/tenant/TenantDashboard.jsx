@@ -4,7 +4,7 @@ import { createPortal } from 'react-dom'
 import { useAuth } from '../../context/AuthContext'
 import './TenantDashboard.css'
 
-const API_URL = 'http://localhost:5001/api'
+const API_URL = 'import.meta.env.VITE_API_URL'
 
 export default function TenantDashboard() {
   const { user, authHeaders }   = useAuth()

@@ -4,7 +4,7 @@ import { useAuth } from '../../context/AuthContext'
 import Toast from '../../components/Toast'
 import './Payments.css'
 
-const API_URL = 'http://localhost:5001/api'
+const API_URL = 'import.meta.env.VITE_API_URL'
 
 const EMPTY_FILTERS = { propertyId: '', status: '', from: '', to: '' }
 const TYPE_LABELS = { rent: 'Rent', deposit: 'Deposit', movein: 'Move-in' }
