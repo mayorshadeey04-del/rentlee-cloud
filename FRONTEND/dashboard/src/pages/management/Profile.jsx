@@ -4,7 +4,7 @@ import { useAuth } from '../../context/AuthContext'
 import Toast from '../../components/Toast'
 import './Profile.css'
 
-const API_URL = 'import.meta.env.VITE_API_URL'
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
 
 const TABS_LANDLORD  = ['profile', 'password', 'email']
 const TABS_CARETAKER = ['password']

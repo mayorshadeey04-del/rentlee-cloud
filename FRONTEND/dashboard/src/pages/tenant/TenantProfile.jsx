@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useAuth } from '../../context/AuthContext'
 import './TenantProfile.css'
 
-const API_URL = 'import.meta.env.VITE_API_URL'
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
 
 export default function TenantProfile() {
   const { user, login, authHeaders } = useAuth()

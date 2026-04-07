@@ -4,7 +4,7 @@ import Toast from '../../components/Toast'
 import ConfirmDialog from '../../components/ConfirmDialog'
 import './PlatformDashboard.css'
 
-const API_URL = 'import.meta.env.VITE_API_URL'
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
 
 // Mock Data for the presentation
 const MOCK_LOGS = [

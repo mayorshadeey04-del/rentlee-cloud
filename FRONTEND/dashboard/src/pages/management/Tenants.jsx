@@ -7,7 +7,7 @@ import ConfirmDialog from '../../components/ConfirmDialog'
 import TenantWizard from '../../components/TenantWizard' 
 import './Tenants.css'
 
-const API_URL = 'import.meta.env.VITE_API_URL'
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
 const STATUSES = ['Active', 'Inactive', 'Pending']
 const EMPTY_FORM = { firstName: '', lastName: '', phone: '', idNumber: '', email: '', propertyId: '', propertyName: '', unitId: '' }
 const EMPTY_EMAIL = { recipients: '', propertyId: '', subject: '', message: '' }

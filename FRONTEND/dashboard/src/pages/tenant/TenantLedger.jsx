@@ -4,7 +4,7 @@ import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
 import './TenantLedger.css'
 
-const API_URL = 'import.meta.env.VITE_API_URL'
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
 
 function formatDate(dateStr) {
   if (!dateStr) return '—'
