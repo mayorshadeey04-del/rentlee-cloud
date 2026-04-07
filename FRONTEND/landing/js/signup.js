@@ -97,7 +97,7 @@ async function registerUser() {
         console.error('Registration Error:', error);
         
         // ✅ Show error popup instead of alert
-        showErrorPopup('Connection Error', 'Unable to connect to the server. Please make sure the backend server is running on port 5001.');
+        showErrorPopup('Connection Error', 'Unable to reach the cloud server. It may be waking up, or there is a network issue.');
 
         // Reset button
         const submitBtn = form.querySelector('button[type="submit"]');
