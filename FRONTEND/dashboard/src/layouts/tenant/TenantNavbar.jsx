@@ -80,7 +80,7 @@ export default function TenantNavbar({ onToggleSidebar, hideMenuBtn }) {
     }
   }
 
-  const handleLogout = () => { logout(); window.location.replace('http://127.0.0.1:5501/FRONTEND/landing/tenant-login.html') }
+  const handleLogout = () => { logout(); window.location.replace('https://rentlee-cloud-l6ur.vercel.app/tenant-login.html') }
   const initials  = user?.name ? user.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() : 'T'
   const firstName = user?.name?.split(' ')[0] ?? 'Tenant'
 

@@ -29,10 +29,10 @@ export default function AuthCallback() {
 
       } catch (err) {
         console.error('Auth callback error:', err)
-        window.location.replace('http://127.0.0.1:5501/FRONTEND/landing/login.html')
+        window.location.replace('https://rentlee-cloud-l6ur.vercel.app/login.html')
       }
     } else {
-      window.location.replace('http://127.0.0.1:5501/FRONTEND/landing/login.html')
+      window.location.replace('https://rentlee-cloud-l6ur.vercel.app/login.html')
     }
   }, [])
 

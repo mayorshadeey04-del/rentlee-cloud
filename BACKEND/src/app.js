@@ -27,8 +27,8 @@ app.use(express.json());
 // app.use(cors());
 app.use(cors({
   origin: [
-    'http://127.0.0.1:5501',
-    'http://localhost:5173'
+    'https://rentlee-cloud-l6ur.vercel.app',
+    'https://rentlee-cloud.vercel.app'
   ],
   credentials: true
 }));
