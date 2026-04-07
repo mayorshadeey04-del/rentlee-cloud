@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom'
 import { useAuth } from '../../context/AuthContext'
 import Toast from '../../components/Toast'
 import ConfirmDialog from '../../components/ConfirmDialog'
+import SubmitButton from '../../components/SubmitButton' // ✅ Imported Pro Button
 import './Settings.css'
 
 const EMPTY_CARETAKER = { firstName: '', lastName: '', email: '', phone: '' }
@@ -23,6 +24,7 @@ export default function Settings() {
   const [assignments, setAssignments]   = useState([])
   const [properties, setProperties]     = useState([])
   const [loading, setLoading]           = useState(true)
+  const [isSubmitting, setIsSubmitting] = useState(false) // ✅ Loading state for forms
   const [toasts, setToasts]             = useState([])
   const [confirm, setConfirm]           = useState(null)
 
@@ -119,6 +121,8 @@ export default function Settings() {
       return
     }
     
+    setIsSubmitting(true) // ✅ Turn spinner ON
+
     try {
       const res = await fetch(`${API_URL}/caretakers`, {
         method: 'POST',
@@ -136,6 +140,8 @@ export default function Settings() {
       showToast('success', 'Caretaker Added', `${addForm.firstName} ${addForm.lastName} has been added and sent a setup email.`)
     } catch (error) {
       setAddError(error.message)
+    } finally {
+      setIsSubmitting(false) // ✅ Turn spinner OFF
     }
   }
 
@@ -158,6 +164,8 @@ export default function Settings() {
       return
     }
     
+    setIsSubmitting(true) // ✅ Turn spinner ON
+
     try {
       const res = await fetch(`${API_URL}/caretakers/${editTarget.id}`, {
         method: 'PUT',
@@ -174,6 +182,8 @@ export default function Settings() {
       showToast('success', 'Caretaker Updated', `${editForm.firstName} has been updated successfully.`)
     } catch (error) {
       setEditError(error.message)
+    } finally {
+      setIsSubmitting(false) // ✅ Turn spinner OFF
     }
   }
 
@@ -239,6 +249,8 @@ export default function Settings() {
     // Add the new one (using Set to prevent duplicates)
     const newPropertyIds = [...new Set([...currentPropertyIds, assignForm.propertyId])];
 
+    setIsSubmitting(true) // ✅ Turn spinner ON
+
     try {
       const res = await fetch(`${API_URL}/caretakers/${assignForm.caretakerId}/properties`, {
         method: 'PUT',
@@ -269,6 +281,8 @@ export default function Settings() {
       
     } catch(error) {
       setAssignError(error.message);
+    } finally {
+      setIsSubmitting(false) // ✅ Turn spinner OFF
     }
   }
 
@@ -488,44 +502,51 @@ export default function Settings() {
 
       {/* ── Add Caretaker Modal ─────────────────────────────────────── */}
       {showAdd && createPortal(
-        <div style={overlayStyle} onClick={() => setShowAdd(false)}>
+        <div style={overlayStyle} onClick={() => !isSubmitting && setShowAdd(false)}>
           <div style={contentStyle} onClick={e => e.stopPropagation()}>
             <div style={headerStyle}>
               <h3 className="modal-title">Add Caretaker</h3>
-              <button style={closeStyle} onClick={() => setShowAdd(false)}><i className="fas fa-times" /></button>
+              <button style={closeStyle} onClick={() => setShowAdd(false)} disabled={isSubmitting}><i className="fas fa-times" /></button>
             </div>
             <div className="modal-body">
               {addError && <p className="form-error">{addError}</p>}
               <div className="form-row">
                 <div className="form-group">
                   <label className="form-label">First Name <span>*</span></label>
-                  <input className="form-input" value={addForm.firstName}
+                  <input className="form-input" value={addForm.firstName} disabled={isSubmitting}
                     onChange={e => { setAddError(''); setAddForm(f => ({ ...f, firstName: e.target.value })) }}
                     placeholder="Enter first name" />
                 </div>
                 <div className="form-group">
                   <label className="form-label">Last Name <span>*</span></label>
-                  <input className="form-input" value={addForm.lastName}
+                  <input className="form-input" value={addForm.lastName} disabled={isSubmitting}
                     onChange={e => { setAddError(''); setAddForm(f => ({ ...f, lastName: e.target.value })) }}
                     placeholder="Enter last name" />
                 </div>
               </div>
               <div className="form-group">
                 <label className="form-label">Email <span>*</span></label>
-                <input className="form-input" type="email" value={addForm.email}
+                <input className="form-input" type="email" value={addForm.email} disabled={isSubmitting}
                   onChange={e => { setAddError(''); setAddForm(f => ({ ...f, email: e.target.value })) }}
                   placeholder="e.g., user@email.com" />
               </div>
               <div className="form-group">
                 <label className="form-label">Phone Number <span>*</span></label>
-                <input className="form-input" type="tel" value={addForm.phone}
+                <input className="form-input" type="tel" value={addForm.phone} disabled={isSubmitting}
                   onChange={e => { setAddError(''); setAddForm(f => ({ ...f, phone: e.target.value })) }}
                   placeholder="e.g., 0712 345 678" />
               </div>
             </div>
             <div className="modal-footer">
-              <button className="btn-cancel" onClick={() => setShowAdd(false)}>Cancel</button>
-              <button className="btn-submit" onClick={submitAdd}>Add Caretaker</button>
+              <button className="btn-cancel" onClick={() => setShowAdd(false)} disabled={isSubmitting}>Cancel</button>
+              {/* ✅ Swapped Button */}
+              <SubmitButton 
+                onClick={submitAdd} 
+                isSubmitting={isSubmitting} 
+                text="Add Caretaker" 
+                loadingText="Creating..." 
+                className="btn-submit"
+              />
             </div>
           </div>
         </div>
@@ -533,40 +554,47 @@ export default function Settings() {
 
       {/* ── Edit Caretaker Modal ────────────────────────────────────── */}
       {showEdit && createPortal(
-        <div style={overlayStyle} onClick={() => setShowEdit(false)}>
+        <div style={overlayStyle} onClick={() => !isSubmitting && setShowEdit(false)}>
           <div style={contentStyle} onClick={e => e.stopPropagation()}>
             <div style={headerStyle}>
               <h3 className="modal-title">Edit Caretaker</h3>
-              <button style={closeStyle} onClick={() => setShowEdit(false)}><i className="fas fa-times" /></button>
+              <button style={closeStyle} onClick={() => setShowEdit(false)} disabled={isSubmitting}><i className="fas fa-times" /></button>
             </div>
             <div className="modal-body">
               {editError && <p className="form-error">{editError}</p>}
               <div className="form-row">
                 <div className="form-group">
                   <label className="form-label">First Name <span>*</span></label>
-                  <input className="form-input" value={editForm.firstName}
+                  <input className="form-input" value={editForm.firstName} disabled={isSubmitting}
                     onChange={e => { setEditError(''); setEditForm(f => ({ ...f, firstName: e.target.value })) }} />
                 </div>
                 <div className="form-group">
                   <label className="form-label">Last Name <span>*</span></label>
-                  <input className="form-input" value={editForm.lastName}
+                  <input className="form-input" value={editForm.lastName} disabled={isSubmitting}
                     onChange={e => { setEditError(''); setEditForm(f => ({ ...f, lastName: e.target.value })) }} />
                 </div>
               </div>
               <div className="form-group">
                 <label className="form-label">Email <span>*</span></label>
-                <input className="form-input" type="email" value={editForm.email}
+                <input className="form-input" type="email" value={editForm.email} disabled={isSubmitting}
                   onChange={e => { setEditError(''); setEditForm(f => ({ ...f, email: e.target.value })) }} />
               </div>
               <div className="form-group">
                 <label className="form-label">Phone Number <span>*</span></label>
-                <input className="form-input" type="tel" value={editForm.phone}
+                <input className="form-input" type="tel" value={editForm.phone} disabled={isSubmitting}
                   onChange={e => { setEditError(''); setEditForm(f => ({ ...f, phone: e.target.value })) }} />
               </div>
             </div>
             <div className="modal-footer">
-              <button className="btn-cancel" onClick={() => setShowEdit(false)}>Cancel</button>
-              <button className="btn-submit" onClick={submitEdit}>Save Changes</button>
+              <button className="btn-cancel" onClick={() => setShowEdit(false)} disabled={isSubmitting}>Cancel</button>
+              {/* ✅ Swapped Button */}
+              <SubmitButton 
+                onClick={submitEdit} 
+                isSubmitting={isSubmitting} 
+                text="Save Changes" 
+                loadingText="Updating..." 
+                className="btn-submit"
+              />
             </div>
           </div>
         </div>
@@ -574,17 +602,17 @@ export default function Settings() {
 
       {/* ── Assign Property Modal ───────────────────────────────────── */}
       {showAssign && createPortal(
-        <div style={overlayStyle} onClick={() => setShowAssign(false)}>
+        <div style={overlayStyle} onClick={() => !isSubmitting && setShowAssign(false)}>
           <div style={contentStyle} onClick={e => e.stopPropagation()}>
             <div style={headerStyle}>
               <h3 className="modal-title">Assign Property</h3>
-              <button style={closeStyle} onClick={() => setShowAssign(false)}><i className="fas fa-times" /></button>
+              <button style={closeStyle} onClick={() => setShowAssign(false)} disabled={isSubmitting}><i className="fas fa-times" /></button>
             </div>
             <div className="modal-body">
               {assignError && <p className="form-error">{assignError}</p>}
               <div className="form-group">
                 <label className="form-label">Select Property <span>*</span></label>
-                <select className="form-select" value={assignForm.propertyId}
+                <select className="form-select" value={assignForm.propertyId} disabled={isSubmitting}
                   onChange={e => { setAssignError(''); setAssignForm(f => ({ ...f, propertyId: e.target.value })) }}>
                   <option value="">Choose a property</option>
                   {properties.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
@@ -592,7 +620,7 @@ export default function Settings() {
               </div>
               <div className="form-group">
                 <label className="form-label">Select Caretaker <span>*</span></label>
-                <select className="form-select" value={assignForm.caretakerId}
+                <select className="form-select" value={assignForm.caretakerId} disabled={isSubmitting}
                   onChange={e => { setAssignError(''); setAssignForm(f => ({ ...f, caretakerId: e.target.value })) }}>
                   <option value="">Choose a caretaker</option>
                   {caretakers.map(c => <option key={c.id} value={c.id}>{c.first_name || c.firstName} {c.last_name || c.lastName}</option>)}
@@ -600,8 +628,15 @@ export default function Settings() {
               </div>
             </div>
             <div className="modal-footer">
-              <button className="btn-cancel" onClick={() => setShowAssign(false)}>Cancel</button>
-              <button className="btn-submit" onClick={submitAssign}>Create Assignment</button>
+              <button className="btn-cancel" onClick={() => setShowAssign(false)} disabled={isSubmitting}>Cancel</button>
+              {/* ✅ Swapped Button */}
+              <SubmitButton 
+                onClick={submitAssign} 
+                isSubmitting={isSubmitting} 
+                text="Create Assignment" 
+                loadingText="Assigning..." 
+                className="btn-submit"
+              />
             </div>
           </div>
         </div>

@@ -2,6 +2,7 @@ import { useState, useCallback, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { useAuth } from '../../context/AuthContext'
 import Toast from '../../components/Toast'
+import SubmitButton from '../../components/SubmitButton' // ✅ Imported Pro Button
 import './Profile.css'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
@@ -21,11 +22,11 @@ function getStrength(pw) {
   if (pw.length < 6)  return { level: 1, label: 'Too short', color: '#e11d48' }
   if (pw.length < 8)  return { level: 2, label: 'Weak',      color: '#f97316' }
   if (pw.length < 12) return { level: 3, label: 'Good',      color: '#eab308' }
-  return               { level: 4, label: 'Strong',   color: '#22c55e' }
+  return              { level: 4, label: 'Strong',   color: '#22c55e' }
 }
 
 // ── Password input with show/hide toggle ──────────────────────────────────────
-function PasswordField({ value, onChange, placeholder }) {
+function PasswordField({ value, onChange, placeholder, disabled }) {
   const [show, setShow] = useState(false)
   return (
     <div className="pw-field-wrap">
@@ -35,12 +36,14 @@ function PasswordField({ value, onChange, placeholder }) {
         value={value}
         onChange={onChange}
         placeholder={placeholder}
+        disabled={disabled} // ✅ Added disabled prop support
       />
       <button
         type="button"
         className="pw-toggle"
         onClick={() => setShow(s => !s)}
         tabIndex={-1}
+        disabled={disabled} // ✅ Disable toggle while loading
       >
         <i className={show ? 'fas fa-eye-slash' : 'fas fa-eye'} />
       </button>
@@ -387,14 +390,15 @@ export default function Profile() {
                 </button>
               ) : (
                 <div className="header-actions">
-                  <button className="btn-cancel" onClick={handleCancelEdit}>Cancel</button>
-                  <button 
-                    className="btn-primary" 
-                    onClick={submitProfile}
-                    disabled={loadingProfile}
-                  >
-                    {loadingProfile ? 'Saving...' : 'Save Changes'}
-                  </button>
+                  <button className="btn-cancel" onClick={handleCancelEdit} disabled={loadingProfile}>Cancel</button>
+                  {/* ✅ Swapped Button */}
+                  <SubmitButton 
+                    onClick={submitProfile} 
+                    isSubmitting={loadingProfile} 
+                    text="Save Changes" 
+                    loadingText="Saving..." 
+                    className="btn-primary"
+                  />
                 </div>
               )}
             </div>
@@ -414,6 +418,7 @@ export default function Profile() {
                       value={profile.firstName} 
                       placeholder="First Name"
                       readOnly={!isEditingProfile}
+                      disabled={loadingProfile}
                       onChange={e => { 
                         setProfileError(''); 
                         const val = e.target.value.replace(/[^a-zA-Z\s]/g, '');
@@ -435,6 +440,7 @@ export default function Profile() {
                       value={profile.lastName} 
                       placeholder="Last Name"
                       readOnly={!isEditingProfile}
+                      disabled={loadingProfile}
                       onChange={e => { 
                         setProfileError(''); 
                         const val = e.target.value.replace(/[^a-zA-Z\s]/g, '');
@@ -474,6 +480,7 @@ export default function Profile() {
                     value={profile.phone} 
                     placeholder="0712345678"
                     readOnly={!isEditingProfile}
+                    disabled={loadingProfile}
                     onChange={e => {
                       setProfileError('');
                       const val = e.target.value.replace(/\D/g, '').slice(0, 10);
@@ -499,6 +506,7 @@ export default function Profile() {
               <PasswordField
                 value={pwForm.current}
                 placeholder="Enter current password"
+                disabled={loadingPassword}
                 onChange={e => { setPwError(''); setPwForm(f => ({ ...f, current: e.target.value })) }}
               />
             </div>
@@ -508,6 +516,7 @@ export default function Profile() {
               <PasswordField
                 value={pwForm.newPw}
                 placeholder="Enter new password"
+                disabled={loadingPassword}
                 onChange={e => { setPwError(''); setPwForm(f => ({ ...f, newPw: e.target.value })) }}
               />
               {pwForm.newPw && strength && (
@@ -531,6 +540,7 @@ export default function Profile() {
               <PasswordField
                 value={pwForm.confirm}
                 placeholder="Confirm new password"
+                disabled={loadingPassword}
                 onChange={e => { setPwError(''); setPwForm(f => ({ ...f, confirm: e.target.value })) }}
               />
               {pwForm.confirm.length > 0 && (
@@ -541,13 +551,14 @@ export default function Profile() {
             </div>
 
             <div className="form-actions">
-              <button 
-                className="btn-primary" 
-                onClick={submitPassword}
-                disabled={loadingPassword}
-              >
-                {loadingPassword ? 'Updating...' : 'Change Password'}
-              </button>
+              {/* ✅ Swapped Button */}
+              <SubmitButton 
+                onClick={submitPassword} 
+                isSubmitting={loadingPassword} 
+                text="Change Password" 
+                loadingText="Updating..." 
+                className="btn-primary"
+              />
             </div>
           </div>
         )}
@@ -562,6 +573,7 @@ export default function Profile() {
               <label className="form-label">Current Email <span className="required">*</span></label>
               <input className="form-input" type="email" value={emailForm.currentEmail}
                 placeholder="Enter your current email"
+                disabled={loadingEmail}
                 onChange={e => { setEmailError(''); setEmailForm(f => ({ ...f, currentEmail: e.target.value })) }} />
             </div>
 
@@ -569,18 +581,20 @@ export default function Profile() {
               <label className="form-label">New Email <span className="required">*</span></label>
               <input className="form-input" type="email" value={emailForm.newEmail}
                 placeholder="Enter new email address"
+                disabled={loadingEmail}
                 onChange={e => { setEmailError(''); setEmailForm(f => ({ ...f, newEmail: e.target.value })) }} />
               <p className="field-hint">A verification code will be sent to your new email</p>
             </div>
 
             <div className="form-actions">
-              <button 
-                className="btn-primary" 
-                onClick={submitEmailChange}
-                disabled={loadingEmail}
-              >
-                {loadingEmail ? 'Sending Code...' : 'Change Email'}
-              </button>
+              {/* ✅ Swapped Button */}
+              <SubmitButton 
+                onClick={submitEmailChange} 
+                isSubmitting={loadingEmail} 
+                text="Change Email" 
+                loadingText="Sending Code..." 
+                className="btn-primary"
+              />
             </div>
           </div>
         )}
@@ -589,11 +603,11 @@ export default function Profile() {
 
       {/* ── Verification modal ──────────────────────────── */}
       {showVerify && createPortal(
-        <div style={overlayStyle} onClick={() => setShowVerify(false)}>
+        <div style={overlayStyle} onClick={() => !loadingVerify && setShowVerify(false)}>
           <div style={contentStyle} onClick={e => e.stopPropagation()}>
             <div style={headerStyle}>
               <h3 className="modal-title">Verify New Email</h3>
-              <button style={closeStyle} onClick={() => setShowVerify(false)}>
+              <button style={closeStyle} onClick={() => setShowVerify(false)} disabled={loadingVerify}>
                 <i className="fas fa-times" />
               </button>
             </div>
@@ -610,6 +624,7 @@ export default function Profile() {
                 <input
                   className="form-input code-input"
                   value={code}
+                  disabled={loadingVerify}
                   onChange={e => { setCodeError(''); setCode(e.target.value.replace(/\D/g, '').slice(0, 6)) }}
                   placeholder="000000"
                   maxLength={6}
@@ -617,14 +632,15 @@ export default function Profile() {
               </div>
             </div>
             <div className="modal-footer">
-              <button className="btn-cancel" onClick={() => setShowVerify(false)}>Cancel</button>
-              <button 
-                className="btn-submit" 
-                onClick={submitVerification}
-                disabled={loadingVerify}
-              >
-                {loadingVerify ? 'Verifying...' : 'Verify & Confirm'}
-              </button>
+              <button className="btn-cancel" onClick={() => setShowVerify(false)} disabled={loadingVerify}>Cancel</button>
+              {/* ✅ Swapped Button */}
+              <SubmitButton 
+                onClick={submitVerification} 
+                isSubmitting={loadingVerify} 
+                text="Verify & Confirm" 
+                loadingText="Verifying..." 
+                className="btn-submit"
+              />
             </div>
           </div>
         </div>

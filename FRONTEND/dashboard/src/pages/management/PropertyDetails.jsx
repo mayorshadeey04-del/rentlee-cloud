@@ -5,6 +5,7 @@ import { useAuth } from '../../context/AuthContext'
 import { can } from '../../utils/permissions'
 import Toast from '../../components/Toast'
 import ConfirmDialog from '../../components/ConfirmDialog'
+import SubmitButton from '../../components/SubmitButton' // ✅ Imported Pro Button
 import './Properties.css' 
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
@@ -31,6 +32,7 @@ export default function PropertyDetails() {
   
   // UI State
   const [loading, setLoading] = useState(true)
+  const [isSubmitting, setIsSubmitting] = useState(false) // ✅ Loading state for all modals
   const [error, setError] = useState('')
   const [pageError, setPageError] = useState('')
   const [toasts, setToasts] = useState([])
@@ -74,7 +76,6 @@ export default function PropertyDetails() {
       setPageError('')
 
       // Fetch Property Details, Room Types, and Units concurrently
-      // ✅ NOTE: using /roomtypes correctly
       const [propRes, typesRes, unitsRes] = await Promise.all([
         fetch(`${API_URL}/properties/${propertyId}`, { headers: authHeaders() }),
         fetch(`${API_URL}/roomtypes?propertyId=${propertyId}`, { headers: authHeaders() }),
@@ -127,6 +128,9 @@ export default function PropertyDetails() {
   // ── LIVE ACTIONS (TYPES) ──────────────────────────────────────────────
   async function submitAddType() {
     if (!typeForm.name || !typeForm.defaultRent) return setError('Please fill in all fields.')
+    
+    setIsSubmitting(true) // ✅ Spinner ON
+
     try {
       const res = await fetch(`${API_URL}/roomtypes`, {
         method: 'POST',
@@ -140,11 +144,18 @@ export default function PropertyDetails() {
       setUnitTypes([...unitTypes, { id: newType.id, name: newType.name, defaultRent: newType.default_rent, unitsCount: 0 }])
       setShowAddType(false)
       showToast('success', 'Type Added', `${newType.name} pricing saved.`)
-    } catch (err) { setError(err.message) }
+    } catch (err) { 
+      setError(err.message) 
+    } finally {
+      setIsSubmitting(false) // ✅ Spinner OFF
+    }
   }
 
   async function submitEditType() {
     if (!typeForm.name || !typeForm.defaultRent) return setError('Please fill in all fields.')
+    
+    setIsSubmitting(true) // ✅ Spinner ON
+
     try {
       const res = await fetch(`${API_URL}/roomtypes/${editTypeTarget.id}`, {
         method: 'PUT',
@@ -161,7 +172,11 @@ export default function PropertyDetails() {
       
       setShowEditType(false)
       showToast('success', 'Price Updated', 'Pricing tier updated successfully.')
-    } catch (err) { setError(err.message) }
+    } catch (err) { 
+      setError(err.message) 
+    } finally {
+      setIsSubmitting(false) // ✅ Spinner OFF
+    }
   }
 
   const handleDeleteType = (type) => {
@@ -172,6 +187,9 @@ export default function PropertyDetails() {
   // ── LIVE ACTIONS (UNITS) ──────────────────────────────────────────────
   async function submitAddUnit() {
     if (!unitForm.unitNumber || !unitForm.typeId) return setError('Please fill in all fields.')
+    
+    setIsSubmitting(true) // ✅ Spinner ON
+
     try {
       const res = await fetch(`${API_URL}/units`, {
         method: 'POST',
@@ -197,11 +215,18 @@ export default function PropertyDetails() {
       setShowAddUnit(false)
       setUnitForm(EMPTY_UNIT_FORM)
       showToast('success', 'Unit Created', `Unit ${createdUnit.unit_number} added successfully.`)
-    } catch (err) { setError(err.message) }
+    } catch (err) { 
+      setError(err.message) 
+    } finally {
+      setIsSubmitting(false) // ✅ Spinner OFF
+    }
   }
 
   async function submitEditUnit() {
     if (!unitForm.unitNumber || !unitForm.typeId) return setError('Please fill in all fields.')
+    
+    setIsSubmitting(true) // ✅ Spinner ON
+
     try {
       const res = await fetch(`${API_URL}/units/${editUnitTarget.id}`, {
         method: 'PUT',
@@ -228,7 +253,11 @@ export default function PropertyDetails() {
       
       setShowEditUnit(false)
       showToast('success', 'Unit Updated', `Unit ${updatedUnit.unit_number} updated successfully.`)
-    } catch (err) { setError(err.message) }
+    } catch (err) { 
+      setError(err.message) 
+    } finally {
+      setIsSubmitting(false) // ✅ Spinner OFF
+    }
   }
 
   const handleDeleteUnit = (unit) => {
@@ -450,9 +479,15 @@ export default function PropertyDetails() {
             </div>
             <div className="modal-footer">
               <button className="btn-cancel" onClick={() => { setShowAddUnit(false); setShowEditUnit(false); }}>Cancel</button>
-              <button className="btn-submit" onClick={showEditUnit ? submitEditUnit : submitAddUnit} disabled={unitTypes.length === 0}>
-                {showEditUnit ? 'Save Changes' : 'Create Unit'}
-              </button>
+              {/* ✅ Swapped Submit Button */}
+              <SubmitButton 
+                onClick={showEditUnit ? submitEditUnit : submitAddUnit}
+                isSubmitting={isSubmitting}
+                disabled={isSubmitting || unitTypes.length === 0}
+                text={showEditUnit ? 'Save Changes' : 'Create Unit'}
+                loadingText={showEditUnit ? 'Saving...' : 'Creating...'}
+                className="btn-submit"
+              />
             </div>
           </div>
         </div>
@@ -494,9 +529,14 @@ export default function PropertyDetails() {
             </div>
             <div className="modal-footer">
               <button className="btn-cancel" onClick={() => { setShowAddType(false); setShowEditType(false); }}>Cancel</button>
-              <button className="btn-submit" onClick={showEditType ? submitEditType : submitAddType}>
-                {showEditType ? 'Save Changes' : 'Create Room Type'}
-              </button>
+              {/* ✅ Swapped Submit Button */}
+              <SubmitButton 
+                onClick={showEditType ? submitEditType : submitAddType}
+                isSubmitting={isSubmitting}
+                text={showEditType ? 'Save Changes' : 'Create Room Type'}
+                loadingText={showEditType ? 'Saving...' : 'Creating...'}
+                className="btn-submit"
+              />
             </div>
           </div>
         </div>

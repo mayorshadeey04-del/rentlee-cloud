@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { useAuth } from '../context/AuthContext'
+import SubmitButton from './SubmitButton' // ✅ Imported Pro Button
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
 
@@ -18,7 +19,7 @@ export default function TenantWizard({ isOpen, onClose, onSuccess, properties })
   const [form, setForm] = useState(EMPTY_FORM)
   const [vacantUnits, setVacantUnits] = useState([])
   const [loadingUnits, setLoadingUnits] = useState(false)
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false) // ✅ Shared loading state
   const [error, setError] = useState('')
 
   // Reset wizard and lock body scroll when opened
@@ -116,7 +117,7 @@ export default function TenantWizard({ isOpen, onClose, onSuccess, properties })
     // ✅ NEW VALIDATION FOR MIGRATION
     if (form.isExisting && !form.historicalDeposit) return setError('Please enter the historical deposit amount paid.')
     
-    setIsSubmitting(true)
+    setIsSubmitting(true) // ✅ Spinner ON
     setError('')
     
     try {
@@ -149,7 +150,7 @@ export default function TenantWizard({ isOpen, onClose, onSuccess, properties })
     } catch (err) {
       setError(err.message)
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false) // ✅ Spinner OFF
     }
   }
 
@@ -303,9 +304,15 @@ export default function TenantWizard({ isOpen, onClose, onSuccess, properties })
             {step < 3 ? (
               <button className="btn-primary" onClick={nextStep}>Next Step →</button>
             ) : (
-              <button className="btn-primary" onClick={submitWizard} disabled={isSubmitting} style={{ background: form.isExisting ? '#3b82f6' : '#10b981' }}>
-                {isSubmitting ? 'Processing...' : (form.isExisting ? 'Sync Existing Tenant' : 'Send Invite & Lock Portal')}
-              </button>
+              /* ✅ Swapped Button */
+              <SubmitButton 
+                onClick={submitWizard} 
+                isSubmitting={isSubmitting} 
+                text={form.isExisting ? 'Sync Existing Tenant' : 'Send Invite & Lock Portal'}
+                loadingText={form.isExisting ? 'Syncing...' : 'Processing...'}
+                className="btn-primary"
+                style={{ background: form.isExisting ? '#3b82f6' : '#10b981' }} // Custom color mapping
+              />
             )}
           </div>
 

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '../../context/AuthContext'
+import SubmitButton from '../../components/SubmitButton' // ✅ Imported Pro Button
 import './TenantProfile.css'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
@@ -62,7 +63,7 @@ export default function TenantProfile() {
       setErrors(newErrors); return
     }
 
-    setSaving(true)
+    setSaving(true) // ✅ Turn spinner ON
     try {
       const res = await fetch(`${API_URL}/profile`, {
         method: 'PUT',
@@ -80,7 +81,7 @@ export default function TenantProfile() {
     } catch (err) {
       setErrors({ form: err.message })
     } finally {
-      setSaving(false)
+      setSaving(false) // ✅ Turn spinner OFF
     }
   }
 
@@ -98,7 +99,7 @@ export default function TenantProfile() {
       setErrors(newErrors); return
     }
 
-    setSavingPwd(true)
+    setSavingPwd(true) // ✅ Turn spinner ON
     try {
       const res = await fetch(`${API_URL}/profile/password`, {
         method: 'PUT',
@@ -115,7 +116,7 @@ export default function TenantProfile() {
     } catch (err) {
       setErrors({ current: err.message })
     } finally {
-      setSavingPwd(false)
+      setSavingPwd(false) // ✅ Turn spinner OFF
     }
   }
 
@@ -157,10 +158,15 @@ export default function TenantProfile() {
                   </button>
                 ) : (
                   <div className="profile-edit-actions">
-                    <button className="btn-cancel-sm" onClick={() => { setEditing(false); setErrors({}); setForm({ email: dbProfile?.email, phone: dbProfile?.phone }); }}>Cancel</button>
-                    <button className="btn-save" onClick={handleSavePersonal} disabled={saving}>
-                      {saving ? 'Saving...' : 'Save Changes'}
-                    </button>
+                    <button className="btn-cancel-sm" onClick={() => { setEditing(false); setErrors({}); setForm({ email: dbProfile?.email, phone: dbProfile?.phone }); }} disabled={saving}>Cancel</button>
+                    {/* ✅ Swapped Button */}
+                    <SubmitButton 
+                      onClick={handleSavePersonal} 
+                      isSubmitting={saving} 
+                      text="Save Changes" 
+                      loadingText="Saving..." 
+                      className="btn-save"
+                    />
                   </div>
                 )}
               </div>
@@ -181,7 +187,7 @@ export default function TenantProfile() {
                   <label className="profile-field-label"><i className="fas fa-envelope" /> Email Address</label>
                   {editing ? (
                     <>
-                      <input className={`profile-input ${errors.email ? 'input-error' : ''}`} type="email" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} />
+                      <input className={`profile-input ${errors.email ? 'input-error' : ''}`} type="email" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} disabled={saving} />
                       {errors.email && <span className="form-error-msg">{errors.email}</span>}
                     </>
                   ) : (
@@ -193,7 +199,7 @@ export default function TenantProfile() {
                   <label className="profile-field-label"><i className="fas fa-phone" /> Phone Number</label>
                   {editing ? (
                     <>
-                      <input className={`profile-input ${errors.phone ? 'input-error' : ''}`} type="tel" value={form.phone} placeholder="+254 7XX XXX XXX" onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} />
+                      <input className={`profile-input ${errors.phone ? 'input-error' : ''}`} type="tel" value={form.phone} placeholder="+254 7XX XXX XXX" onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} disabled={saving} />
                       {errors.phone && <span className="form-error-msg">{errors.phone}</span>}
                     </>
                   ) : (
@@ -211,26 +217,32 @@ export default function TenantProfile() {
               <form className="profile-fields" onSubmit={handleSavePassword}>
                 <div className="profile-field">
                   <label className="profile-field-label">Current Password</label>
-                  <input className={`profile-input ${errors.current ? 'input-error' : ''}`} type="password" value={pwdForm.current} onChange={e => setPwdForm(f => ({ ...f, current: e.target.value }))} placeholder="Enter current password" />
+                  <input className={`profile-input ${errors.current ? 'input-error' : ''}`} type="password" value={pwdForm.current} onChange={e => setPwdForm(f => ({ ...f, current: e.target.value }))} placeholder="Enter current password" disabled={savingPwd} />
                   {errors.current && <span className="form-error-msg">{errors.current}</span>}
                 </div>
                 
                 <div className="profile-field">
                   <label className="profile-field-label">New Password</label>
-                  <input className={`profile-input ${errors.new ? 'input-error' : ''}`} type="password" value={pwdForm.new} onChange={e => setPwdForm(f => ({ ...f, new: e.target.value }))} placeholder="Min 8 characters" />
+                  <input className={`profile-input ${errors.new ? 'input-error' : ''}`} type="password" value={pwdForm.new} onChange={e => setPwdForm(f => ({ ...f, new: e.target.value }))} placeholder="Min 8 characters" disabled={savingPwd} />
                   {errors.new && <span className="form-error-msg">{errors.new}</span>}
                 </div>
 
                 <div className="profile-field">
                   <label className="profile-field-label">Confirm New Password</label>
-                  <input className={`profile-input ${errors.confirm ? 'input-error' : ''}`} type="password" value={pwdForm.confirm} onChange={e => setPwdForm(f => ({ ...f, confirm: e.target.value }))} placeholder="Retype new password" />
+                  <input className={`profile-input ${errors.confirm ? 'input-error' : ''}`} type="password" value={pwdForm.confirm} onChange={e => setPwdForm(f => ({ ...f, confirm: e.target.value }))} placeholder="Retype new password" disabled={savingPwd} />
                   {errors.confirm && <span className="form-error-msg">{errors.confirm}</span>}
                 </div>
 
                 <div style={{ marginTop: '1rem' }}>
-                  <button type="submit" className="btn-save" style={{ padding: '0.875rem 2rem' }} disabled={savingPwd}>
-                    {savingPwd ? 'Updating Security...' : 'Update Password'}
-                  </button>
+                  {/* ✅ Swapped Button */}
+                  <SubmitButton 
+                    type="submit" 
+                    isSubmitting={savingPwd} 
+                    text="Update Password" 
+                    loadingText="Updating Security..." 
+                    className="btn-save"
+                    style={{ padding: '0.875rem 2rem' }}
+                  />
                 </div>
               </form>
             </div>

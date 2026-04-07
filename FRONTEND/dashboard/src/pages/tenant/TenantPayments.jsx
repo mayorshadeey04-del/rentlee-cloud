@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom'
 import { useAuth } from '../../context/AuthContext'
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
+import SubmitButton from '../../components/SubmitButton' // ✅ Imported Pro Button
 import './TenantPayments.css'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
@@ -18,7 +19,7 @@ export default function TenantPayments() {
   const [showModal, setShowModal]               = useState(false)
   const [paymentAmount, setPaymentAmount]       = useState('')
   const [paymentPhone, setPaymentPhone]         = useState('')
-  const [isProcessing, setIsProcessing]         = useState(false)
+  const [isProcessing, setIsProcessing]         = useState(false) // ✅ Renamed slightly but behaves like isSubmitting
   const [paymentSuccess, setPaymentSuccess]     = useState(false)
 
   // ── LIVE API FETCH ──
@@ -91,7 +92,7 @@ export default function TenantPayments() {
        return
     }
     
-    setIsProcessing(true)
+    setIsProcessing(true) // ✅ Turn spinner ON
 
     try {
       const res = await fetch(`${API_URL}/payments/initiate`, {
@@ -107,8 +108,9 @@ export default function TenantPayments() {
       const data = await res.json()
       if (!res.ok) throw new Error(data.message)
 
+      // Simulate a slight delay to let the STK Push prompt appear on phone
       setTimeout(() => {
-        setIsProcessing(false)
+        setIsProcessing(false) // ✅ Turn spinner OFF
         setPaymentSuccess(true)
         
         setTimeout(() => {
@@ -137,7 +139,7 @@ export default function TenantPayments() {
 
     } catch (err) {
       alert(`Payment failed: ${err.message}`)
-      setIsProcessing(false)
+      setIsProcessing(false) // ✅ Turn spinner OFF on error
     }
   }
 
@@ -356,6 +358,7 @@ export default function TenantPayments() {
                         onChange={(e) => setPaymentAmount(e.target.value)} 
                         placeholder="e.g. 25000" 
                         required 
+                        disabled={isProcessing}
                         style={{ width: '100%', padding: '0.875rem 1rem', border: '2px solid #e2e8f0', borderRadius: '10px', fontSize: '1rem', fontFamily: "'DM Sans', sans-serif" }}
                       />
                     </div>
@@ -371,18 +374,25 @@ export default function TenantPayments() {
                           onChange={handlePhoneChange} 
                           placeholder="712345678" 
                           required 
+                          disabled={isProcessing}
                           style={{ border: 'none', borderRadius: '0', flex: 1, padding: '0.875rem 1rem', fontSize: '1rem', fontFamily: "'DM Sans', sans-serif", outline: 'none' }}
                         />
                       </div>
                     </div>
 
-                    <button type="submit" className="btn-mpesa" disabled={isProcessing} style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.75rem', padding: '1rem', background: isProcessing ? '#a7f3d0' : '#10b981', color: 'white', border: 'none', borderRadius: '12px', fontFamily: "'DM Sans', sans-serif", fontWeight: '700', fontSize: '1rem', cursor: isProcessing ? 'not-allowed' : 'pointer' }}>
-                      {isProcessing ? (
-                        <><i className="fas fa-spinner fa-spin"></i> Triggering Prompt...</>
-                      ) : (
-                        <><i className="fas fa-mobile-alt"></i> Send STK Push</>
-                      )}
-                    </button>
+                    {/* ✅ Swapped Submit Button with specific M-Pesa styling */}
+                    <SubmitButton 
+                      type="submit"
+                      isSubmitting={isProcessing} 
+                      text={<><i className="fas fa-mobile-alt"></i> Send STK Push</>}
+                      loadingText="Triggering Prompt..." 
+                      className="btn-mpesa"
+                      style={{ 
+                        width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.75rem', padding: '1rem', 
+                        background: isProcessing ? '#a7f3d0' : '#10b981', color: 'white', border: 'none', borderRadius: '12px', 
+                        fontFamily: "'DM Sans', sans-serif", fontWeight: '700', fontSize: '1rem', cursor: isProcessing ? 'not-allowed' : 'pointer' 
+                      }}
+                    />
                   </form>
                 )}
               </div>

@@ -5,6 +5,7 @@ import { can } from '../../utils/permissions'
 import Toast from '../../components/Toast'
 import ConfirmDialog from '../../components/ConfirmDialog'
 import TenantWizard from '../../components/TenantWizard' 
+import SubmitButton from '../../components/SubmitButton' // ✅ Imported Pro Button
 import './Tenants.css'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
@@ -23,6 +24,7 @@ export default function Tenants() {
   const [properties, setProperties]     = useState([])
   const [vacantUnits, setVacantUnits]   = useState([])
   const [loading, setLoading]           = useState(true)
+  const [isSubmitting, setIsSubmitting] = useState(false) // ✅ Shared loading state for modals
   const [pageError, setPageError]       = useState('')
   const [showFilter, setShowFilter]     = useState(false)
   
@@ -35,7 +37,6 @@ export default function Tenants() {
   const [emailForm, setEmailForm]       = useState(EMPTY_EMAIL)
   const [error, setError]               = useState('')
   const [emailError, setEmailError]     = useState('')
-  const [isSendingEmail, setIsSendingEmail] = useState(false)
   const [filters, setFilters]           = useState(EMPTY_FILTERS)
   const [activeFilters, setActiveFilters] = useState(EMPTY_FILTERS)
   const [toasts, setToasts]             = useState([])
@@ -220,6 +221,8 @@ const handleWizardSuccess = (newTenant) => {
       return setError('Please enter a strictly valid email address (e.g., name@gmail.com).')
     }
 
+    setIsSubmitting(true) // ✅ Turn spinner ON
+
     // Proceed to API call if all validations pass
     try {
       const res = await fetch(`${API_URL}/tenants/${editTarget.id}`, {
@@ -235,6 +238,8 @@ const handleWizardSuccess = (newTenant) => {
       showToast('success', 'Tenant Updated', `${form.firstName} ${form.lastName} has been updated.`)
     } catch (err) {
       setError(err.message)
+    } finally {
+      setIsSubmitting(false) // ✅ Turn spinner OFF
     }
   }
 
@@ -280,7 +285,7 @@ const handleWizardSuccess = (newTenant) => {
     if (!emailForm.recipients || !emailForm.subject || !emailForm.message) return setEmailError('Fill all required fields.')
     if (emailForm.recipients === 'property' && !emailForm.propertyId) return setEmailError('Select a property.')
     
-    setIsSendingEmail(true)
+    setIsSubmitting(true) // ✅ Turn spinner ON
     setEmailError('')
 
     try {
@@ -299,7 +304,7 @@ const handleWizardSuccess = (newTenant) => {
     } catch (err) {
       setEmailError(err.message)
     } finally {
-      setIsSendingEmail(false)
+      setIsSubmitting(false) // ✅ Turn spinner OFF
     }
   }
 
@@ -418,27 +423,28 @@ const handleWizardSuccess = (newTenant) => {
         properties={properties} 
       />
 
+      {/* EDIT TENANT MODAL */}
       {showEdit && createPortal(
-        <div style={overlayStyle} onClick={() => setShowEdit(false)}>
+        <div style={overlayStyle} onClick={() => !isSubmitting && setShowEdit(false)}>
           <div style={wrapperStyle}>
             <div style={contentStyle} onClick={e => e.stopPropagation()}>
               <div style={headerStyle}>
                 <h3 className="modal-title">Edit Tenant</h3>
-                <button style={closeStyle} onClick={() => setShowEdit(false)}><i className="fas fa-times" /></button>
+                <button style={closeStyle} onClick={() => setShowEdit(false)} disabled={isSubmitting}><i className="fas fa-times" /></button>
               </div>
               
               <div style={{ padding: '2rem' }}>
                 {error && <p className="form-error">{error}</p>}
                 <div className="form-row">
-                  <div className="form-group"><label className="form-label">First Name <span>*</span></label><input className="form-input" name="firstName" value={form.firstName} onChange={handleChange} /></div>
-                  <div className="form-group"><label className="form-label">Last Name <span>*</span></label><input className="form-input" name="lastName" value={form.lastName} onChange={handleChange} /></div>
+                  <div className="form-group"><label className="form-label">First Name <span>*</span></label><input className="form-input" name="firstName" value={form.firstName} onChange={handleChange} disabled={isSubmitting}/></div>
+                  <div className="form-group"><label className="form-label">Last Name <span>*</span></label><input className="form-input" name="lastName" value={form.lastName} onChange={handleChange} disabled={isSubmitting}/></div>
                 </div>
                 <div className="form-row">
-                  <div className="form-group"><label className="form-label">Phone Number <span>*</span></label><input className="form-input" name="phone" value={form.phone} onChange={handleChange} /></div>
-                  <div className="form-group"><label className="form-label">ID Number <span>*</span></label><input className="form-input" name="idNumber" value={form.idNumber} onChange={handleChange} /></div>
+                  <div className="form-group"><label className="form-label">Phone Number <span>*</span></label><input className="form-input" name="phone" value={form.phone} onChange={handleChange} disabled={isSubmitting}/></div>
+                  <div className="form-group"><label className="form-label">ID Number <span>*</span></label><input className="form-input" name="idNumber" value={form.idNumber} onChange={handleChange} disabled={isSubmitting}/></div>
                 </div>
                 <div className="form-row">
-                  <div className="form-group"><label className="form-label">Email <span>*</span></label><input className="form-input" type="email" name="email" value={form.email} onChange={handleChange} /></div>
+                  <div className="form-group"><label className="form-label">Email <span>*</span></label><input className="form-input" type="email" name="email" value={form.email} onChange={handleChange} disabled={isSubmitting}/></div>
                   <div className="form-group"><label className="form-label">Property <span>*</span></label>
                     <select className="form-select" name="propertyId" value={form.propertyId} onChange={handleChange} disabled>
                       <option value={form.propertyId}>{form.propertyName}</option>
@@ -448,22 +454,29 @@ const handleWizardSuccess = (newTenant) => {
               </div>
 
               <div className="modal-footer" style={{ flexShrink: 0, borderTop: '1px solid #e2e8f0' }}>
-                <button className="btn-cancel" onClick={() => setShowEdit(false)}>Cancel</button>
-                <button className="btn-submit" onClick={submitEdit}>Update Tenant</button>
+                <button className="btn-cancel" onClick={() => setShowEdit(false)} disabled={isSubmitting}>Cancel</button>
+                {/* ✅ Swapped Button */}
+                <SubmitButton 
+                  onClick={submitEdit} 
+                  isSubmitting={isSubmitting} 
+                  text="Update Tenant" 
+                  loadingText="Updating..." 
+                  className="btn-submit"
+                />
               </div>
             </div>
           </div>
         </div>
       , document.body)}
 
-      {/* ✅ UPDATED EMAIL MODAL WITH DYNAMIC TEMPLATE HINTS */}
+      {/* SEND EMAIL MODAL */}
       {showEmail && createPortal(
-        <div style={overlayStyle} onClick={() => !isSendingEmail && setShowEmail(false)}>
+        <div style={overlayStyle} onClick={() => !isSubmitting && setShowEmail(false)}>
           <div style={wrapperStyle}>
             <div style={contentStyle} onClick={e => e.stopPropagation()}>
               <div style={headerStyle}>
                 <h3 className="modal-title">Send Email Notice</h3>
-                <button style={closeStyle} onClick={() => setShowEmail(false)} disabled={isSendingEmail}><i className="fas fa-times" /></button>
+                <button style={closeStyle} onClick={() => setShowEmail(false)} disabled={isSubmitting}><i className="fas fa-times" /></button>
               </div>
               
               <div style={{ padding: '2rem' }}>
@@ -471,7 +484,7 @@ const handleWizardSuccess = (newTenant) => {
                 
                 <div className="form-group full-width">
                   <label className="form-label">Recipients <span>*</span></label>
-                  <select className="form-select" name="recipients" value={emailForm.recipients} onChange={handleEmailChange} disabled={isSendingEmail}>
+                  <select className="form-select" name="recipients" value={emailForm.recipients} onChange={handleEmailChange} disabled={isSubmitting}>
                     <option value="">Choose recipients</option>
                     <option value="all">All Active Tenants</option>
                     <option value="property">By Specific Property</option>
@@ -482,7 +495,7 @@ const handleWizardSuccess = (newTenant) => {
                 {emailForm.recipients === 'property' && (
                   <div className="form-group full-width">
                     <label className="form-label">Select Property <span>*</span></label>
-                    <select className="form-select" name="propertyId" value={emailForm.propertyId} onChange={handleEmailChange} disabled={isSendingEmail}>
+                    <select className="form-select" name="propertyId" value={emailForm.propertyId} onChange={handleEmailChange} disabled={isSubmitting}>
                       <option value="">Choose a property</option>
                       {properties.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
                     </select>
@@ -500,7 +513,7 @@ const handleWizardSuccess = (newTenant) => {
                     value={emailForm.subject} 
                     onChange={handleEmailChange} 
                     placeholder="e.g., Rent Reminder for {{fullName}}" 
-                    disabled={isSendingEmail}
+                    disabled={isSubmitting}
                   />
                 </div>
 
@@ -516,16 +529,21 @@ const handleWizardSuccess = (newTenant) => {
                     onChange={handleEmailChange} 
                     rows="6" 
                     placeholder="Dear {{firstName}}, this is a reminder that you have an outstanding balance of Ksh {{balance}} for {{unit}}. Please pay immediately." 
-                    disabled={isSendingEmail}
+                    disabled={isSubmitting}
                   />
                 </div>
               </div>
 
               <div className="modal-footer" style={{ flexShrink: 0, borderTop: '1px solid #e2e8f0' }}>
-                <button className="btn-cancel" onClick={() => setShowEmail(false)} disabled={isSendingEmail}>Cancel</button>
-                <button className="btn-submit" onClick={submitEmail} disabled={isSendingEmail}>
-                  {isSendingEmail ? <><i className="fas fa-spinner fa-spin"></i> Sending...</> : 'Send Emails'}
-                </button>
+                <button className="btn-cancel" onClick={() => setShowEmail(false)} disabled={isSubmitting}>Cancel</button>
+                {/* ✅ Swapped Button */}
+                <SubmitButton 
+                  onClick={submitEmail} 
+                  isSubmitting={isSubmitting} 
+                  text="Send Emails" 
+                  loadingText="Sending..." 
+                  className="btn-submit"
+                />
               </div>
             </div>
           </div>

@@ -5,6 +5,7 @@ import { useAuth } from '../../context/AuthContext'
 import { can } from '../../utils/permissions'
 import Toast from '../../components/Toast'
 import ConfirmDialog from '../../components/ConfirmDialog'
+import SubmitButton from '../../components/SubmitButton' // ✅ Imported your Pro Button
 import './Properties.css'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
@@ -16,6 +17,7 @@ export default function Properties() {
   
   const [properties, setProperties] = useState([])
   const [loading, setLoading]       = useState(true)
+  const [isSubmitting, setIsSubmitting] = useState(false) // ✅ Added loading state for forms
   const [showAdd, setShowAdd]       = useState(false)
   const [showEdit, setShowEdit]     = useState(false)
   const [editTarget, setEditTarget] = useState(null)
@@ -114,6 +116,8 @@ export default function Properties() {
       return
     }
 
+    setIsSubmitting(true) // ✅ Turn spinner ON
+
     try {
       const res = await fetch(`${API_URL}/properties`, {
         method: 'POST',
@@ -150,6 +154,8 @@ export default function Properties() {
       
     } catch (err) {
       setError(err.message || 'Failed to create property')
+    } finally {
+      setIsSubmitting(false) // ✅ Turn spinner OFF
     }
   }
 
@@ -159,6 +165,8 @@ export default function Properties() {
       setError('Please fill in all required fields.')
       return
     }
+
+    setIsSubmitting(true) // ✅ Turn spinner ON
 
     try {
       const res = await fetch(`${API_URL}/properties/${editTarget.id}`, {
@@ -198,6 +206,8 @@ export default function Properties() {
       
     } catch (err) {
       setError(err.message || 'Failed to update property')
+    } finally {
+      setIsSubmitting(false) // ✅ Turn spinner OFF
     }
   }
 
@@ -414,7 +424,14 @@ export default function Properties() {
             </div>
             <div className="modal-footer">
               <button className="btn-cancel" onClick={() => setShowAdd(false)}>Cancel</button>
-              <button className="btn-submit" onClick={submitAdd}>Add Property</button>
+              {/* ✅ Swapped Button */}
+              <SubmitButton 
+                onClick={submitAdd} 
+                isSubmitting={isSubmitting} 
+                text="Add Property" 
+                loadingText="Creating..." 
+                className="btn-submit"
+              />
             </div>
           </div>
         </div>
@@ -449,7 +466,14 @@ export default function Properties() {
             </div>
             <div className="modal-footer">
               <button className="btn-cancel" onClick={() => setShowEdit(false)}>Cancel</button>
-              <button className="btn-submit" onClick={submitEdit}>Update Property</button>
+              {/* ✅ Swapped Button */}
+              <SubmitButton 
+                onClick={submitEdit} 
+                isSubmitting={isSubmitting} 
+                text="Update Property" 
+                loadingText="Updating..." 
+                className="btn-submit"
+              />
             </div>
           </div>
         </div>
