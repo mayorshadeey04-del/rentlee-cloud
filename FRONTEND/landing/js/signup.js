@@ -1,4 +1,4 @@
-const API_URL = 'import.meta.env.VITE_API_URL'; // ✅ Changed to port 5001 to match your backend
+const API_URL = 'https://rentlee-api.onrender.com/api';
 
 // Get form and input elements
 const form = document.getElementById("signupForm");
