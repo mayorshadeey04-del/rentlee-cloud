@@ -93,7 +93,7 @@ setTimeout(() => {
     console.log('🚀 Redirecting to dashboard...');
     const encodedUser  = encodeURIComponent(JSON.stringify(dashboardUser));
     const encodedToken = encodeURIComponent(token);
-    window.location.href = `http://localhost:5173/auth-callback?token=${encodedToken}&user=${encodedUser}`;
+   window.location.href = `https://rentlee-cloud.vercel.app/auth-callback?token=${encodedToken}&user=${encodedUser}`;
 }, 1000);
 
         } else {
