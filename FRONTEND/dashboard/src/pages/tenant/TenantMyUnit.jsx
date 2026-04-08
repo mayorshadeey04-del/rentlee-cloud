@@ -32,10 +32,64 @@ export default function TenantMyUnit() {
     fetchMyUnit()
   }, [])
 
+  // ============================================================================
+  // SKELETON LOADER
+  // ============================================================================
   if (loading) {
     return (
       <div className="tenant-my-unit">
-        <div className="unit-loading"><i className="fas fa-circle-notch fa-spin" /></div>
+        <div className="unit-page-header">
+          <div className="skeleton skeleton-title" style={{ width: '25%', marginBottom: '0.5rem' }}></div>
+          <div className="skeleton skeleton-text" style={{ width: '40%' }}></div>
+        </div>
+
+        <div className="unit-grid">
+          {/* Skeleton Card 1: Unit Overview */}
+          <div className="unit-card">
+            <div className="unit-card-header">
+              <div className="skeleton skeleton-title" style={{ width: '40%', margin: 0, height: '1.5rem' }}></div>
+              <div className="skeleton" style={{ width: '60px', height: '1.5rem', borderRadius: '8px' }}></div>
+            </div>
+            <div className="unit-card-body">
+              <div className="skeleton" style={{ width: '120px', height: '4rem', marginBottom: '2rem', borderRadius: '8px' }}></div>
+              
+              <div className="unit-detail-grid">
+                <div className="unit-detail-item">
+                  <div className="skeleton skeleton-text" style={{ width: '40%', marginBottom: '0.25rem' }}></div>
+                  <div className="skeleton skeleton-text" style={{ width: '80%', height: '1.25rem' }}></div>
+                </div>
+                <div className="unit-detail-item">
+                  <div className="skeleton skeleton-text" style={{ width: '40%', marginBottom: '0.25rem' }}></div>
+                  <div className="skeleton skeleton-text" style={{ width: '80%', height: '1.25rem' }}></div>
+                </div>
+                <div className="unit-detail-item" style={{ gridColumn: '1 / -1' }}> 
+                  <div className="skeleton skeleton-text" style={{ width: '20%', marginBottom: '0.25rem' }}></div>
+                  <div className="skeleton skeleton-text" style={{ width: '60%', height: '1.25rem' }}></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Skeleton Card 2: Tenancy Details */}
+          <div className="unit-card">
+            <div className="unit-card-header">
+              <div className="skeleton skeleton-title" style={{ width: '40%', margin: 0, height: '1.5rem' }}></div>
+            </div>
+            <div className="unit-card-body">
+              <div className="tenancy-detail-list">
+                {[1, 2, 3, 4].map(i => (
+                  <div key={i} className="tenancy-item">
+                    <div className="skeleton skeleton-icon" style={{ margin: 0 }}></div>
+                    <div style={{ flex: 1 }}>
+                      <div className="skeleton skeleton-text" style={{ width: '30%', marginBottom: '0.35rem' }}></div>
+                      <div className="skeleton skeleton-text" style={{ width: '50%', height: '1.25rem' }}></div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     )
   }

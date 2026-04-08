@@ -120,7 +120,46 @@ export default function TenantProfile() {
     }
   }
 
-  if (loadingData) return <div className="tenant-profile" style={{padding: '2rem'}}>Loading profile...</div>
+  // ============================================================================
+  // SKELETON LOADER
+  // ============================================================================
+  if (loadingData) {
+    return (
+      <div className="tenant-profile">
+        <div className="profile-header">
+          <div className="skeleton skeleton-title" style={{ width: '25%', marginBottom: '0.5rem' }}></div>
+          <div className="skeleton skeleton-text" style={{ width: '35%' }}></div>
+        </div>
+
+        <div className="profile-container">
+          <div className="profile-info-card">
+            {/* Skeleton Tabs */}
+            <div className="profile-tabs" style={{ display: 'flex', gap: '1px', background: 'var(--slate-200)' }}>
+              <div className="skeleton" style={{ flex: 1, height: '3.5rem', borderRadius: 0 }}></div>
+              <div className="skeleton" style={{ flex: 1, height: '3.5rem', borderRadius: 0 }}></div>
+            </div>
+
+            {/* Skeleton Form Fields */}
+            <div className="profile-tab-content" style={{ padding: '1.5rem 2rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2rem' }}>
+                <div className="skeleton skeleton-title" style={{ width: '30%', margin: 0 }}></div>
+                <div className="skeleton" style={{ width: '120px', height: '2.5rem', borderRadius: '10px' }}></div>
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                {[1, 2, 3, 4].map(i => (
+                  <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                    <div className="skeleton skeleton-text" style={{ width: '20%' }}></div>
+                    <div className="skeleton" style={{ width: '100%', height: '3rem', borderRadius: '10px' }}></div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="tenant-profile">

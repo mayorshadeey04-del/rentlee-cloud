@@ -128,3 +128,20 @@
   font-size: 0.75rem;
   color: var(--slate-400);
 }
+
+/* =========================================================
+   SKELETON LOADING ANIMATION
+   ========================================================= */
+@keyframes skeleton-pulse {
+  0% { background-color: var(--slate-100); }
+  50% { background-color: var(--slate-200); }
+  100% { background-color: var(--slate-100); }
+}
+
+.skeleton {
+  animation: skeleton-pulse 1.5s infinite ease-in-out;
+  border-radius: 8px;
+}
+
+.skeleton-text { height: 1rem; border-radius: 4px; }
+.skeleton-title { height: 1.75rem; border-radius: 6px; }
