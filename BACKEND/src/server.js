@@ -6,7 +6,8 @@ dotenv.config();
 
 const PORT = process.env.PORT || 5001;
 
-app.listen(PORT, () => {
+// Adding '0.0.0.0' forces the server to open itself to the internet
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server running on PORT ${PORT}`);
 });
 
