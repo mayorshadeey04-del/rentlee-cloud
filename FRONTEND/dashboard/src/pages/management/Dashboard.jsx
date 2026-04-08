@@ -75,7 +75,7 @@ export default function Dashboard() {
         console.log('✅ Normalized stats:', normalizedStats)
         setStats(normalizedStats)
 
-        // 👇 FIX 1: Pull chart data directly from the pre-calculated stats payload
+        // ✅ Pull chart data directly from the pre-calculated stats payload
         if (rawStats.maintenance) {
           setMaintenanceData({
              open: rawStats.maintenance.pending || 0,
@@ -142,7 +142,10 @@ export default function Dashboard() {
 
     if (chartInstance.current) chartInstance.current.destroy()
 
-    chartInstance.current = new Chart(chartRef.current, {
+    // Grab the 2D context explicitly to fix the blank rendering bug
+    const ctx = chartRef.current.getContext('2d');
+
+    chartInstance.current = new Chart(ctx, {
       type: 'pie',
       data: {
         labels: ['Open', 'In Progress', 'Complete'],
@@ -195,7 +198,7 @@ export default function Dashboard() {
       icon: 'fas fa-comment-dots',
       title: 'Send Notice',
       desc: 'Bulk SMS / Email',
-      path: '/management/tenants', // 👇 FIX 2: Corrected the routing path
+      path: '/management/tenants',
       show: can(user?.role, 'tenants', 'create'),
     },
   ].filter(l => l.show)
@@ -280,9 +283,10 @@ export default function Dashboard() {
           <div className="dashboard-card-header">
             <h2 className="dashboard-card-title">Maintenance Requests</h2>
           </div>
+          {/* Override flexbox display with block, and provide an explicit height so Chart.js doesn't collapse */}
           <div className="dashboard-chart-container" style={{ display: 'block', position: 'relative', height: '320px', width: '100%' }}>
             {maintenanceData && (maintenanceData.open > 0 || maintenanceData.inProgress > 0 || maintenanceData.complete > 0)
-              ? <canvas ref={chartRef}></canvas>
+              ? <canvas ref={chartRef} width="300" height="300"></canvas>
               : <div className="dashboard-empty"><i className="fas fa-chart-pie"></i><p>No maintenance data yet</p></div>
             }
           </div>
