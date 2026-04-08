@@ -8,7 +8,7 @@ import {
 } from './email.templates.js';
 
 // Helper to get consistent Frontend URL
-const FRONTEND_BASE_URL = 'https://rentlee-cloud.vercel.app';
+const LANDING_PAGE_URL = 'https://rentlee-cloud-l6ur.vercel.app';
 
 // ============================================
 // SEND VERIFICATION EMAIL
@@ -40,7 +40,7 @@ export const sendVerificationEmail = async (email, code, firstName) => {
 export const sendPasswordSetupEmail = async (email, token, firstName, role) => {
   try {
     // Fixed path to match your Vercel structure
-    const setupUrl = `${FRONTEND_BASE_URL}/set-password.html?token=${token}`;
+    const setupUrl = `${LANDING_PAGE_URL}/set-password.html?token=${token}`;
     const template = passwordSetupEmailTemplate(firstName, setupUrl, role);
 
     const mailOptions = {
@@ -66,7 +66,7 @@ export const sendPasswordSetupEmail = async (email, token, firstName, role) => {
 export const sendPasswordResetEmail = async (email, token, firstName) => {
   try {
     // Fixed: Named it resetUrl so the template can actually find it
-    const resetUrl = `${FRONTEND_BASE_URL}/set-password.html?token=${token}`;
+    const resetUrl = `${LANDING_PAGE_URL}/set-password.html?token=${token}`;
     const template = passwordResetEmailTemplate(firstName, resetUrl);
 
     const mailOptions = {
