@@ -2,6 +2,7 @@
 const form = document.getElementById('setPasswordForm');
 const password = document.getElementById('password');
 const confirmPassword = document.getElementById('confirmPassword');
+const submitBtn = form.querySelector('button[type="submit"]');
 
 // Password requirement elements
 const reqLength = document.getElementById('req-length');
@@ -9,13 +10,16 @@ const reqUppercase = document.getElementById('req-uppercase');
 const reqLowercase = document.getElementById('req-lowercase');
 const reqNumber = document.getElementById('req-number');
 
-// Get token from URL (sent in password reset email)
-const urlParams = new URLSearchParams(window.location.search);
-const resetToken = urlParams.get('token');
+// Live Render API URL
+const API_URL = 'https://rentlee-api.onrender.com/api';
 
-// If no token, redirect to forgot password (or login)
-if (!resetToken) {
-    alert('Invalid or missing reset token. Please request a new password link.');
+// Get token from URL
+const urlParams = new URLSearchParams(window.location.search);
+const token = urlParams.get('token');
+
+// If no token, redirect to forgot password
+if (!token) {
+    alert('Invalid or missing reset token. Please request a new link.');
     window.location.href = 'forgot-password.html';
 }
 
@@ -23,40 +27,15 @@ if (!resetToken) {
 password.addEventListener('input', () => {
     const value = password.value;
     
-    // Check length (8+ characters)
-    if (value.length >= 8) {
-        reqLength.classList.add('met');
-    } else {
-        reqLength.classList.remove('met');
-    }
+    if (value.length >= 8) reqLength.classList.add('met'); else reqLength.classList.remove('met');
+    if (/[A-Z]/.test(value)) reqUppercase.classList.add('met'); else reqUppercase.classList.remove('met');
+    if (/[a-z]/.test(value)) reqLowercase.classList.add('met'); else reqLowercase.classList.remove('met');
+    if (/[0-9]/.test(value)) reqNumber.classList.add('met'); else reqNumber.classList.remove('met');
     
-    // Check uppercase
-    if (/[A-Z]/.test(value)) {
-        reqUppercase.classList.add('met');
-    } else {
-        reqUppercase.classList.remove('met');
-    }
-    
-    // Check lowercase
-    if (/[a-z]/.test(value)) {
-        reqLowercase.classList.add('met');
-    } else {
-        reqLowercase.classList.remove('met');
-    }
-    
-    // Check number
-    if (/[0-9]/.test(value)) {
-        reqNumber.classList.add('met');
-    } else {
-        reqNumber.classList.remove('met');
-    }
-    
-    // Clear error
     password.classList.remove('invalid');
     password.parentElement.querySelector('.error').textContent = '';
 });
 
-// Validate confirm password in real-time
 confirmPassword.addEventListener('input', () => {
     confirmPassword.classList.remove('invalid');
     confirmPassword.parentElement.querySelector('.error').textContent = '';
@@ -66,141 +45,97 @@ confirmPassword.addEventListener('input', () => {
 form.addEventListener('submit', async (e) => {
     e.preventDefault();
     
-    // Validate password
-    const passwordOK = validatePassword();
-    const confirmOK = validateConfirmPassword();
-    
-    if (passwordOK && confirmOK) {
-        await resetPassword();
+    if (validatePassword() && validateConfirmPassword()) {
+        await handlePasswordSubmission();
     }
 });
 
-// Validate password meets all requirements
-function validatePassword() {
-    const value = password.value;
-    
-    if (value === '') {
-        showError(password, 'Password is required');
-        return false;
-    }
-    
-    if (value.length < 8) {
-        showError(password, 'Password must be at least 8 characters');
-        return false;
-    }
-    
-    if (!/[A-Z]/.test(value)) {
-        showError(password, 'Password must contain an uppercase letter');
-        return false;
-    }
-    
-    if (!/[a-z]/.test(value)) {
-        showError(password, 'Password must contain a lowercase letter');
-        return false;
-    }
-    
-    if (!/[0-9]/.test(value)) {
-        showError(password, 'Password must contain a number');
-        return false;
-    }
-    
-    showSuccess(password);
-    return true;
-}
+async function handlePasswordSubmission() {
+    const originalText = submitBtn.textContent;
+    submitBtn.textContent = 'Processing...';
+    submitBtn.disabled = true;
 
-// Validate confirm password matches
-function validateConfirmPassword() {
-    const value = confirmPassword.value;
-    
-    if (value === '') {
-        showError(confirmPassword, 'Please confirm your password');
-        return false;
-    }
-    
-    if (value !== password.value) {
-        showError(confirmPassword, 'Passwords do not match');
-        return false;
-    }
-    
-    showSuccess(confirmPassword);
-    return true;
-}
-
-// Reset/Set password via API
-async function resetPassword() {
     try {
-        const submitBtn = form.querySelector('button[type="submit"]');
-        const originalText = submitBtn.textContent;
-        submitBtn.textContent = 'Setting Password...';
-        submitBtn.disabled = true;
+        /* NOTE: We check both endpoints. 
+           If it's a reset (Forgot Password), we use /signin/reset-password
+           If it's a new account setup, we use /signup/setup-password
+        */
         
-        // Make the actual call to your backend
-        const response = await fetch('import.meta.env.VITE_API_URL/signup/setup-password', {
+        // Let's try the Reset Password endpoint first
+        let response = await fetch(`${API_URL}/signin/reset-password`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                token: resetToken,
-                newPassword: password.value
-            })
+            body: JSON.stringify({ token: token, newPassword: password.value })
         });
-        
+
+        // If that fails, try the Setup Password endpoint
         if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || 'Failed to set password');
+            response = await fetch(`${API_URL}/signup/setup-password`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ token: token, newPassword: password.value })
+            });
         }
-        
-        // Success State
-        submitBtn.textContent = 'Password Set! ✓';
-        submitBtn.style.background = '#10b981';
-        
-        alert('Password set successfully! You can now log in to your account.');
-        
-        // Redirect to login page
-        setTimeout(() => {
-            window.location.href = 'login.html';
-        }, 1500);
-        
+
+        const data = await response.json();
+
+        if (response.ok) {
+            submitBtn.textContent = 'Success! ✓';
+            submitBtn.style.background = '#10b981';
+            alert('Password updated successfully! Redirecting to login...');
+            setTimeout(() => { window.location.href = 'login.html'; }, 1500);
+        } else {
+            throw new Error(data.message || 'Link expired or invalid.');
+        }
+
     } catch (error) {
-        console.error('Password Setup Error:', error);
-        alert(error.message || 'Failed to set password. Please try again or request a new link.');
-        
-        // Reset button state
-        const submitBtn = form.querySelector('button[type="submit"]');
-        submitBtn.textContent = 'Set Password';
+        console.error('Submission Error:', error);
+        alert(error.message);
+        submitBtn.textContent = originalText;
         submitBtn.disabled = false;
     }
 }
 
-// Helper functions
+// Validation Helpers
+function validatePassword() {
+    const value = password.value;
+    if (value.length < 8 || !/[A-Z]/.test(value) || !/[a-z]/.test(value) || !/[0-9]/.test(value)) {
+        showError(password, 'Please meet all password requirements');
+        return false;
+    }
+    showSuccess(password);
+    return true;
+}
+
+function validateConfirmPassword() {
+    if (confirmPassword.value !== password.value) {
+        showError(confirmPassword, 'Passwords do not match');
+        return false;
+    }
+    showSuccess(confirmPassword);
+    return true;
+}
+
 function showError(input, message) {
     input.classList.add('invalid');
-    input.classList.remove('valid');
     const errorElement = input.parentElement.querySelector('.error');
-    if (errorElement) {
-        errorElement.textContent = message;
-    }
+    if (errorElement) errorElement.textContent = message;
 }
 
 function showSuccess(input) {
     input.classList.remove('invalid');
     input.classList.add('valid');
     const errorElement = input.parentElement.querySelector('.error');
-    if (errorElement) {
-        errorElement.textContent = '';
-    }
+    if (errorElement) errorElement.textContent = '';
 }
 
-// Toggle password visibility
 function togglePassword(id, icon) {
     const field = document.getElementById(id);
-    
     if (field.type === 'password') {
         field.type = 'text';
-        icon.classList.remove('fa-eye');
-        icon.classList.add('fa-eye-slash');
+        icon.classList.replace('fa-eye', 'fa-eye-slash');
     } else {
         field.type = 'password';
-        icon.classList.remove('fa-eye-slash');
-        icon.classList.add('fa-eye');
+        icon.classList.replace('fa-eye-slash', 'fa-eye');
     }
 }

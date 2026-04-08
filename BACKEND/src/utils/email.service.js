@@ -66,7 +66,7 @@ export const sendPasswordSetupEmail = async (email, token, firstName, role) => {
 export const sendPasswordResetEmail = async (email, token, firstName) => {
   try {
     // Fixed: Named it resetUrl so the template can actually find it
-    const resetUrl = `${FRONTEND_BASE_URL}/reset-password.html?token=${token}`;
+    const resetUrl = `${FRONTEND_BASE_URL}/set-password.html?token=${token}`;
     const template = passwordResetEmailTemplate(firstName, resetUrl);
 
     const mailOptions = {

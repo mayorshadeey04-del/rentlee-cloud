@@ -32,16 +32,16 @@ export const verificationEmailTemplate = (firstName, code) => {
           </div>
           <div class="content">
             <p>Hi ${firstName},</p>
-            <p>Thank you for registering with RentCare. Please verify your email address by entering the code below:</p>
+            <p>Thank you for registering with Rentlee. Please verify your email address by entering the code below:</p>
             
             <div class="code-box">${code}</div>
             
             <p><strong>This code will expire in 15 minutes.</strong></p>
-            <p>If you didn't create an account with RentCare, please ignore this email.</p>
-            <p>Best regards,<br>The RentCare Team</p>
+            <p>If you didn't create an account with Rentlee, please ignore this email.</p>
+            <p>Best regards,<br>The Rentlee Team</p>
           </div>
           <div class="footer">
-            <p>&copy; ${new Date().getFullYear()} RentCare. All rights reserved.</p>
+            <p>&copy; ${new Date().getFullYear()} Rentlee. All rights reserved.</p>
           </div>
         </div>
       </body>
@@ -50,16 +50,16 @@ export const verificationEmailTemplate = (firstName, code) => {
     text: `
 Hi ${firstName},
 
-Thank you for registering with RentCare. 
+Thank you for registering with Rentlee. 
 
 Your verification code is: ${code}
 
 This code will expire in 15 minutes.
 
-If you didn't create an account with RentCare, please ignore this email.
+If you didn't create an account with Rentlee, please ignore this email.
 
 Best regards,
-The RentCare Team
+The Rentlee Team
     `
   };
 };
@@ -100,11 +100,11 @@ export const passwordSetupEmailTemplate = (firstName, setupUrl, role) => {
       <body>
         <div class="container">
           <div class="header">
-            <h1>Set Up Your RentCare Account</h1>
+            <h1>Set Up Your Rentlee Account</h1>
           </div>
           <div class="content">
             <p>Hi ${firstName},</p>
-            <p>You have been added as a <strong>${role}</strong> on RentCare. To get started, please set up your password by clicking the button below:</p>
+            <p>You have been added as a <strong>${role}</strong> on Rentlee. To get started, please set up your password by clicking the button below:</p>
             
             <div class="button-container">
               <a href="${setupUrl}" class="button">Set Up Password</a>
@@ -113,10 +113,10 @@ export const passwordSetupEmailTemplate = (firstName, setupUrl, role) => {
             <p><strong>Security Notice:</strong> This link will expire in 24 hours.</p>
             
             <p>If you didn't expect this email, please contact your administrator.</p>
-            <p>Best regards,<br>The RentCare Team</p>
+            <p>Best regards,<br>The Rentlee Team</p>
           </div>
           <div class="footer">
-            <p>&copy; ${new Date().getFullYear()} RentCare. All rights reserved.</p>
+            <p>&copy; ${new Date().getFullYear()} Rentlee. All rights reserved.</p>
           </div>
         </div>
       </body>
@@ -125,7 +125,7 @@ export const passwordSetupEmailTemplate = (firstName, setupUrl, role) => {
     text: `
 Hi ${firstName},
 
-You have been added as a ${role} on RentCare. 
+You have been added as a ${role} on Rentlee. 
 
 To get started, please set up your password by clicking this link:
 ${setupUrl}
@@ -135,7 +135,7 @@ Security Notice: This link will expire in 24 hours.
 If you didn't expect this email, please contact your administrator.
 
 Best regards,
-The RentCare Team
+The Rentlee Team
     `
   };
 };
@@ -179,7 +179,7 @@ export const passwordResetEmailTemplate = (firstName, resetUrl) => {
           </div>
           <div class="content">
             <p>Hi ${firstName},</p>
-            <p>We received a request to reset your password for your RentCare account. Click the button below to reset it:</p>
+            <p>We received a request to reset your password for your Rentlee account. Click the button below to reset it:</p>
             
             <div class="button-container">
               <a href="${resetUrl}" class="button">Reset Password</a>
@@ -188,10 +188,10 @@ export const passwordResetEmailTemplate = (firstName, resetUrl) => {
             <p><strong>Security Notice: This link will expire in 1 hour.</strong></p>
             
             <p>If you didn't request a password reset, please ignore this email or contact support if you're concerned about your account security.</p>
-            <p>Best regards,<br>The RentCare Team</p>
+            <p>Best regards,<br>The Rentlee Team</p>
           </div>
           <div class="footer">
-            <p>&copy; ${new Date().getFullYear()} RentCare. All rights reserved.</p>
+            <p>&copy; ${new Date().getFullYear()} Rentlee. All rights reserved.</p>
           </div>
         </div>
       </body>
@@ -200,7 +200,7 @@ export const passwordResetEmailTemplate = (firstName, resetUrl) => {
     text: `
 Hi ${firstName},
 
-We received a request to reset your password for your RentCare account.
+We received a request to reset your password for your Rentlee account.
 
 Click this link to reset your password:
 ${resetUrl}
@@ -210,7 +210,7 @@ Security Notice: This link will expire in 1 hour.
 If you didn't request a password reset, please ignore this email.
 
 Best regards,
-The RentCare Team
+The Rentlee Team
     `
   };
 };
@@ -259,10 +259,10 @@ export const emailChangeVerificationTemplate = (firstName, code) => {
             
             <p><strong>This code will expire in 15 minutes.</strong></p>
             <p>If you didn't request this change, please contact support immediately.</p>
-            <p>Best regards,<br>The RentCare Team</p>
+            <p>Best regards,<br>The Rentlee Team</p>
           </div>
           <div class="footer">
-            <p>&copy; ${new Date().getFullYear()} RentCare. All rights reserved.</p>
+            <p>&copy; ${new Date().getFullYear()} Rentlee. All rights reserved.</p>
           </div>
         </div>
       </body>
@@ -280,7 +280,7 @@ This code will expire in 15 minutes.
 If you didn't request this change, please contact support immediately.
 
 Best regards,
-The RentCare Team
+The Rentlee Team
     `
   };
 };
