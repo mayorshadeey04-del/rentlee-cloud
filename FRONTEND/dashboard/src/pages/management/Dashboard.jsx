@@ -74,31 +74,16 @@ export default function Dashboard() {
         console.log('✅ Normalized stats:', normalizedStats)
         setStats(normalizedStats)
 
-        // ✅ 2. GET /api/maintenance
-        try {
-          const maintRes = await fetch(`${API_URL}/maintenance`, { 
-            headers: authHeaders() 
-          })
-          
-          if (maintRes.ok) {
-            const maintData = await maintRes.json()
-            const records = maintData.data || maintData
-            
-            const summary = {
-              open: records.filter(r => r.status === 'open').length,
-              inProgress: records.filter(r => r.status === 'in_progress' || r.status === 'in-progress').length,
-              complete: records.filter(r => r.status === 'complete' || r.status === 'completed').length
-            }
-            
-            console.log('✅ Maintenance summary:', summary)
-            setMaintenanceData(summary)
-          }
-        } catch (err) {
-          console.log('ℹ️ Maintenance data not available')
-          setMaintenanceData({ open: 0, inProgress: 0, complete: 0 })
+        // 👇 FIX 1: Pull chart data directly from the pre-calculated stats payload
+        if (rawStats.maintenance) {
+          setMaintenanceData({
+             open: rawStats.maintenance.pending || 0,
+             inProgress: rawStats.maintenance.in_progress || 0,
+             complete: rawStats.maintenance.completed || 0
+          });
         }
 
-        // ✅ 3. GET /api/properties
+        // ✅ 2. GET /api/properties
         const propsRes = await fetch(`${API_URL}/properties`, { 
           headers: authHeaders() 
         })
@@ -209,7 +194,7 @@ export default function Dashboard() {
       icon: 'fas fa-comment-dots',
       title: 'Send Notice',
       desc: 'Bulk SMS / Email',
-      path: '/management/notices',
+      path: '/management/tenants', // 👇 FIX 2: Corrected the routing path
       show: can(user?.role, 'tenants', 'create'),
     },
   ].filter(l => l.show)
