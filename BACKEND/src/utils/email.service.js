@@ -7,21 +7,20 @@ import {
   tenantNotificationTemplate
 } from './email.templates.js';
 
+// Helper to get consistent Frontend URL
+const FRONTEND_BASE_URL = 'https://rentlee-cloud.vercel.app';
+
 // ============================================
 // SEND VERIFICATION EMAIL
-// Used in: signup.controller.js
-// - registerLandlord() - sends code after user registers
-// - resendVerification() - resends code if expired
 // ============================================
 export const sendVerificationEmail = async (email, code, firstName) => {
   try {
     const template = verificationEmailTemplate(firstName, code);
 
     const mailOptions = {
-      // from: process.env.EMAIL_FROM || 'RentCare <noreply@rentcare.com>',
       from: process.env.SENDER_EMAIL,
       to: email,
-      subject: 'Verify Your Email - RentCare',
+      subject: 'Verify Your Email - Rentlee',
       html: template.html,
       text: template.text
     };
@@ -29,7 +28,6 @@ export const sendVerificationEmail = async (email, code, firstName) => {
     const info = await transporter.sendMail(mailOptions);
     console.log('Verification email sent:', info.messageId);
     return info;
-
   } catch (error) {
     console.error('Error sending verification email:', error);
     throw new Error('Failed to send verification email');
@@ -37,21 +35,18 @@ export const sendVerificationEmail = async (email, code, firstName) => {
 };
 
 // ============================================
-// SEND PASSWORD SETUP EMAIL
-// Used in: caretakers.controller.js
-// - createCaretaker() - sends setup link to new caretaker
-// Used in: tenants.controller.js
-// - createTenant() - sends setup link to new tenant
+// SEND PASSWORD SETUP EMAIL (Fixed setupUrl & from address)
 // ============================================
 export const sendPasswordSetupEmail = async (email, token, firstName, role) => {
   try {
-    const setupUrl = `${process.env.FRONTEND_URL}/FRONTEND/landing/set-password.html?token=${token}`;
+    // Fixed path to match your Vercel structure
+    const setupUrl = `${FRONTEND_BASE_URL}/set-password.html?token=${token}`;
     const template = passwordSetupEmailTemplate(firstName, setupUrl, role);
 
     const mailOptions = {
-      from: process.env.EMAIL_FROM || 'RentCare <noreply@rentcare.com>',
+      from: process.env.SENDER_EMAIL, // Use your verified sender email
       to: email,
-      subject: 'Set Up Your RentCare Account',
+      subject: 'Set Up Your Rentlee Account',
       html: template.html,
       text: template.text
     };
@@ -59,7 +54,6 @@ export const sendPasswordSetupEmail = async (email, token, firstName, role) => {
     const info = await transporter.sendMail(mailOptions);
     console.log('Password setup email sent:', info.messageId);
     return info;
-
   } catch (error) {
     console.error('Error sending password setup email:', error);
     throw new Error('Failed to send password setup email');
@@ -67,20 +61,18 @@ export const sendPasswordSetupEmail = async (email, token, firstName, role) => {
 };
 
 // ============================================
-// SEND PASSWORD RESET EMAIL
-// Used in: signin.controller.js
-// - forgotPassword() - sends reset link when user forgets password
+// SEND PASSWORD RESET EMAIL (Fixed resetUrl variable name)
 // ============================================
 export const sendPasswordResetEmail = async (email, token, firstName) => {
   try {
-    const setupUrl = `${process.env.FRONTEND_URL}/FRONTEND/landing/set-password.html?token=${token}`;
+    // Fixed: Named it resetUrl so the template can actually find it
+    const resetUrl = `${FRONTEND_BASE_URL}/reset-password.html?token=${token}`;
     const template = passwordResetEmailTemplate(firstName, resetUrl);
 
     const mailOptions = {
-      // from: process.env.EMAIL_FROM || 'RentCare <noreply@rentcare.com>',
       from: process.env.SENDER_EMAIL,
       to: email,
-      subject: 'Reset Your Password - RentCare',
+      subject: 'Reset Your Password - Rentlee',
       html: template.html,
       text: template.text
     };
@@ -88,7 +80,6 @@ export const sendPasswordResetEmail = async (email, token, firstName) => {
     const info = await transporter.sendMail(mailOptions);
     console.log('Password reset email sent:', info.messageId);
     return info;
-
   } catch (error) {
     console.error('Error sending password reset email:', error);
     throw new Error('Failed to send password reset email');
@@ -97,26 +88,21 @@ export const sendPasswordResetEmail = async (email, token, firstName) => {
 
 // ============================================
 // SEND EMAIL CHANGE VERIFICATION
-// Used in: signin.controller.js
-// - changeEmail() - sends code to verify new email address (landlord only)
 // ============================================
 export const sendEmailChangeVerification = async (email, code, firstName) => {
   try {
     const template = emailChangeVerificationTemplate(firstName, code);
 
     const mailOptions = {
-      // from: process.env.EMAIL_FROM || 'RentCare <noreply@rentcare.com>',
       from: process.env.SENDER_EMAIL,
       to: email,
-      subject: 'Verify Your New Email - RentCare',
+      subject: 'Verify Your New Email - Rentlee',
       html: template.html,
       text: template.text
     };
 
     const info = await transporter.sendMail(mailOptions);
-    console.log('Email change verification sent:', info.messageId);
     return info;
-
   } catch (error) {
     console.error('Error sending email change verification:', error);
     throw new Error('Failed to send email change verification');
@@ -124,15 +110,14 @@ export const sendEmailChangeVerification = async (email, code, firstName) => {
 };
 
 // ============================================
-// SEND DYNAMIC TENANT EMAIL (MAIL MERGE)
-// Used in: tenants.controller.js - sendEmailNotice()
+// SEND DYNAMIC TENANT EMAIL
 // ============================================
 export const sendDynamicTenantEmail = async (email, subject, htmlBody) => {
   try {
     const template = tenantNotificationTemplate(subject, htmlBody);
 
     const mailOptions = {
-      from: process.env.SENDER_EMAIL || 'Rentlee <noreply@rentlee.com>',
+      from: process.env.SENDER_EMAIL,
       to: email,
       subject: subject,
       html: template.html,
@@ -143,7 +128,6 @@ export const sendDynamicTenantEmail = async (email, subject, htmlBody) => {
     return info;
   } catch (error) {
     console.error(`Failed to send dynamic email to ${email}:`, error);
-    // We don't throw an error here so the loop doesn't crash if one email fails!
   }
 };
 
