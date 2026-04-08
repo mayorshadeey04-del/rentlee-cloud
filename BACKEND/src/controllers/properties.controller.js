@@ -78,7 +78,7 @@ export const getProperty = async (req, res) => {
 
     const result = await db.query(
       `SELECT p.*, 
-              COUNT(DISTINCT u.id) as total_units,
+              COUNT(DISTINCT u.id) as physical_unit_count, -- ✅ FIXED: Renamed to prevent overwriting p.total_units
               COUNT(DISTINCT CASE WHEN u.status = 'occupied' THEN u.id END) as occupied_units,
               COUNT(DISTINCT CASE WHEN u.status = 'vacant' THEN u.id END) as vacant_units,
               COUNT(DISTINCT t.id) as total_tenants
