@@ -119,7 +119,51 @@ export default function TenantDashboard() {
     }
   }
 
-  if (loading) return <div style={{ padding: '3rem', textAlign: 'center', color: '#64748b' }}>Loading dashboard...</div>
+  // ============================================================================
+  // SKELETON LOADER
+  // ============================================================================
+  if (loading) {
+    return (
+      <div className="tenant-dashboard">
+        <div className="tenant-welcome">
+          <div className="skeleton skeleton-title" style={{ width: '30%', marginBottom: '0.75rem' }}></div>
+          <div className="skeleton skeleton-text" style={{ width: '25%' }}></div>
+        </div>
+
+        <section className="tenant-stats">
+          {[1, 2, 3, 4].map(i => (
+            <div key={i} className="tenant-stat-card" style={{ border: '2px solid var(--slate-100)', boxShadow: 'none' }}>
+              <div className="skeleton skeleton-icon"></div>
+              <div className="skeleton skeleton-text" style={{ width: '45%' }}></div>
+              <div className="skeleton skeleton-value" style={{ width: '65%', height: '2rem', marginTop: '0.5rem' }}></div>
+              <div className="skeleton skeleton-text" style={{ width: '55%', marginTop: '0.5rem' }}></div>
+            </div>
+          ))}
+        </section>
+
+        <section className="tenant-quick-actions">
+          <div className="skeleton skeleton-title" style={{ width: '150px', marginBottom: '1rem', height: '1.5rem' }}></div>
+          <div className="tenant-action-grid">
+            {[1, 2].map(i => (
+              <div key={i} className="skeleton skeleton-btn" style={{ height: '85px', borderRadius: '14px', border: '2px solid var(--slate-100)' }}></div>
+            ))}
+          </div>
+        </section>
+
+        <section className="tenant-bottom-grid">
+          {[1, 2].map(i => (
+            <div key={i} className="tenant-card" style={{ border: '2px solid var(--slate-100)', padding: '1.5rem' }}>
+              <div className="skeleton skeleton-title" style={{ width: '40%' }}></div>
+              <div style={{ marginTop: '1.5rem' }}>
+                {[1, 2, 3].map(j => <div key={j} className="skeleton skeleton-table-row"></div>)}
+              </div>
+            </div>
+          ))}
+        </section>
+      </div>
+    )
+  }
+
   if (pageError) return <div style={{ padding: '3rem', textAlign: 'center', color: '#ef4444' }}>{pageError}</div>
 
   // ============================================================================
@@ -203,7 +247,7 @@ export default function TenantDashboard() {
 
       <div className="tenant-welcome">
         <div>
-          <h2 className="tenant-welcome-title">Welcome back, {firstName}! 👋</h2>
+          <h2 className="tenant-welcome-title">Welcome back, {firstName}!</h2>
           <p className="tenant-welcome-sub">Here's a summary of your tenancy</p>
         </div>
       </div>

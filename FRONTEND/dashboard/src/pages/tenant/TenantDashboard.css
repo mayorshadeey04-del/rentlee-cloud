@@ -349,3 +349,22 @@
   color: #166534;
   font-size: 0.938rem;
 }
+
+/* ── Skeleton Loading ── */
+@keyframes skeleton-pulse {
+  0% { background-color: var(--slate-100); }
+  50% { background-color: var(--slate-200); }
+  100% { background-color: var(--slate-100); }
+}
+
+.skeleton {
+  animation: skeleton-pulse 1.5s infinite ease-in-out;
+  border-radius: 8px;
+}
+
+.skeleton-icon { width: 44px; height: 44px; border-radius: 12px; margin-bottom: 1rem; }
+.skeleton-text { height: 1rem; border-radius: 4px; }
+.skeleton-title { height: 1.75rem; border-radius: 6px; }
+.skeleton-value { height: 2.5rem; border-radius: 6px; }
+.skeleton-btn { width: 100%; }
+.skeleton-table-row { height: 3.5rem; margin-bottom: 0.75rem; border-radius: 8px; }
