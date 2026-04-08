@@ -280,7 +280,7 @@ export default function Dashboard() {
           <div className="dashboard-card-header">
             <h2 className="dashboard-card-title">Maintenance Requests</h2>
           </div>
-          <div className="dashboard-chart-container">
+          <div className="dashboard-chart-container" style={{ display: 'block', position: 'relative', height: '320px', width: '100%' }}>
             {maintenanceData && (maintenanceData.open > 0 || maintenanceData.inProgress > 0 || maintenanceData.complete > 0)
               ? <canvas ref={chartRef}></canvas>
               : <div className="dashboard-empty"><i className="fas fa-chart-pie"></i><p>No maintenance data yet</p></div>
