@@ -1,4 +1,3 @@
-
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 import db from '../config/db.js';
@@ -25,19 +24,6 @@ export const registerLandlord = async (req, res) => {
       });
     }
 
-    // Check if user already exists
-    const existingUser = await db.query(
-      'SELECT id FROM users WHERE email = $1', 
-      [email]
-    );
-
-    if (existingUser.rows.length > 0) {
-      return res.status(400).json({ 
-        success: false, 
-        message: 'Email already registered' 
-      });
-    }
-
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -46,45 +32,81 @@ export const registerLandlord = async (req, res) => {
     const codeHash = crypto.createHash('sha256').update(code).digest('hex');
     const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
 
-    // Create user
-    const userResult = await db.query(
-      `INSERT INTO users (first_name, last_name, email, phone, password_hash, role, is_active)
-       VALUES ($1, $2, $3, $4, $5, $6, $7) 
-       RETURNING id, first_name, last_name, email, phone, role`,
-      [firstName, lastName, email, phone, hashedPassword, 'landlord', false]
+    let userId;
+
+    // Check if user already exists
+    const existingUser = await db.query(
+      'SELECT id, is_active FROM users WHERE email = $1', 
+      [email]
     );
 
-    const user = userResult.rows[0];
+    if (existingUser.rows.length > 0) {
+      const user = existingUser.rows[0];
 
-   // Store verification code
-await db.query(
-  'INSERT INTO email_verification (user_id, code_hash, expires_at) VALUES ($1, $2, $3)',
-  [user.id, codeHash, expiresAt]
-);
+      // CASE A: User exists and is verified -> BLOCK
+      if (user.is_active) {
+        return res.status(400).json({ 
+          success: false, 
+          message: 'This email is already registered and verified. Please log in.' 
+        });
+      }
 
-// ✅ SEND VERIFICATION EMAIL ASYNCHRONOUSLY (don't wait for it)
-sendVerificationEmail(email, code, firstName).catch(err => {
-  console.error('❌ Background email send failed (non-blocking):', err);
-  // Email failure won't block user signup
-});
+      // CASE B: User exists but is NOT verified -> OVERWRITE (The Amazon Way)
+      userId = user.id;
+      
+      // Overwrite their details just in case they fixed a typo in their name/phone/password
+      await db.query(
+        `UPDATE users 
+         SET first_name = $1, last_name = $2, phone = $3, password_hash = $4, updated_at = CURRENT_TIMESTAMP 
+         WHERE id = $5`,
+        [firstName, lastName, phone, hashedPassword, userId]
+      );
 
-console.log(`📧 Verification email queued for ${email}`);
+      // Clean up: Mark any previous pending verification codes as used so they don't clash
+      await db.query(
+        'UPDATE email_verification SET used = true WHERE user_id = $1',
+        [userId]
+      );
 
-// ✅ RESPOND IMMEDIATELY (don't wait for email)
-res.status(201).json({
-  success: true,
-  message: 'Registration successful. Please check your email for verification code.',
-  user: {
-    id: user.id,
-    firstName: user.first_name,
-    lastName: user.last_name,
-    email: user.email,
-    phone: user.phone,
-    role: user.role
-  }
-});
+      console.log(`♻️ Overwriting unverified account for ${email}`);
 
-console.log(`✅ User ${email} registered successfully (email sending in background)`);
+    } else {
+      // CASE C: Brand New User -> INSERT
+      const userResult = await db.query(
+        `INSERT INTO users (first_name, last_name, email, phone, password_hash, role, is_active)
+         VALUES ($1, $2, $3, $4, $5, $6, $7) 
+         RETURNING id`,
+        [firstName, lastName, email, phone, hashedPassword, 'landlord', false]
+      );
+      userId = userResult.rows[0].id;
+    }
+
+    // Store NEW verification code
+    await db.query(
+      'INSERT INTO email_verification (user_id, code_hash, expires_at) VALUES ($1, $2, $3)',
+      [userId, codeHash, expiresAt]
+    );
+
+    // ✅ SEND VERIFICATION EMAIL ASYNCHRONOUSLY
+    sendVerificationEmail(email, code, firstName).catch(err => {
+      console.error('❌ Background email send failed (non-blocking):', err);
+    });
+
+    console.log(`📧 Verification email queued for ${email} (Code: ${code})`); // Useful for testing in Render logs!
+
+    // ✅ RESPOND IMMEDIATELY
+    res.status(201).json({
+      success: true,
+      message: 'Registration successful. Please check your email for verification code.',
+      user: {
+        id: userId,
+        firstName: firstName,
+        lastName: lastName,
+        email: email,
+        phone: phone,
+        role: 'landlord'
+      }
+    });
 
   } catch (error) {
     console.error('Registration error:', error);

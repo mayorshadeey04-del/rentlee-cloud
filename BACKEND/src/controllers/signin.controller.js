@@ -498,9 +498,12 @@ export const forgotPassword = async (req, res) => {
       [user.id, tokenHash, 'password_reset', expiresAt]
     );
 
-    // SEND PASSWORD RESET EMAIL
-    await sendPasswordResetEmail(email, resetToken, user.first_name);
+   // ✅ SEND PASSWORD RESET EMAIL (Non-blocking)
+    sendPasswordResetEmail(email, resetToken, user.first_name).catch(err => {
+        console.error('Background password reset email failed:', err);
+    });
 
+    // ✅ RESPOND IMMEDIATELY
     res.json({ 
       success: true, 
       message: 'If an account exists, a password reset link has been sent.' 

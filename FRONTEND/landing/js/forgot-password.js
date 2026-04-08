@@ -1,15 +1,54 @@
 // Get form and input elements
 const form = document.getElementById("resetForm");
 const email = document.getElementById("email");
+const submitBtn = form.querySelector('button[type="submit"]') || form.querySelector('button');
+
+// Live Render API URL
+const API_URL = 'https://rentlee-api.onrender.com/api';
 
 // Form submission handler
-form.addEventListener("submit", e => {
+form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    // Validate email
-    if (validateEmail()) {
-        alert("Password reset link sent to your email! Please check your inbox and spam folder.");
-        window.location.href='login.html'
+    // Validate email first
+    if (!validateEmail()) return;
+
+    const emailValue = email.value.trim();
+
+    // UI Loading State
+    const originalBtnText = submitBtn.innerText;
+    submitBtn.innerText = "Sending Link...";
+    submitBtn.disabled = true;
+    submitBtn.style.opacity = "0.7";
+
+    try {
+        const response = await fetch(`${API_URL}/signin/forgot-password`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ email: emailValue })
+        });
+
+        const data = await response.json();
+
+        // Check if backend responded successfully
+        if (response.ok && data.success) {
+            alert("Password reset link sent! Please check your inbox and spam folder.");
+            window.location.href = 'login.html'; // Redirect to login
+        } else {
+            // Handle backend errors (e.g., account not activated)
+            showError(email, data.message || "Failed to send reset link.");
+        }
+
+    } catch (error) {
+        console.error("Forgot password error:", error);
+        showError(email, "Network error. Please try again later.");
+    } finally {
+        // Restore UI state
+        submitBtn.innerText = originalBtnText;
+        submitBtn.disabled = false;
+        submitBtn.style.opacity = "1";
     }
 });
 

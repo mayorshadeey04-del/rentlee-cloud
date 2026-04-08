@@ -210,16 +210,31 @@ export const createTenant = async (req, res) => {
       }
     }
 
-    // Check if email already exists
-    const emailCheck = await db.query('SELECT id FROM users WHERE email = $1', [email]);
-    if (emailCheck.rows.length > 0) {
-      return res.status(400).json({ success: false, message: 'Email already in use' });
-    }
+    // ✅ AMAZON-STYLE OVERWRITE: Check for existing unverified (pending) tenants
+    // If the email or ID exists, but the status is 'pending', we delete the old record and start fresh.
+    const duplicateCheck = await db.query(
+      `SELECT u.id as user_id, t.status 
+       FROM users u 
+       LEFT JOIN tenants t ON u.id = t.user_id 
+       WHERE u.email = $1 OR t.id_number = $2`,
+      [email, idNumber]
+    );
 
-    // Check if ID number already exists
-    const idNumberCheck = await db.query('SELECT id FROM tenants WHERE id_number = $1', [idNumber]);
-    if (idNumberCheck.rows.length > 0) {
-      return res.status(400).json({ success: false, message: 'ID number already registered' });
+    if (duplicateCheck.rows.length > 0) {
+      const existingRecord = duplicateCheck.rows[0];
+      
+      if (existingRecord.status === 'pending') {
+         // The user dropped off or email failed. Delete the old unverified record completely.
+         // Since your DB has ON DELETE CASCADE for foreign keys, deleting the user wipes the pending tenant, tenancies, and tokens.
+         console.log(`♻️ Found pending tenant for ${email}. Deleting old record to start fresh.`);
+         await db.query('DELETE FROM users WHERE id = $1', [existingRecord.user_id]);
+      } else {
+         // They are 'active' or 'inactive', which means they successfully registered previously. Block them.
+         return res.status(400).json({ 
+           success: false, 
+           message: 'This Email or ID Number is already registered and active in the system.' 
+         });
+      }
     }
 
     // Check if unit exists and is vacant

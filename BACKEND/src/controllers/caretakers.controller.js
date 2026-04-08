@@ -136,17 +136,28 @@ export const createCaretaker = async (req, res) => {
       });
     }
 
-    // Check if email already exists
-    const emailCheck = await db.query(
-      'SELECT id FROM users WHERE email = $1',
+    // ✅ AMAZON-STYLE OVERWRITE: Check if email already exists
+    const duplicateCheck = await db.query(
+      'SELECT id, is_active FROM users WHERE email = $1',
       [email]
     );
 
-    if (emailCheck.rows.length > 0) {
-      return res.status(400).json({
-        success: false,
-        message: 'Email already in use'
-      });
+    if (duplicateCheck.rows.length > 0) {
+      const existingUser = duplicateCheck.rows[0];
+
+      // If the user exists but is NOT active yet (pending verification)
+      if (existingUser.is_active === false) {
+        // Delete the old pending record to start fresh. 
+        // ON DELETE CASCADE will handle caretaker_properties and password_tokens automatically.
+        console.log(`♻️ Found pending caretaker for ${email}. Deleting old record to start fresh.`);
+        await db.query('DELETE FROM users WHERE id = $1', [existingUser.id]);
+      } else {
+        // User is active and verified, block creation
+        return res.status(400).json({
+          success: false,
+          message: 'This email is already registered and active in the system.'
+        });
+      }
     }
 
     // Generate activation token
@@ -154,11 +165,13 @@ export const createCaretaker = async (req, res) => {
     const tokenHash = crypto.createHash('sha256').update(activationToken).digest('hex');
     const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
 
-    // 👇 NEW: Generate a random temporary password hash to keep the database happy
+    // Generate a random temporary password hash to keep the database happy
     const tempPassword = crypto.randomBytes(12).toString('hex');
     const tempHashedPassword = await bcrypt.hash(tempPassword, 10);
 
-    // 👇 UPDATED: Added password_hash to the INSERT statement
+    // ── START TRANSACTION ──
+    await db.query('BEGIN');
+
     const userResult = await db.query(
       `INSERT INTO users (first_name, last_name, email, phone, role, landlord_id, is_active, password_hash)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
@@ -192,8 +205,13 @@ export const createCaretaker = async (req, res) => {
       }
     }
 
-    // SEND PASSWORD SETUP EMAIL
-    await sendPasswordSetupEmail(email, activationToken, firstName, 'caretaker');
+    // ── COMMIT TRANSACTION ──
+    await db.query('COMMIT');
+
+    // ✅ FIRE AND FORGET EMAIL (non-blocking)
+    sendPasswordSetupEmail(email, activationToken, firstName, 'caretaker').catch(err => {
+      console.error('Background email failed to send:', err);
+    });
 
     res.status(201).json({
       success: true,
@@ -202,6 +220,7 @@ export const createCaretaker = async (req, res) => {
     });
 
   } catch (error) {
+    await db.query('ROLLBACK').catch(() => {});
     console.error('Create caretaker error:', error);
     res.status(500).json({
       success: false,
