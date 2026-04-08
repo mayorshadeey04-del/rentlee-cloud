@@ -4,14 +4,18 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const transporter = nodemailer.createTransport({
-  host: 'smtp.gmail.com',
-  port: 465,             // 👈 Back to your original, working port!
-  secure: true,          // 👈 Must be true for 465
+  host: process.env.SMTP_HOST, 
+  port: parseInt(process.env.SMTP_PORT), 
+  secure: true, 
   auth: {
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASSWORD
   },
-  family: 4              // 👈 The shield keeping Render's IPv6 bugs away
+  // We keep this just so Render doesn't use the broken IPv6 route
+  family: 4, 
+  // 👇 Adds detailed network logging to your Render dashboard
+  logger: true,
+  debug: true 
 });
 
 export default transporter;
