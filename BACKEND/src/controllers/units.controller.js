@@ -100,6 +100,25 @@ export const createUnit = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Property ID, unit number, and room type are required' });
     }
 
+    // 👇 NEW LOGIC: Check if property has reached its maximum registered units
+    const propertyCheck = await db.query('SELECT total_units FROM properties WHERE id = $1', [propertyId]);
+    if (propertyCheck.rows.length === 0) {
+      return res.status(404).json({ success: false, message: 'Property not found' });
+    }
+    
+    const maxUnits = propertyCheck.rows[0].total_units;
+
+    const countCheck = await db.query('SELECT COUNT(*) FROM units WHERE property_id = $1', [propertyId]);
+    const currentUnitCount = parseInt(countCheck.rows[0].count);
+
+    if (currentUnitCount >= maxUnits) {
+      return res.status(400).json({ 
+        success: false, 
+        message: `Limit reached! This property is only registered for a maximum of ${maxUnits} units.` 
+      });
+    }
+    // 👆 END OF NEW LOGIC
+
     const typeCheck = await db.query('SELECT id FROM unit_types WHERE id = $1 AND property_id = $2', [roomTypeId, propertyId]);
     if (typeCheck.rows.length === 0) return res.status(400).json({ success: false, message: 'Invalid room type for this property' });
 

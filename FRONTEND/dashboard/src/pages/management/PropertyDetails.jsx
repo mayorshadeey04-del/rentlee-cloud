@@ -341,9 +341,25 @@ export default function PropertyDetails() {
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
             <p style={{ color: 'var(--slate-500)', fontSize: '0.938rem' }}>Manage the individual doors and occupancy in this building.</p>
             {canManageUnits && (
-              <button className="btn-primary" onClick={() => { setUnitForm(EMPTY_UNIT_FORM); setError(''); setShowAddUnit(true); }}>
-                <i className="fas fa-plus" /> Add New Unit
-              </button>
+              // 👇 NEW LOGIC: Check if property is full before enabling the button
+              (() => {
+                const isFull = property && units.length >= property.total_units;
+                
+                if (isFull) {
+                  return (
+                    <button className="btn-primary" disabled style={{ background: '#cbd5e1', cursor: 'not-allowed', border: 'none' }} title="Maximum unit limit reached for this property">
+                      <i className="fas fa-lock" /> Limit Reached
+                    </button>
+                  );
+                }
+                
+                return (
+                  <button className="btn-primary" onClick={() => { setUnitForm(EMPTY_UNIT_FORM); setError(''); setShowAddUnit(true); }}>
+                    <i className="fas fa-plus" /> Add New Unit
+                  </button>
+                );
+              })()
+              // 👆 END OF NEW LOGIC
             )}
           </div>
 
