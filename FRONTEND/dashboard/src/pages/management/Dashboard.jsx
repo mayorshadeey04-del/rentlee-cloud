@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { can, isAssigned } from '../../utils/permissions'
+import Chart from 'chart.js/auto';
 import './Dashboard.css'
 
 export default function Dashboard() {
@@ -141,7 +142,7 @@ export default function Dashboard() {
 
     if (chartInstance.current) chartInstance.current.destroy()
 
-    chartInstance.current = new window.Chart(chartRef.current, {
+    chartInstance.current = new Chart(chartRef.current, {
       type: 'pie',
       data: {
         labels: ['Open', 'In Progress', 'Complete'],
