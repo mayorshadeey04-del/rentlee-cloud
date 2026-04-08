@@ -237,3 +237,23 @@
 @media (max-width: 768px) {
     .stats-grid { grid-template-columns: 1fr; }
 }
+
+/* ── Skeleton Loading ── */
+@keyframes skeleton-pulse {
+  0% { background-color: var(--slate-100); }
+  50% { background-color: var(--slate-200); }
+  100% { background-color: var(--slate-100); }
+}
+
+.skeleton {
+  animation: skeleton-pulse 1.5s infinite ease-in-out;
+  border-radius: 8px;
+}
+
+.skeleton-icon { width: 48px; height: 48px; border-radius: 12px; }
+.skeleton-text { height: 1rem; margin-bottom: 0.5rem; border-radius: 4px; }
+.skeleton-title { width: 40%; height: 1.75rem; margin-bottom: 1.5rem; }
+.skeleton-value { width: 60%; height: 2.5rem; }
+.skeleton-chart { width: 220px; height: 220px; border-radius: 50%; margin: 2rem auto; }
+.skeleton-btn { height: 85px; border-radius: 12px; margin-bottom: 1rem; width: 100%; border: 2px solid var(--slate-100); }
+.skeleton-table-row { height: 4rem; margin-bottom: 1rem; border-radius: 8px; }

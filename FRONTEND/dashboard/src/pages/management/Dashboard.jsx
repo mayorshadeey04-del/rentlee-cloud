@@ -112,14 +112,49 @@ export default function Dashboard() {
     { icon: 'fas fa-comment-dots', title: 'Send Notice', desc: 'Bulk SMS / Email', path: '/management/tenants', show: can(user?.role, 'tenants', 'create') },
   ].filter(l => l.show)
 
-  // Format data for Recharts
   const pieData = maintenanceData ? [
     { name: 'Open', value: maintenanceData.open || 0, color: '#f97316' },
     { name: 'In Progress', value: maintenanceData.inProgress || 0, color: '#3b82f6' },
     { name: 'Complete', value: maintenanceData.complete || 0, color: '#22c55e' }
-  ].filter(d => d.value > 0) : []; // Only pass sections that have values > 0
+  ].filter(d => d.value > 0) : [];
 
-  if (loading) return <div className="dashboard-empty"><i className="fas fa-circle-notch fa-spin"></i><p>Loading dashboard...</p></div>
+  // 👇 The Premium Skeleton Loader
+  if (loading) {
+    return (
+      <>
+        <section className="stats-grid">
+          {[1, 2, 3, 4].map(i => (
+            <div key={i} className="stat-card" style={{ border: '2px solid var(--slate-100)', boxShadow: 'none' }}>
+              <div className="stat-card-header">
+                <div className="skeleton skeleton-icon"></div>
+              </div>
+              <div className="skeleton skeleton-text" style={{ width: '50%' }}></div>
+              <div className="skeleton skeleton-value"></div>
+            </div>
+          ))}
+        </section>
+
+        <section className="dashboard-grid">
+          <div className="dashboard-card" style={{ border: '2px solid var(--slate-100)' }}>
+            <div className="skeleton skeleton-title"></div>
+            <div className="skeleton skeleton-chart"></div>
+          </div>
+          <div className="dashboard-card" style={{ border: '2px solid var(--slate-100)' }}>
+            <div className="skeleton skeleton-title"></div>
+            {[1, 2, 3].map(i => <div key={i} className="skeleton skeleton-btn"></div>)}
+          </div>
+        </section>
+
+        <section className="properties-table-card" style={{ border: '2px solid var(--slate-100)' }}>
+          <div className="skeleton skeleton-title" style={{ width: '25%' }}></div>
+          <div style={{ marginTop: '2rem' }}>
+            {[1, 2, 3].map(i => <div key={i} className="skeleton skeleton-table-row"></div>)}
+          </div>
+        </section>
+      </>
+    )
+  }
+
   if (error) return <div className="dashboard-empty"><i className="fas fa-exclamation-circle" style={{ color: '#ef4444' }}></i><p>Error: {error}</p></div>
 
   return (
@@ -154,13 +189,12 @@ export default function Dashboard() {
             {pieData.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
-                  {/* 👇 Fixed solid Pie Chart styling here! */}
                   <Pie data={pieData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={110} stroke="none">
                     {pieData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={entry.color} />
                     ))}
                   </Pie>
-                  <Tooltip formatter={(value) => [value, 'Requests']} />
+                  <Tooltip />
                   <Legend verticalAlign="bottom" height={36} iconType="rect" />
                 </PieChart>
               </ResponsiveContainer>
