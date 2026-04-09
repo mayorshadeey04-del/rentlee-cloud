@@ -48,7 +48,7 @@ export const login = async (req, res) => {
 
     const user = result.rows[0];
 
-    // ✅ NEW: Check if user is soft deleted
+    //  NEW: Check if user is soft deleted
     if (user.deleted_at) {
       return res.status(401).json({ 
         success: false, 
@@ -64,7 +64,7 @@ export const login = async (req, res) => {
       });
     }
 
-    // ✅ NEW: For tenants, check tenant status
+    //  NEW: For tenants, check tenant status
     if (user.role === 'tenant') {
       const tenantResult = await db.query(
         'SELECT status FROM tenants WHERE user_id = $1',
@@ -337,12 +337,12 @@ export const changeEmail = async (req, res) => {
       [req.user.id, verificationData, expiresAt]
     );
 
-   // ✅ SEND EMAIL ASYNCHRONOUSLY (don't wait for it)
+   //  SEND EMAIL ASYNCHRONOUSLY (don't wait for it)
     sendEmailChangeVerification(newEmail, code, req.user.first_name).catch(err => {
       console.error('❌ Background email send failed:', err);
     });
 
-    // ✅ RESPOND IMMEDIATELY to pop open the modal
+    //  RESPOND IMMEDIATELY to pop open the modal
     res.json({ 
       success: true, 
       message: `Verification code queued for ${newEmail}` 
@@ -498,12 +498,12 @@ export const forgotPassword = async (req, res) => {
       [user.id, tokenHash, 'password_reset', expiresAt]
     );
 
-   // ✅ SEND PASSWORD RESET EMAIL (Non-blocking)
+   //  SEND PASSWORD RESET EMAIL (Non-blocking)
     sendPasswordResetEmail(email, resetToken, user.first_name).catch(err => {
         console.error('Background password reset email failed:', err);
     });
 
-    // ✅ RESPOND IMMEDIATELY
+    //  RESPOND IMMEDIATELY
     res.json({ 
       success: true, 
       message: 'If an account exists, a password reset link has been sent.' 

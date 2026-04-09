@@ -87,14 +87,14 @@ export const registerLandlord = async (req, res) => {
       [userId, codeHash, expiresAt]
     );
 
-    // ✅ SEND VERIFICATION EMAIL ASYNCHRONOUSLY
+    //  SEND VERIFICATION EMAIL ASYNCHRONOUSLY
     sendVerificationEmail(email, code, firstName).catch(err => {
       console.error('❌ Background email send failed (non-blocking):', err);
     });
 
     console.log(`📧 Verification email queued for ${email} (Code: ${code})`); // Useful for testing in Render logs!
 
-    // ✅ RESPOND IMMEDIATELY
+    //  RESPOND IMMEDIATELY
     res.status(201).json({
       success: true,
       message: 'Registration successful. Please check your email for verification code.',
@@ -240,12 +240,12 @@ export const resendVerification = async (req, res) => {
       [user.id, codeHash, expiresAt]
     );
 
-   // ✅ SEND VERIFICATION EMAIL ASYNCHRONOUSLY
+   //  SEND VERIFICATION EMAIL ASYNCHRONOUSLY
 sendVerificationEmail(email, code, user.first_name).catch(err => {
   console.error('❌ Background email resend failed:', err);
 });
 
-// ✅ RESPOND IMMEDIATELY
+//  RESPOND IMMEDIATELY
 res.json({
   success: true,
   message: 'Verification code resent successfully'
@@ -322,13 +322,13 @@ export const setupPassword = async (req, res) => {
       [hashedPassword, tokenData.user_id]
     );
 
-    // ✅ NEW: If user is a tenant, update tenant status to 'active'
+    //  NEW: If user is a tenant, update tenant status to 'active'
     if (tokenData.role === 'tenant') {
       await db.query(
         'UPDATE tenants SET status = $1 WHERE user_id = $2',
         ['active', tokenData.user_id]
       );
-      console.log(`✅ Tenant ${tokenData.user_id} status updated to ACTIVE`);
+      console.log(` Tenant ${tokenData.user_id} status updated to ACTIVE`);
     }
 
     // Mark token as used

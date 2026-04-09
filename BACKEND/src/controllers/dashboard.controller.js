@@ -53,7 +53,7 @@ export const getDashboardStats = async (req, res) => {
         [userId]
       );
 
-      // ✅ FIXED: Now calculates revenue from active tenancies instead of the dropped unit column
+      //  FIXED: Now calculates revenue from active tenancies instead of the dropped unit column
       const revenueResult = await db.query(
         `SELECT COALESCE(SUM(agreed_rent), 0) as monthly_revenue,
                 0 as total_balance
@@ -140,7 +140,7 @@ export const getDashboardStats = async (req, res) => {
         [userId]
       );
 
-      // ✅ FIXED
+      //  FIXED
       const revenueResult = await db.query(
         `SELECT COALESCE(SUM(tc.agreed_rent), 0) as monthly_revenue
          FROM tenancies tc
@@ -176,7 +176,7 @@ export const getDashboardStats = async (req, res) => {
 
     } else if (role === 'tenant') {
       
-      // ✅ FIXED: Replaced u.rent_amount with tc.agreed_rent
+      //  FIXED: Replaced u.rent_amount with tc.agreed_rent
       const tenantResult = await db.query(
         `SELECT t.*, 
                 p.name as property_name, 

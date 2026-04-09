@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '../../context/AuthContext'
-import SubmitButton from '../../components/SubmitButton' // ✅ Imported Pro Button
+import SubmitButton from '../../components/SubmitButton' //  Imported Pro Button
 import './TenantProfile.css'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
@@ -63,7 +63,7 @@ export default function TenantProfile() {
       setErrors(newErrors); return
     }
 
-    setSaving(true) // ✅ Turn spinner ON
+    setSaving(true) //  Turn spinner ON
     try {
       const res = await fetch(`${API_URL}/profile`, {
         method: 'PUT',
@@ -81,7 +81,7 @@ export default function TenantProfile() {
     } catch (err) {
       setErrors({ form: err.message })
     } finally {
-      setSaving(false) // ✅ Turn spinner OFF
+      setSaving(false) //  Turn spinner OFF
     }
   }
 
@@ -99,7 +99,7 @@ export default function TenantProfile() {
       setErrors(newErrors); return
     }
 
-    setSavingPwd(true) // ✅ Turn spinner ON
+    setSavingPwd(true) //  Turn spinner ON
     try {
       const res = await fetch(`${API_URL}/profile/password`, {
         method: 'PUT',
@@ -116,7 +116,7 @@ export default function TenantProfile() {
     } catch (err) {
       setErrors({ current: err.message })
     } finally {
-      setSavingPwd(false) // ✅ Turn spinner OFF
+      setSavingPwd(false) //  Turn spinner OFF
     }
   }
 
@@ -198,7 +198,7 @@ export default function TenantProfile() {
                 ) : (
                   <div className="profile-edit-actions">
                     <button className="btn-cancel-sm" onClick={() => { setEditing(false); setErrors({}); setForm({ email: dbProfile?.email, phone: dbProfile?.phone }); }} disabled={saving}>Cancel</button>
-                    {/* ✅ Swapped Button */}
+                    {/*  Swapped Button */}
                     <SubmitButton 
                       onClick={handleSavePersonal} 
                       isSubmitting={saving} 
@@ -216,7 +216,7 @@ export default function TenantProfile() {
                   <span className="profile-field-value readonly-text">{dbProfile?.first_name} {dbProfile?.last_name} <i className="fas fa-lock lock-icon" title="Cannot edit name"></i></span>
                 </div>
                 
-                {/* ✅ FIXED: Looking for id_number instead of national_id */}
+                {/*  FIXED: Looking for id_number instead of national_id */}
                 <div className="profile-field">
                   <label className="profile-field-label"><i className="fas fa-id-card" /> ID Number</label>
                   <span className="profile-field-value readonly-text profile-id">{dbProfile?.id_number || 'N/A'} <i className="fas fa-lock lock-icon" title="Cannot edit ID"></i></span>
@@ -273,7 +273,7 @@ export default function TenantProfile() {
                 </div>
 
                 <div style={{ marginTop: '1rem' }}>
-                  {/* ✅ Swapped Button */}
+                  {/*  Swapped Button */}
                   <SubmitButton 
                     type="submit" 
                     isSubmitting={savingPwd} 

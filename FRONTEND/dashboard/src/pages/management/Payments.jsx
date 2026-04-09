@@ -125,7 +125,7 @@ export default function Payments() {
   function applyFilters() { setActiveFilters({ ...filters }) }
   function clearFilters() { setFilters(EMPTY_FILTERS); setActiveFilters(EMPTY_FILTERS) }
 
-  // ✅ GENERATE RENT
+  //  GENERATE RENT
   async function handleGenerateRent() {
     if (!genForm.dueDate) {
       return showToast('error', 'Missing Field', 'Please select a due date.')
@@ -158,7 +158,7 @@ export default function Payments() {
     }
   }
 
-  // ✅ REVERSE (UNDO) RENT (WITH AUTO-DERIVED MONTH PICKER)
+  //  REVERSE (UNDO) RENT (WITH AUTO-DERIVED MONTH PICKER)
   async function handleReverseRent() {
     if (!reversePeriod) {
       return showToast('error', 'Missing Field', 'Please select a month to reverse.')
@@ -332,7 +332,7 @@ export default function Payments() {
         </table>
       </div>
 
-      {/* ✅ GENERATE RENT MODAL */}
+      {/*  GENERATE RENT MODAL */}
       {showGenerateModal && createPortal(
         <div style={overlayStyle} onClick={() => !isGenerating && setShowGenerateModal(false)}>
           <div style={wrapperStyle}>
@@ -382,7 +382,7 @@ export default function Payments() {
         </div>
       , document.body)}
 
-      {/* ✅ REVERSE RENT MODAL (UPDATED) */}
+      {/*  REVERSE RENT MODAL (UPDATED) */}
       {showReverseModal && createPortal(
         <div style={overlayStyle} onClick={() => !isReversing && setShowReverseModal(false)}>
           <div style={wrapperStyle}>
@@ -403,7 +403,7 @@ export default function Payments() {
                 
                 <div className="form-group">
                   <label className="filter-label" style={{ display: 'block', marginBottom: '0.5rem' }}>Select Month to Reverse <span style={{color: '#f87171'}}>*</span></label>
-                  {/* ✅ THE MONTH PICKER: Outputs YYYY-MM */}
+                  {/*  THE MONTH PICKER: Outputs YYYY-MM */}
                   <input 
                     type="month" 
                     className="filter-input" 

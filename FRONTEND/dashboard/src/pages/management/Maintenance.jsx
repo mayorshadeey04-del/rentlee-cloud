@@ -200,7 +200,7 @@ export default function Maintenance() {
                   className="request-row" 
                   onClick={() => navigate('/management/maintenance/maintenancedetail', { state: { id: req.id } })}
                 >
-                  {/* ✅ FIXED: Correctly pulls first and last name from backend */}
+                  {/*  FIXED: Correctly pulls first and last name from backend */}
                   <td className="tenant-name">{req.tenant_first_name} {req.tenant_last_name}</td>
                   
                   <td className="property-cell">

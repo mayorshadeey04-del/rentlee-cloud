@@ -51,7 +51,7 @@ async function loginUser() {
 
         console.log('🔐 Attempting login for:', credentials.email);
 
-        // ✅ Call backend login endpoint
+        //  Call backend login endpoint
         const response = await fetch(`${API_URL}/signin/login`, {
             method: 'POST',
             headers: {
@@ -64,10 +64,10 @@ async function loginUser() {
         console.log('📥 Login response:', data);
 
         if (response.ok && data.success) {
-            // ✅ LOGIN SUCCESSFUL
+            //  LOGIN SUCCESSFUL
             const { token, user } = data.data;
 
-            console.log('✅ Login successful for user:', user);
+            console.log(' Login successful for user:', user);
 
             // Store authentication token
             localStorage.setItem('authToken', token);
@@ -84,11 +84,11 @@ const dashboardUser = {
 
 console.log('💾 User data ready:', dashboardUser);
 
-// ✅ Show success message
+//  Show success message
 submitBtn.textContent = 'Success! Redirecting...';
 submitBtn.style.background = '#10b981';
 
-// ✅ Pass token + user via URL to React (fixes origin mismatch)
+//  Pass token + user via URL to React (fixes origin mismatch)
 setTimeout(() => {
     console.log('🚀 Redirecting to dashboard...');
     const encodedUser  = encodeURIComponent(JSON.stringify(dashboardUser));

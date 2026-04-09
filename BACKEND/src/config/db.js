@@ -35,7 +35,7 @@ const db = new pg.Pool(
 );
 
 db.connect()
-    .then(() => console.log(isProduction ? "✅ Cloud Database is connected" : "✅ Local Database is connected"))
+    .then(() => console.log(isProduction ? " Cloud Database is connected" : " Local Database is connected"))
     .catch((err) => {
         console.error("Connection denied", err);
         process.exit(1);

@@ -5,7 +5,7 @@ import { can } from '../../utils/permissions'
 import Toast from '../../components/Toast'
 import ConfirmDialog from '../../components/ConfirmDialog'
 import TenantWizard from '../../components/TenantWizard' 
-import SubmitButton from '../../components/SubmitButton' // ✅ Imported Pro Button
+import SubmitButton from '../../components/SubmitButton' //  Imported Pro Button
 import './Tenants.css'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
@@ -24,7 +24,7 @@ export default function Tenants() {
   const [properties, setProperties]     = useState([])
   const [vacantUnits, setVacantUnits]   = useState([])
   const [loading, setLoading]           = useState(true)
-  const [isSubmitting, setIsSubmitting] = useState(false) // ✅ Shared loading state for modals
+  const [isSubmitting, setIsSubmitting] = useState(false) //  Shared loading state for modals
   const [pageError, setPageError]       = useState('')
   const [showFilter, setShowFilter]     = useState(false)
   
@@ -129,7 +129,7 @@ export default function Tenants() {
       (activeFilters.balance === 'unpaid' && Number(t.balance) > 0))
   )
 
-  // ✅ STRICT AUTO-CLEANING FOR EDIT FORM
+  //  STRICT AUTO-CLEANING FOR EDIT FORM
   function handleChange(e) {
     setError('')
     const { name } = e.target
@@ -177,7 +177,7 @@ export default function Tenants() {
 const handleWizardSuccess = (newTenant) => {
     fetchData() 
     
-    // ✅ Check if it was a migration or a brand new tenant
+    //  Check if it was a migration or a brand new tenant
     if (newTenant.isExisting) {
       showToast('success', 'Tenant Migrated!', `${newTenant.firstName}'s ledger is synced and their portal is fully unlocked.`)
     } else {
@@ -185,7 +185,7 @@ const handleWizardSuccess = (newTenant) => {
     }
   }
 
-  // ✅ STRICT FORMAT VALIDATION BEFORE SUBMITTING EDIT
+  //  STRICT FORMAT VALIDATION BEFORE SUBMITTING EDIT
   async function submitEdit() {
     setError('')
 
@@ -221,7 +221,7 @@ const handleWizardSuccess = (newTenant) => {
       return setError('Please enter a strictly valid email address (e.g., name@gmail.com).')
     }
 
-    setIsSubmitting(true) // ✅ Turn spinner ON
+    setIsSubmitting(true) //  Turn spinner ON
 
     // Proceed to API call if all validations pass
     try {
@@ -239,7 +239,7 @@ const handleWizardSuccess = (newTenant) => {
     } catch (err) {
       setError(err.message)
     } finally {
-      setIsSubmitting(false) // ✅ Turn spinner OFF
+      setIsSubmitting(false) //  Turn spinner OFF
     }
   }
 
@@ -280,12 +280,12 @@ const handleWizardSuccess = (newTenant) => {
     }
   }
 
-  // ✅ LIVE SEND EMAIL LOGIC
+  //  LIVE SEND EMAIL LOGIC
   const submitEmail = async () => {
     if (!emailForm.recipients || !emailForm.subject || !emailForm.message) return setEmailError('Fill all required fields.')
     if (emailForm.recipients === 'property' && !emailForm.propertyId) return setEmailError('Select a property.')
     
-    setIsSubmitting(true) // ✅ Turn spinner ON
+    setIsSubmitting(true) //  Turn spinner ON
     setEmailError('')
 
     try {
@@ -304,7 +304,7 @@ const handleWizardSuccess = (newTenant) => {
     } catch (err) {
       setEmailError(err.message)
     } finally {
-      setIsSubmitting(false) // ✅ Turn spinner OFF
+      setIsSubmitting(false) //  Turn spinner OFF
     }
   }
 
@@ -455,7 +455,7 @@ const handleWizardSuccess = (newTenant) => {
 
               <div className="modal-footer" style={{ flexShrink: 0, borderTop: '1px solid #e2e8f0' }}>
                 <button className="btn-cancel" onClick={() => setShowEdit(false)} disabled={isSubmitting}>Cancel</button>
-                {/* ✅ Swapped Button */}
+                {/*  Swapped Button */}
                 <SubmitButton 
                   onClick={submitEdit} 
                   isSubmitting={isSubmitting} 
@@ -536,7 +536,7 @@ const handleWizardSuccess = (newTenant) => {
 
               <div className="modal-footer" style={{ flexShrink: 0, borderTop: '1px solid #e2e8f0' }}>
                 <button className="btn-cancel" onClick={() => setShowEmail(false)} disabled={isSubmitting}>Cancel</button>
-                {/* ✅ Swapped Button */}
+                {/*  Swapped Button */}
                 <SubmitButton 
                   onClick={submitEmail} 
                   isSubmitting={isSubmitting} 

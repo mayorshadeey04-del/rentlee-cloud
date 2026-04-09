@@ -17,7 +17,7 @@ export default function AuthCallback() {
         localStorage.setItem('rentlee_token', decodeURIComponent(token))
         localStorage.setItem('rentlee_user', JSON.stringify(userData))
 
-        console.log('✅ Auth saved, redirecting:', userData.role)
+        console.log(' Auth saved, redirecting:', userData.role)
 
         // Use full page reload so AuthContext re-initializes
         // fresh from localStorage — no race condition with state updates

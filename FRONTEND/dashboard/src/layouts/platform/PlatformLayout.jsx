@@ -9,7 +9,7 @@ export default function PlatformLayout() {
   const [mobileOpen, setMobileOpen] = useState(false)
   const location = useLocation()
 
-  // ✅ Auto-close the mobile sidebar whenever the user navigates
+  //  Auto-close the mobile sidebar whenever the user navigates
   useEffect(() => {
     setMobileOpen(false)
   }, [location.pathname])
@@ -24,12 +24,12 @@ export default function PlatformLayout() {
 
   return (
     <div className="platform-layout">
-      {/* ✅ Dark overlay for mobile */}
+      {/*  Dark overlay for mobile */}
       {mobileOpen && (
         <div className="sidebar-overlay" onClick={() => setMobileOpen(false)}></div>
       )}
 
-      {/* ✅ Pass mobileOpen prop */}
+      {/*  Pass mobileOpen prop */}
       <PlatformSidebar collapsed={collapsed} mobileOpen={mobileOpen} />
       
       <div className={`platform-main ${collapsed ? 'expanded' : ''}`}>

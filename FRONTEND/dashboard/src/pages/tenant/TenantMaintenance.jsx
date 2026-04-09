@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom'
 import { useAuth } from '../../context/AuthContext'
 import Toast from '../../components/Toast'
 import ConfirmDialog from '../../components/ConfirmDialog'
-import SubmitButton from '../../components/SubmitButton' // ✅ Imported Pro Button
+import SubmitButton from '../../components/SubmitButton' //  Imported Pro Button
 import './TenantMaintenance.css'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
@@ -36,7 +36,7 @@ export default function TenantMaintenance() {
   const [showModal, setShowModal]   = useState(false)
   const [editId, setEditId]         = useState(null) 
   const [form, setForm]             = useState({ title: '', description: '', category: '', priority: 'medium' })
-  const [isSubmitting, setIsSubmitting] = useState(false) // ✅ Renamed for consistency
+  const [isSubmitting, setIsSubmitting] = useState(false) //  Renamed for consistency
 
   const showToast = useCallback((type, title, message) => {
     const id = Date.now()
@@ -122,7 +122,7 @@ export default function TenantMaintenance() {
 
   const handleSubmit = async () => {
     if (!form.title || !form.description || !form.category) return
-    setIsSubmitting(true) // ✅ Turn spinner ON
+    setIsSubmitting(true) //  Turn spinner ON
     setPageError('')
     
     try {
@@ -144,7 +144,7 @@ export default function TenantMaintenance() {
     } catch (err) {
       showToast('error', 'Submission Failed', err.message)
     } finally {
-      setIsSubmitting(false) // ✅ Turn spinner OFF
+      setIsSubmitting(false) //  Turn spinner OFF
     }
   }
 
@@ -326,7 +326,7 @@ export default function TenantMaintenance() {
 
               <div style={{ padding: '1rem 2rem 1.75rem', display: 'flex', gap: '1rem', justifyContent: 'flex-end', borderTop: '1.5px solid #f1f5f9' }}>
                 <button className="btn-cancel" onClick={() => setShowModal(false)} disabled={isSubmitting}>Cancel</button>
-                {/* ✅ Swapped Button */}
+                {/*  Swapped Button */}
                 <SubmitButton 
                   onClick={handleSubmit} 
                   isSubmitting={isSubmitting} 

@@ -196,7 +196,7 @@ CREATE TABLE maintenance_requests (
     priority VARCHAR(20) NOT NULL CHECK (priority IN ('low','medium','high','urgent')),
     status VARCHAR(20) DEFAULT 'open' CHECK (status IN ('open','in_progress','completed')),
     
-    -- ✅ DUAL ARCHIVING: Independent soft-deletes for Landlords and Tenants
+    --  DUAL ARCHIVING: Independent soft-deletes for Landlords and Tenants
     landlord_deleted_at TIMESTAMP DEFAULT NULL,
     tenant_deleted_at TIMESTAMP DEFAULT NULL,
     
@@ -306,7 +306,7 @@ CREATE INDEX idx_payments_tenancy ON payments(tenancy_id);
 CREATE INDEX idx_payments_tenant ON payments(tenant_id);
 CREATE INDEX idx_deposits_tenancy ON deposits(tenancy_id);
 
--- ✅ DUAL ARCHIVING INDEXES FOR MAINTENANCE
+--  DUAL ARCHIVING INDEXES FOR MAINTENANCE
 CREATE INDEX idx_maintenance_landlord_deleted ON maintenance_requests(landlord_deleted_at) WHERE landlord_deleted_at IS NOT NULL;
 CREATE INDEX idx_maintenance_tenant_deleted ON maintenance_requests(tenant_deleted_at) WHERE tenant_deleted_at IS NOT NULL;
 

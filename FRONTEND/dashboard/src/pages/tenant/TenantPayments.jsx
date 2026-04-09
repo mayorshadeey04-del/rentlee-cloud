@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom'
 import { useAuth } from '../../context/AuthContext'
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
-import SubmitButton from '../../components/SubmitButton' // ✅ Imported Pro Button
+import SubmitButton from '../../components/SubmitButton' //  Imported Pro Button
 import './TenantPayments.css'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
@@ -19,7 +19,7 @@ export default function TenantPayments() {
   const [showModal, setShowModal]               = useState(false)
   const [paymentAmount, setPaymentAmount]       = useState('')
   const [paymentPhone, setPaymentPhone]         = useState('')
-  const [isProcessing, setIsProcessing]         = useState(false) // ✅ Renamed slightly but behaves like isSubmitting
+  const [isProcessing, setIsProcessing]         = useState(false) //  Renamed slightly but behaves like isSubmitting
   const [paymentSuccess, setPaymentSuccess]     = useState(false)
 
   // ── LIVE API FETCH ──
@@ -40,7 +40,7 @@ export default function TenantPayments() {
 
         setInfo({ balance: dashData.data.info.balance })
 
-        // ✅ Updated: Now capturing tenant name, property, unit, and type for the receipt
+        //  Updated: Now capturing tenant name, property, unit, and type for the receipt
         const formattedPayments = (paymentsData.data || []).map(p => {
           const dateObj = new Date(p.payment_date)
           return {
@@ -92,7 +92,7 @@ export default function TenantPayments() {
        return
     }
     
-    setIsProcessing(true) // ✅ Turn spinner ON
+    setIsProcessing(true) //  Turn spinner ON
 
     try {
       const res = await fetch(`${API_URL}/payments/initiate`, {
@@ -110,7 +110,7 @@ export default function TenantPayments() {
 
       // Simulate a slight delay to let the STK Push prompt appear on phone
       setTimeout(() => {
-        setIsProcessing(false) // ✅ Turn spinner OFF
+        setIsProcessing(false) //  Turn spinner OFF
         setPaymentSuccess(true)
         
         setTimeout(() => {
@@ -139,11 +139,11 @@ export default function TenantPayments() {
 
     } catch (err) {
       alert(`Payment failed: ${err.message}`)
-      setIsProcessing(false) // ✅ Turn spinner OFF on error
+      setIsProcessing(false) //  Turn spinner OFF on error
     }
   }
 
-  // ✅ RECEIPT GENERATOR FUNCTION
+  //  RECEIPT GENERATOR FUNCTION
   const downloadReceipt = (payment) => {
     const doc = new jsPDF()
 
@@ -280,7 +280,7 @@ export default function TenantPayments() {
         ) : !loading && (
           <table className="payments-table">
             <thead>
-              {/* ✅ Added Action column for Receipt */}
+              {/*  Added Action column for Receipt */}
               <tr><th>Reference</th><th>Month</th><th>Date</th><th>Amount</th><th>Status</th><th style={{textAlign: 'center'}}>Receipt</th></tr>
             </thead>
             <tbody>
@@ -295,7 +295,7 @@ export default function TenantPayments() {
                       {p.status.charAt(0).toUpperCase() + p.status.slice(1)}
                     </span>
                   </td>
-                  {/* ✅ Added Receipt Button */}
+                  {/*  Added Receipt Button */}
                   <td style={{textAlign: 'center'}}>
                     {p.status === 'confirmed' ? (
                       <button 
@@ -380,7 +380,7 @@ export default function TenantPayments() {
                       </div>
                     </div>
 
-                    {/* ✅ Swapped Submit Button with specific M-Pesa styling */}
+                    {/*  Swapped Submit Button with specific M-Pesa styling */}
                     <SubmitButton 
                       type="submit"
                       isSubmitting={isProcessing} 

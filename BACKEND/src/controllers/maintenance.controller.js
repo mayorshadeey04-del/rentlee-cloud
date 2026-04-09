@@ -182,7 +182,7 @@ export const createMaintenanceRequest = async (req, res) => {
       [tenant.landlord_id, tenant.id, tenant.property_id, tenant.unit_id, title, description, category || null, priority.toLowerCase()]
     );
 
-    // ✅ AUTOMATED NOTIFICATION TRIGGER: Notify the Landlord
+    //  AUTOMATED NOTIFICATION TRIGGER: Notify the Landlord
     await db.query(
       `INSERT INTO notifications (user_id, title, message, type)
        VALUES ($1, $2, $3, 'maintenance')`,
@@ -270,7 +270,7 @@ export const updateMaintenanceStatus = async (req, res) => {
       [status, id]
     );
 
-    // ✅ AUTOMATED NOTIFICATION TRIGGER: Notify the Tenant
+    //  AUTOMATED NOTIFICATION TRIGGER: Notify the Tenant
     const niceStatus = status === 'in_progress' ? 'In Progress' : status === 'completed' ? 'Completed' : 'Open';
     await db.query(
       `INSERT INTO notifications (user_id, title, message, type)

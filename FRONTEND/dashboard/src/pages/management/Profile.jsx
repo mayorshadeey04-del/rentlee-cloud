@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { useAuth } from '../../context/AuthContext'
 import Toast from '../../components/Toast'
-import SubmitButton from '../../components/SubmitButton' // ✅ Imported Pro Button
+import SubmitButton from '../../components/SubmitButton' //  Imported Pro Button
 import './Profile.css'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
@@ -36,14 +36,14 @@ function PasswordField({ value, onChange, placeholder, disabled }) {
         value={value}
         onChange={onChange}
         placeholder={placeholder}
-        disabled={disabled} // ✅ Added disabled prop support
+        disabled={disabled} //  Added disabled prop support
       />
       <button
         type="button"
         className="pw-toggle"
         onClick={() => setShow(s => !s)}
         tabIndex={-1}
-        disabled={disabled} // ✅ Disable toggle while loading
+        disabled={disabled} //  Disable toggle while loading
       >
         <i className={show ? 'fas fa-eye-slash' : 'fas fa-eye'} />
       </button>
@@ -391,7 +391,7 @@ export default function Profile() {
               ) : (
                 <div className="header-actions">
                   <button className="btn-cancel" onClick={handleCancelEdit} disabled={loadingProfile}>Cancel</button>
-                  {/* ✅ Swapped Button */}
+                  {/*  Swapped Button */}
                   <SubmitButton 
                     onClick={submitProfile} 
                     isSubmitting={loadingProfile} 
@@ -551,7 +551,7 @@ export default function Profile() {
             </div>
 
             <div className="form-actions">
-              {/* ✅ Swapped Button */}
+              {/*  Swapped Button */}
               <SubmitButton 
                 onClick={submitPassword} 
                 isSubmitting={loadingPassword} 
@@ -587,7 +587,7 @@ export default function Profile() {
             </div>
 
             <div className="form-actions">
-              {/* ✅ Swapped Button */}
+              {/*  Swapped Button */}
               <SubmitButton 
                 onClick={submitEmailChange} 
                 isSubmitting={loadingEmail} 
@@ -633,7 +633,7 @@ export default function Profile() {
             </div>
             <div className="modal-footer">
               <button className="btn-cancel" onClick={() => setShowVerify(false)} disabled={loadingVerify}>Cancel</button>
-              {/* ✅ Swapped Button */}
+              {/*  Swapped Button */}
               <SubmitButton 
                 onClick={submitVerification} 
                 isSubmitting={loadingVerify} 

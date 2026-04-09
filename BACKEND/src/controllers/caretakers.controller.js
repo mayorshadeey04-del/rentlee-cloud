@@ -136,7 +136,7 @@ export const createCaretaker = async (req, res) => {
       });
     }
 
-    // ✅ AMAZON-STYLE OVERWRITE: Check if email already exists
+    //  AMAZON-STYLE OVERWRITE: Check if email already exists
     const duplicateCheck = await db.query(
       'SELECT id, is_active FROM users WHERE email = $1',
       [email]
@@ -208,7 +208,7 @@ export const createCaretaker = async (req, res) => {
     // ── COMMIT TRANSACTION ──
     await db.query('COMMIT');
 
-    // ✅ FIRE AND FORGET EMAIL (non-blocking)
+    //  FIRE AND FORGET EMAIL (non-blocking)
     sendPasswordSetupEmail(email, activationToken, firstName, 'caretaker').catch(err => {
       console.error('Background email failed to send:', err);
     });
@@ -407,13 +407,13 @@ export const deleteCaretaker = async (req, res) => {
 
     // ── TWO-STAGE DELETE LOGIC ────────────────────────────────────────────────
 
-    // ✅ STAGE 2: PERMANENT DELETE (If already soft deleted / inactive)
+    //  STAGE 2: PERMANENT DELETE (If already soft deleted / inactive)
     if (caretaker.deleted_at !== null) {
       
       // Deleting the user triggers ON DELETE CASCADE for caretaker_properties
       await db.query('DELETE FROM users WHERE id = $1', [id]);
 
-      console.log(`✅ Caretaker ${id} permanently erased.`);
+      console.log(` Caretaker ${id} permanently erased.`);
 
       return res.json({
         success: true,
@@ -421,7 +421,7 @@ export const deleteCaretaker = async (req, res) => {
       });
     }
 
-    // ✅ STAGE 1: SOFT DELETE (Deactivation)
+    //  STAGE 1: SOFT DELETE (Deactivation)
     else {
       await db.query('BEGIN');
 
@@ -439,7 +439,7 @@ export const deleteCaretaker = async (req, res) => {
 
       await db.query('COMMIT');
 
-      console.log(`✅ Caretaker ${id} soft deleted (deactivated).`);
+      console.log(` Caretaker ${id} soft deleted (deactivated).`);
 
       return res.json({
         success: true,

@@ -298,7 +298,7 @@ export const tenantNotificationTemplate = (subject, htmlBody) => {
         <style>
           body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; background-color: #f4f7f6; }
           .container { max-width: 600px; margin: 40px auto; background: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-          /* ✅ BRANDED BLUE GRADIENT HEADER */
+          /*  BRANDED BLUE GRADIENT HEADER */
           .header { background: linear-gradient(135deg, #3B82F6 0%, #22D3EE 100%); color: white; padding: 30px 40px; text-align: left; }
           .header h1 { margin: 0; font-size: 22px; font-weight: 600; letter-spacing: 0.5px; }
           .content { padding: 40px; color: #334155; font-size: 16px; }

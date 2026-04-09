@@ -6,7 +6,7 @@ import './PlatformDashboard.css'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
 
-// ✅ Helper to format timestamps dynamically
+//  Helper to format timestamps dynamically
 function timeAgo(dateStr) {
   if (!dateStr) return '';
   const diff = Math.floor((Date.now() - new Date(dateStr)) / 1000);
@@ -20,7 +20,7 @@ export default function PlatformDashboard() {
   const { authHeaders } = useAuth()
   const [stats, setStats] = useState({ total_landlords: 0, total_properties: 0, total_tenants: 0 })
   const [landlords, setLandlords] = useState([])
-  const [logs, setLogs] = useState([]) // ✅ NEW: Logs state
+  const [logs, setLogs] = useState([]) //  NEW: Logs state
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   
@@ -50,7 +50,7 @@ export default function PlatformDashboard() {
       
       setStats(data.data.stats)
       setLandlords(data.data.landlords)
-      setLogs(data.data.logs || []) // ✅ Save dynamic logs to state
+      setLogs(data.data.logs || []) //  Save dynamic logs to state
     } catch (err) {
       setError(err.message || 'Failed to load platform data')
     } finally {

@@ -20,7 +20,7 @@ export const getPayments = async (req, res) => {
     const params     = [];
     let   paramIndex = 1;
 
-    // ✅ FIXED: Allow tenants to fetch their own payments
+    //  FIXED: Allow tenants to fetch their own payments
     if (role === 'landlord') {
       conditions.push(`p.landlord_id = $${paramIndex++}`);
       params.push(userId);

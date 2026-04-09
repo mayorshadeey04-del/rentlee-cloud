@@ -10,11 +10,11 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
 export default function TenantLayout() {
   const { authHeaders } = useAuth()
   const [collapsed, setCollapsed] = useState(false)
-  const [mobileOpen, setMobileOpen] = useState(false) // ✅ NEW: Mobile state
+  const [mobileOpen, setMobileOpen] = useState(false) //  NEW: Mobile state
   const [isLocked, setIsLocked] = useState(null) // null = loading
   const location = useLocation()
 
-  // ✅ Auto-close the mobile sidebar whenever the user navigates to a new page
+  //  Auto-close the mobile sidebar whenever the user navigates to a new page
   useEffect(() => {
     setMobileOpen(false)
   }, [location.pathname])
@@ -77,7 +77,7 @@ export default function TenantLayout() {
     )
   }
 
-  // ✅ Handle Toggle for both Desktop and Mobile
+  //  Handle Toggle for both Desktop and Mobile
   const handleToggleSidebar = () => {
     if (window.innerWidth <= 768) {
       setMobileOpen(!mobileOpen)
@@ -92,12 +92,12 @@ export default function TenantLayout() {
   return (
     <div className="tenant-layout">
       
-      {/* ✅ Dark overlay for mobile when sidebar is open */}
+      {/*  Dark overlay for mobile when sidebar is open */}
       {mobileOpen && (
         <div className="sidebar-overlay" onClick={() => setMobileOpen(false)}></div>
       )}
 
-      {/* ✅ Passed mobileOpen prop */}
+      {/*  Passed mobileOpen prop */}
       <TenantSidebar collapsed={collapsed} mobileOpen={mobileOpen} />
       
       <div className={`tenant-main ${collapsed ? 'expanded' : ''}`}>

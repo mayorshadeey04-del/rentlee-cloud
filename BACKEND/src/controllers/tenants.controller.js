@@ -33,7 +33,7 @@ export const getTenants = async (req, res) => {
       return res.json({ success: true, data: [] });
     }
 
-    // ✅ FIXED: Ledger math now includes all confirmed payments (rent + move-in + deposit)
+    //  FIXED: Ledger math now includes all confirmed payments (rent + move-in + deposit)
     const result = await db.query(
       `SELECT t.id, 
               u.first_name, 
@@ -173,9 +173,9 @@ export const createTenant = async (req, res) => {
     propertyId,
     unitId,
     depositAmount,
-    isExisting,         // ✅ NEW: Migration flag
-    historicalDeposit,  // ✅ NEW: Past deposit
-    currentArrears      // ✅ NEW: Past debt
+    isExisting,         //  NEW: Migration flag
+    historicalDeposit,  //  NEW: Past deposit
+    currentArrears      //  NEW: Past debt
   } = req.body;
 
   try {
@@ -210,7 +210,7 @@ export const createTenant = async (req, res) => {
       }
     }
 
-    // ✅ AMAZON-STYLE OVERWRITE: Check for existing unverified (pending) tenants
+    //  AMAZON-STYLE OVERWRITE: Check for existing unverified (pending) tenants
     // If the email or ID exists, but the status is 'pending', we delete the old record and start fresh.
     const duplicateCheck = await db.query(
       `SELECT u.id as user_id, t.status 
@@ -553,7 +553,7 @@ export const deleteTenant = async (req, res) => {
 
     // ── TWO-STAGE DELETE LOGIC ────────────────────────────────────────────────
 
-    // ✅ STAGE 2: PERMANENT DELETE (If already inactive)
+    //  STAGE 2: PERMANENT DELETE (If already inactive)
     if (tenant.status === 'inactive') {
       
       await db.query('DELETE FROM users WHERE id = $1', [tenant.user_id]);
@@ -564,7 +564,7 @@ export const deleteTenant = async (req, res) => {
       });
     } 
     
-    // ✅ STAGE 1: SOFT DELETE (Deactivation)
+    //  STAGE 1: SOFT DELETE (Deactivation)
     else {
       await db.query('BEGIN');
 
@@ -646,14 +646,14 @@ export const sendEmailNotice = async (req, res) => {
       return res.status(404).json({ success: false, message: 'No active tenants found matching criteria.' });
     }
 
-    // ✅ INSTANT RESPONSE: Tell the frontend success immediately so the modal closes!
+    //  INSTANT RESPONSE: Tell the frontend success immediately so the modal closes!
     res.json({ 
       success: true, 
       count: targetTenants.length, 
       message: `Emails are being dispatched to ${targetTenants.length} tenants.` 
     });
 
-    // ✅ BACKGROUND WORKER: Send the emails silently in the background
+    //  BACKGROUND WORKER: Send the emails silently in the background
     (async () => {
       for (const tenant of targetTenants) {
         try {

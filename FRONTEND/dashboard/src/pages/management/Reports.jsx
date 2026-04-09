@@ -18,7 +18,7 @@ const exportToPDF = (title, columns, rows, propertyLabel = 'All Properties', use
     const pageWidth = doc.internal.pageSize.width
 
     // ── Header area ─────────────────────────────────────────────────────────
-    // ✅ INCREASED FONT SIZES & REPOSITIONED FOR BETTER READABILITY
+    //  INCREASED FONT SIZES & REPOSITIONED FOR BETTER READABILITY
     const headerHeight = 54
 
     doc.setFillColor(255, 255, 255)
@@ -233,7 +233,7 @@ function TenantStatement({ properties }) {
         : [r.tenantName, r.unitId, balCell]
     })
     
-    // ✅ ADD STATS FOR PDF
+    //  ADD STATS FOR PDF
     const pdfStats = [
       { label: 'Total Tenants', value: filtered.length },
       { label: 'Total Arrears', value: `Ksh ${filtered.reduce((sum, r) => sum + Number(r.balance), 0).toLocaleString()}`, color: [225, 29, 72] }
@@ -344,7 +344,7 @@ function PropertyStatement({ properties }) {
       r.caretaker
     ])
     
-    // ✅ ADD STATS FOR PDF
+    //  ADD STATS FOR PDF
     const pdfStats = [
       { label: 'Total Properties', value: rows.length },
       { label: 'Overall Occupancy', value: `${rows.length > 0 ? Math.round((rows.reduce((sum, r) => sum + Number(r.occupiedUnits), 0) / rows.reduce((sum, r) => sum + Number(r.totalUnits), 0)) * 100) : 0}%`, color: [5, 150, 105] }
@@ -454,7 +454,7 @@ function UnitStatusReport({ properties }) {
         : [r.unitId, r.roomType, `Ksh ${Number(r.rent).toLocaleString()}`, statusCell]
     })
     
-    // ✅ ADD STATS FOR PDF
+    //  ADD STATS FOR PDF
     const pdfStats = [
       { label: 'Total Units', value: filtered.length },
       { label: 'Occupied', value: filtered.filter(r => r.status === 'occupied').length, color: [5, 150, 105] },
@@ -574,7 +574,7 @@ function TenantDirectoryReport({ properties }) {
       : [{ value: r.tenantName, bold: true }, r.unitId, r.phone, r.email]
     )
     
-    // ✅ ADD STATS FOR PDF
+    //  ADD STATS FOR PDF
     const pdfStats = [
       { label: 'Total Tenants Found', value: rows.length }
     ]
@@ -698,7 +698,7 @@ function RevenueReport({ properties }) {
       return isAllProps ? [r.propertyName, ...cells] : cells
     })
     
-    // ✅ ADD STATS FOR PDF
+    //  ADD STATS FOR PDF
     const pdfStats = [
       { label: 'Total Expected', value: `Ksh ${rows.reduce((sum, r) => sum + Number(r.expectedRevenue), 0).toLocaleString()}` },
       { label: 'Total Collected', value: `Ksh ${rows.reduce((sum, r) => sum + Number(r.collectedRevenue), 0).toLocaleString()}`, color: [5, 150, 105] },
@@ -838,7 +838,7 @@ function MaintenanceReport({ properties }) {
       return isAllProps ? [r.propertyName, ...cells] : cells
     })
     
-    // ✅ ADD STATS FOR PDF
+    //  ADD STATS FOR PDF
     const pdfStats = [
       { label: 'Total Tickets', value: rows.reduce((sum, r) => sum + Number(r.totalTickets), 0) },
       { label: 'Open / In Progress', value: rows.reduce((sum, r) => sum + Number(r.open) + Number(r.inProgress), 0), color: [225, 29, 72] },
@@ -921,7 +921,7 @@ export default function Reports() {
   const [activeTab, setActiveTab]   = useState('tenant-statement')
   const [properties, setProperties] = useState([])
 
-  // ✅ FIXED: Hide the "Property Overview" tab from Caretakers
+  //  FIXED: Hide the "Property Overview" tab from Caretakers
   const availableTabs = REPORT_TABS.filter(tab => {
     if (tab.key === 'property-statement' && user?.role === 'caretaker') return false;
     return true;

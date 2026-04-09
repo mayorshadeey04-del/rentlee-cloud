@@ -33,7 +33,7 @@ export const getTenantDashboardData = async (req, res) => {
         
         (SELECT COUNT(*) FROM payments py WHERE py.tenant_id = t.id AND py.status = 'confirmed') as confirmed_payments_count,
 
-        -- ✅ NEW: Checks if we actually generated a move-in invoice for them
+        --  NEW: Checks if we actually generated a move-in invoice for them
         (SELECT COUNT(*) FROM rent_periods rp WHERE rp.tenant_id = t.id AND rp.period_name = 'Move-in Charges') as has_movein_invoice
 
       FROM tenants t
@@ -54,7 +54,7 @@ export const getTenantDashboardData = async (req, res) => {
     const agreedRent = parseFloat(tInfo.agreed_rent) || 0;
     const depositAmount = parseFloat(tInfo.deposit_amount) || 0;
 
-    // ✅ FIXED: Only lock them if they have 0 payments AND a Move-In invoice actually exists!
+    //  FIXED: Only lock them if they have 0 payments AND a Move-In invoice actually exists!
     const requiresMoveInPayment = parseInt(tInfo.has_movein_invoice) > 0 && parseInt(tInfo.confirmed_payments_count) === 0;
 
     // Get the REAL due date from the bulk rent invoices

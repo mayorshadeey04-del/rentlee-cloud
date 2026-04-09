@@ -8,7 +8,7 @@ import './Units.css'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
 
-// ✅ Database unit types (matching backend validation)
+//  Database unit types (matching backend validation)
 const UNIT_TYPES = ['single_room', 'one_bedroom', 'two_bedroom', 'bedsitter']
 
 // Display labels for unit types
@@ -21,7 +21,7 @@ const UNIT_TYPE_LABELS = {
 
 const STATUSES = ['occupied', 'vacant'] // used for filtering only — not editable in modals
 
-// ✅ Updated form fields to match backend: unitNumber, rentAmount
+//  Updated form fields to match backend: unitNumber, rentAmount
 const EMPTY_FORM = { propertyId: '', propertyName: '', unitNumber: '', type: '', rentAmount: '' }
 
 function formatRent(amount) {
@@ -74,7 +74,7 @@ export default function Units() {
         const unitsData = await unitsRes.json()
         const propsData = await propsRes.json()
 
-        // ✅ Normalize backend data (snake_case → camelCase for internal use)
+        //  Normalize backend data (snake_case → camelCase for internal use)
         const unitsList = (unitsData.data || unitsData).map(unit => ({
           id: unit.id,
           propertyId: unit.property_id,
@@ -166,12 +166,12 @@ function handleChange(e) {
     }
 
     try {
-      // ✅ Send data with backend field names
+      //  Send data with backend field names
       const res = await fetch(`${API_URL}/units`, {
         method: 'POST',
         headers: authHeaders(),
         body: JSON.stringify({
-          propertyId: form.propertyId,  // ✅
+          propertyId: form.propertyId,  // 
           unitNumber: form.unitNumber,
           type: form.type,
           rentAmount: Number(form.rentAmount)
@@ -186,7 +186,7 @@ function handleChange(e) {
       const data = await res.json()
       const rawUnit = data.data || data
 
-      // ✅ Normalize response
+      //  Normalize response
       const created = {
         id: rawUnit.id,
         propertyId: rawUnit.property_id,
@@ -214,12 +214,12 @@ function handleChange(e) {
     }
 
     try {
-      // ✅ Send data with backend field names
+      //  Send data with backend field names
       const res = await fetch(`${API_URL}/units/${editTarget.id}`, {
         method: 'PUT',
         headers: authHeaders(),
         body: JSON.stringify({
-          propertyId: form.propertyId,  // ✅
+          propertyId: form.propertyId,  // 
           unitNumber: form.unitNumber,
           type: form.type,
           rentAmount: Number(form.rentAmount)
@@ -234,7 +234,7 @@ function handleChange(e) {
       const data = await res.json()
       const rawUnit = data.data || data
 
-      // ✅ Normalize response
+      //  Normalize response
       const updated = {
         id: rawUnit.id,
         propertyId: rawUnit.property_id,

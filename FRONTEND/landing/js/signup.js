@@ -55,7 +55,7 @@ async function registerUser() {
             password: password.value
         };
 
-        // ✅ UPDATED: Call your actual backend endpoint
+        //  UPDATED: Call your actual backend endpoint
         const response = await fetch(`${API_URL}/signup/landlord`, {
             method: 'POST',
             headers: {
@@ -66,24 +66,24 @@ async function registerUser() {
 
         const data = await response.json();
 
-        // ✅ UPDATED: Handle your backend response format
+        //  UPDATED: Handle your backend response format
         if (response.ok && data.success) {
             // Store email for OTP verification
             localStorage.setItem('verificationEmail', email.value.trim());
             
-            // ✅ NEW: Store password temporarily for auto-login after OTP
+            //  NEW: Store password temporarily for auto-login after OTP
             localStorage.setItem('signupPassword', password.value);
             
-            // ✅ UPDATED: Store user data if needed
+            //  UPDATED: Store user data if needed
             if (data.user) {
                 localStorage.setItem('tempUser', JSON.stringify(data.user));
             }
 
-            // ✅ Show beautiful success popup instead of alert
+            //  Show beautiful success popup instead of alert
             showSuccessPopup(email.value.trim());
 
         } else {
-            // ✅ UPDATED: Handle your backend error format
+            //  UPDATED: Handle your backend error format
             const errorMessage = data.message || 'Registration failed. Please try again.';
             showErrorPopup('Registration Failed', errorMessage);
 
@@ -96,7 +96,7 @@ async function registerUser() {
     } catch (error) {
         console.error('Registration Error:', error);
         
-        // ✅ Show error popup instead of alert
+        //  Show error popup instead of alert
         showErrorPopup('Connection Error', 'Unable to reach the cloud server. It may be waking up, or there is a network issue.');
 
         // Reset button

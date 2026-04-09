@@ -27,7 +27,7 @@ export const getRoomTypes = async (req, res) => {
     let query;
     let params;
 
-    // ✅ FIXED: Using unit_types and unit_type_id matching your schema.sql
+    //  FIXED: Using unit_types and unit_type_id matching your schema.sql
     const selectClause = `
       SELECT ut.id, ut.property_id, ut.name, ut.default_rent,
              COUNT(u.id)::int AS units_count

@@ -38,7 +38,7 @@ export const getPlatformDashboard = async (req, res) => {
     `;
     const landlordsRes = await db.query(landlordsQuery);
 
-    // 3. ✅ THE FIX: Dynamic Audit Logs using UNION ALL
+    // 3.  THE FIX: Dynamic Audit Logs using UNION ALL
     const logsQuery = `
       SELECT 'user' AS type, 'New ' || role || ' account registered: ' || first_name || ' ' || last_name AS text, created_at
       FROM users

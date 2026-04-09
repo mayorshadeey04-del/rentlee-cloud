@@ -43,7 +43,7 @@ export default function TenantLedger() {
     fetchLedger()
   }, [])
 
-  // ✅ UPDATED PDF GENERATOR WITH LOGO & EXACT ORDER
+  //  UPDATED PDF GENERATOR WITH LOGO & EXACT ORDER
   const downloadPDF = () => {
     const doc = new jsPDF()
     const tenantName = tenantInfo?.full_name || user?.name || 'Tenant'

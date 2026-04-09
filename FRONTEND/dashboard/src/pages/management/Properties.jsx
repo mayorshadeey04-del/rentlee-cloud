@@ -5,7 +5,7 @@ import { useAuth } from '../../context/AuthContext'
 import { can } from '../../utils/permissions'
 import Toast from '../../components/Toast'
 import ConfirmDialog from '../../components/ConfirmDialog'
-import SubmitButton from '../../components/SubmitButton' // ✅ Imported your Pro Button
+import SubmitButton from '../../components/SubmitButton' //  Imported your Pro Button
 import './Properties.css'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
@@ -17,7 +17,7 @@ export default function Properties() {
   
   const [properties, setProperties] = useState([])
   const [loading, setLoading]       = useState(true)
-  const [isSubmitting, setIsSubmitting] = useState(false) // ✅ Added loading state for forms
+  const [isSubmitting, setIsSubmitting] = useState(false) //  Added loading state for forms
   const [showAdd, setShowAdd]       = useState(false)
   const [showEdit, setShowEdit]     = useState(false)
   const [editTarget, setEditTarget] = useState(null)
@@ -38,7 +38,7 @@ export default function Properties() {
     setTimeout(() => setToasts(t => t.filter(x => x.id !== id)), 3200)
   }, [])
 
-  // ✅ Fetch properties from backend
+  //  Fetch properties from backend
   useEffect(() => {
     fetchProperties()
   }, [])
@@ -64,10 +64,10 @@ export default function Properties() {
 
       const data = await res.json()
       
-      // ✅ Handle both response formats and normalize data
+      //  Handle both response formats and normalize data
       let propertiesList = data.data || data
       
-      // ✅ Normalize snake_case to camelCase & include occupiedUnits
+      //  Normalize snake_case to camelCase & include occupiedUnits
       propertiesList = propertiesList.map(prop => ({
         id: prop.id,
         name: prop.name,
@@ -109,14 +109,14 @@ export default function Properties() {
     setShowEdit(true)
   }
 
-  // ✅ Create new property
+  //  Create new property
   async function submitAdd() {
     if (!form.name || !form.location || !form.totalUnits) {
       setError('Please fill in all required fields.')
       return
     }
 
-    setIsSubmitting(true) // ✅ Turn spinner ON
+    setIsSubmitting(true) //  Turn spinner ON
 
     try {
       const res = await fetch(`${API_URL}/properties`, {
@@ -136,7 +136,7 @@ export default function Properties() {
 
       const data = await res.json()
       
-      // ✅ Normalize the created property
+      //  Normalize the created property
       const rawProperty = data.data || data
       const created = {
         id: rawProperty.id,
@@ -155,18 +155,18 @@ export default function Properties() {
     } catch (err) {
       setError(err.message || 'Failed to create property')
     } finally {
-      setIsSubmitting(false) // ✅ Turn spinner OFF
+      setIsSubmitting(false) //  Turn spinner OFF
     }
   }
 
-  // ✅ Update existing property
+  //  Update existing property
   async function submitEdit() {
     if (!form.name || !form.location || !form.totalUnits) {
       setError('Please fill in all required fields.')
       return
     }
 
-    setIsSubmitting(true) // ✅ Turn spinner ON
+    setIsSubmitting(true) //  Turn spinner ON
 
     try {
       const res = await fetch(`${API_URL}/properties/${editTarget.id}`, {
@@ -186,7 +186,7 @@ export default function Properties() {
 
       const data = await res.json()
       
-      // ✅ Normalize the updated property
+      //  Normalize the updated property
       const rawProperty = data.data || data
       const updated = {
         id: rawProperty.id,
@@ -207,11 +207,11 @@ export default function Properties() {
     } catch (err) {
       setError(err.message || 'Failed to update property')
     } finally {
-      setIsSubmitting(false) // ✅ Turn spinner OFF
+      setIsSubmitting(false) //  Turn spinner OFF
     }
   }
 
-  // ✅ Delete property
+  //  Delete property
   function deleteProperty(id, e) {
     e.stopPropagation() // Prevent row click when clicking delete
     const prop = properties.find(p => p.id === id)
@@ -424,7 +424,7 @@ export default function Properties() {
             </div>
             <div className="modal-footer">
               <button className="btn-cancel" onClick={() => setShowAdd(false)}>Cancel</button>
-              {/* ✅ Swapped Button */}
+              {/*  Swapped Button */}
               <SubmitButton 
                 onClick={submitAdd} 
                 isSubmitting={isSubmitting} 
@@ -466,7 +466,7 @@ export default function Properties() {
             </div>
             <div className="modal-footer">
               <button className="btn-cancel" onClick={() => setShowEdit(false)}>Cancel</button>
-              {/* ✅ Swapped Button */}
+              {/*  Swapped Button */}
               <SubmitButton 
                 onClick={submitEdit} 
                 isSubmitting={isSubmitting} 

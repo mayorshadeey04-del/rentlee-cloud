@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom'
 import { useAuth } from '../../context/AuthContext'
 import Toast from '../../components/Toast'
 import ConfirmDialog from '../../components/ConfirmDialog'
-import SubmitButton from '../../components/SubmitButton' // ✅ Imported Pro Button
+import SubmitButton from '../../components/SubmitButton' //  Imported Pro Button
 import './Settings.css'
 
 const EMPTY_CARETAKER = { firstName: '', lastName: '', email: '', phone: '' }
@@ -24,7 +24,7 @@ export default function Settings() {
   const [assignments, setAssignments]   = useState([])
   const [properties, setProperties]     = useState([])
   const [loading, setLoading]           = useState(true)
-  const [isSubmitting, setIsSubmitting] = useState(false) // ✅ Loading state for forms
+  const [isSubmitting, setIsSubmitting] = useState(false) //  Loading state for forms
   const [toasts, setToasts]             = useState([])
   const [confirm, setConfirm]           = useState(null)
 
@@ -77,7 +77,7 @@ export default function Settings() {
           const cData = await cRes.json()
           setCaretakers(cData.data || [])
           
-          // ✅ Extract real assignments from the caretaker data!
+          //  Extract real assignments from the caretaker data!
           const realAssignments = [];
           (cData.data || []).forEach(ct => {
             if (ct.properties && Array.isArray(ct.properties)) {
@@ -121,7 +121,7 @@ export default function Settings() {
       return
     }
     
-    setIsSubmitting(true) // ✅ Turn spinner ON
+    setIsSubmitting(true) //  Turn spinner ON
 
     try {
       const res = await fetch(`${API_URL}/caretakers`, {
@@ -141,7 +141,7 @@ export default function Settings() {
     } catch (error) {
       setAddError(error.message)
     } finally {
-      setIsSubmitting(false) // ✅ Turn spinner OFF
+      setIsSubmitting(false) //  Turn spinner OFF
     }
   }
 
@@ -164,7 +164,7 @@ export default function Settings() {
       return
     }
     
-    setIsSubmitting(true) // ✅ Turn spinner ON
+    setIsSubmitting(true) //  Turn spinner ON
 
     try {
       const res = await fetch(`${API_URL}/caretakers/${editTarget.id}`, {
@@ -183,7 +183,7 @@ export default function Settings() {
     } catch (error) {
       setEditError(error.message)
     } finally {
-      setIsSubmitting(false) // ✅ Turn spinner OFF
+      setIsSubmitting(false) //  Turn spinner OFF
     }
   }
 
@@ -249,7 +249,7 @@ export default function Settings() {
     // Add the new one (using Set to prevent duplicates)
     const newPropertyIds = [...new Set([...currentPropertyIds, assignForm.propertyId])];
 
-    setIsSubmitting(true) // ✅ Turn spinner ON
+    setIsSubmitting(true) //  Turn spinner ON
 
     try {
       const res = await fetch(`${API_URL}/caretakers/${assignForm.caretakerId}/properties`, {
@@ -282,7 +282,7 @@ export default function Settings() {
     } catch(error) {
       setAssignError(error.message);
     } finally {
-      setIsSubmitting(false) // ✅ Turn spinner OFF
+      setIsSubmitting(false) //  Turn spinner OFF
     }
   }
 
@@ -539,7 +539,7 @@ export default function Settings() {
             </div>
             <div className="modal-footer">
               <button className="btn-cancel" onClick={() => setShowAdd(false)} disabled={isSubmitting}>Cancel</button>
-              {/* ✅ Swapped Button */}
+              {/*  Swapped Button */}
               <SubmitButton 
                 onClick={submitAdd} 
                 isSubmitting={isSubmitting} 
@@ -587,7 +587,7 @@ export default function Settings() {
             </div>
             <div className="modal-footer">
               <button className="btn-cancel" onClick={() => setShowEdit(false)} disabled={isSubmitting}>Cancel</button>
-              {/* ✅ Swapped Button */}
+              {/*  Swapped Button */}
               <SubmitButton 
                 onClick={submitEdit} 
                 isSubmitting={isSubmitting} 
@@ -629,7 +629,7 @@ export default function Settings() {
             </div>
             <div className="modal-footer">
               <button className="btn-cancel" onClick={() => setShowAssign(false)} disabled={isSubmitting}>Cancel</button>
-              {/* ✅ Swapped Button */}
+              {/*  Swapped Button */}
               <SubmitButton 
                 onClick={submitAssign} 
                 isSubmitting={isSubmitting} 

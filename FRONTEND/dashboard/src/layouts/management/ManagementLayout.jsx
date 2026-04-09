@@ -9,7 +9,7 @@ export default function ManagementLayout() {
   const [mobileOpen, setMobileOpen] = useState(false)
   const location = useLocation()
 
-  // ✅ Auto-close the mobile sidebar whenever the user navigates to a new page
+  //  Auto-close the mobile sidebar whenever the user navigates to a new page
   useEffect(() => {
     setMobileOpen(false)
   }, [location.pathname])
@@ -25,7 +25,7 @@ export default function ManagementLayout() {
   return (
     <div className="management-layout">
       
-      {/* ✅ Dark overlay for mobile when sidebar is open */}
+      {/*  Dark overlay for mobile when sidebar is open */}
       {mobileOpen && (
         <div className="sidebar-overlay" onClick={() => setMobileOpen(false)}></div>
       )}

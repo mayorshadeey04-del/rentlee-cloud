@@ -5,7 +5,7 @@ import { useAuth } from '../../context/AuthContext'
 import { can } from '../../utils/permissions'
 import Toast from '../../components/Toast'
 import ConfirmDialog from '../../components/ConfirmDialog'
-import SubmitButton from '../../components/SubmitButton' // ✅ Imported Pro Button
+import SubmitButton from '../../components/SubmitButton' //  Imported Pro Button
 import './Properties.css' 
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
@@ -21,7 +21,7 @@ export default function PropertyDetails() {
   const navigate = useNavigate()
   const { user, authHeaders } = useAuth()
   
-  // ✅ Bulletproof ID grabber: Try URL params first, then try the hidden state!
+  //  Bulletproof ID grabber: Try URL params first, then try the hidden state!
   const propertyId = params.id || location.state?.id;
   
   // Data State
@@ -32,7 +32,7 @@ export default function PropertyDetails() {
   
   // UI State
   const [loading, setLoading] = useState(true)
-  const [isSubmitting, setIsSubmitting] = useState(false) // ✅ Loading state for all modals
+  const [isSubmitting, setIsSubmitting] = useState(false) //  Loading state for all modals
   const [error, setError] = useState('')
   const [pageError, setPageError] = useState('')
   const [toasts, setToasts] = useState([])
@@ -129,7 +129,7 @@ export default function PropertyDetails() {
   async function submitAddType() {
     if (!typeForm.name || !typeForm.defaultRent) return setError('Please fill in all fields.')
     
-    setIsSubmitting(true) // ✅ Spinner ON
+    setIsSubmitting(true) //  Spinner ON
 
     try {
       const res = await fetch(`${API_URL}/roomtypes`, {
@@ -147,14 +147,14 @@ export default function PropertyDetails() {
     } catch (err) { 
       setError(err.message) 
     } finally {
-      setIsSubmitting(false) // ✅ Spinner OFF
+      setIsSubmitting(false) //  Spinner OFF
     }
   }
 
   async function submitEditType() {
     if (!typeForm.name || !typeForm.defaultRent) return setError('Please fill in all fields.')
     
-    setIsSubmitting(true) // ✅ Spinner ON
+    setIsSubmitting(true) //  Spinner ON
 
     try {
       const res = await fetch(`${API_URL}/roomtypes/${editTypeTarget.id}`, {
@@ -175,7 +175,7 @@ export default function PropertyDetails() {
     } catch (err) { 
       setError(err.message) 
     } finally {
-      setIsSubmitting(false) // ✅ Spinner OFF
+      setIsSubmitting(false) //  Spinner OFF
     }
   }
 
@@ -188,7 +188,7 @@ export default function PropertyDetails() {
   async function submitAddUnit() {
     if (!unitForm.unitNumber || !unitForm.typeId) return setError('Please fill in all fields.')
     
-    setIsSubmitting(true) // ✅ Spinner ON
+    setIsSubmitting(true) //  Spinner ON
 
     try {
       const res = await fetch(`${API_URL}/units`, {
@@ -218,14 +218,14 @@ export default function PropertyDetails() {
     } catch (err) { 
       setError(err.message) 
     } finally {
-      setIsSubmitting(false) // ✅ Spinner OFF
+      setIsSubmitting(false) //  Spinner OFF
     }
   }
 
   async function submitEditUnit() {
     if (!unitForm.unitNumber || !unitForm.typeId) return setError('Please fill in all fields.')
     
-    setIsSubmitting(true) // ✅ Spinner ON
+    setIsSubmitting(true) //  Spinner ON
 
     try {
       const res = await fetch(`${API_URL}/units/${editUnitTarget.id}`, {
@@ -256,7 +256,7 @@ export default function PropertyDetails() {
     } catch (err) { 
       setError(err.message) 
     } finally {
-      setIsSubmitting(false) // ✅ Spinner OFF
+      setIsSubmitting(false) //  Spinner OFF
     }
   }
 
@@ -495,7 +495,7 @@ export default function PropertyDetails() {
             </div>
             <div className="modal-footer">
               <button className="btn-cancel" onClick={() => { setShowAddUnit(false); setShowEditUnit(false); }}>Cancel</button>
-              {/* ✅ Swapped Submit Button */}
+              {/*  Swapped Submit Button */}
               <SubmitButton 
                 onClick={showEditUnit ? submitEditUnit : submitAddUnit}
                 isSubmitting={isSubmitting}
@@ -545,7 +545,7 @@ export default function PropertyDetails() {
             </div>
             <div className="modal-footer">
               <button className="btn-cancel" onClick={() => { setShowAddType(false); setShowEditType(false); }}>Cancel</button>
-              {/* ✅ Swapped Submit Button */}
+              {/*  Swapped Submit Button */}
               <SubmitButton 
                 onClick={showEditType ? submitEditType : submitAddType}
                 isSubmitting={isSubmitting}

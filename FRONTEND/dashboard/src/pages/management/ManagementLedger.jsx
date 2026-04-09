@@ -155,7 +155,7 @@ export default function ManagementLedger() {
         </button>
       </div>
 
-      {/* ✅ YOUR BRILLIANT SELECTION UI */}
+      {/*  YOUR BRILLIANT SELECTION UI */}
       <div className="ledger-selection-panel">
         <div className="selection-group">
           <label>1. Filter by Property (Optional)</label>

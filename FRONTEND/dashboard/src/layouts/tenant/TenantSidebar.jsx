@@ -46,7 +46,7 @@ export default function TenantSidebar({ collapsed, mobileOpen }) {
             </NavLink>
           </li>
 
-          {/* ✅ THE NEW FINANCIALS DROPDOWN (Fixed alignment) */}
+          {/*  THE NEW FINANCIALS DROPDOWN (Fixed alignment) */}
           <li className="sidebar-nav-item dropdown-container">
             <div 
               className={`sidebar-nav-link ${isFinancialActive ? 'active-parent' : ''}`} 

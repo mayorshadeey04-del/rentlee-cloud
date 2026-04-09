@@ -27,10 +27,10 @@ router.get('/stats', authorize('landlord', 'caretaker'), getPaymentStats);
 // Get ALL payments
 router.get('/', authorize('landlord', 'caretaker', 'tenant'), getPayments);
 
-// ✅ MOVE THIS HERE: Specific text routes must go BEFORE dynamic /:id routes
+//  MOVE THIS HERE: Specific text routes must go BEFORE dynamic /:id routes
 router.get('/ledger', authorize('tenant'), getTenantLedger);
 
-// ✅ Add this right below your /ledger (tenant) route, and ABOVE the /:id route!
+//  Add this right below your /ledger (tenant) route, and ABOVE the /:id route!
 router.get('/ledger/admin/:tenantId', authorize('landlord', 'caretaker'), getAdminTenantLedger);
 
 // Get single payment (dynamic ID goes AFTER specific routes)

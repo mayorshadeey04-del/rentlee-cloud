@@ -14,7 +14,7 @@ const resendBtn = document.getElementById('resendBtn');
 const timerSpan = document.getElementById('timer');
 const userEmailSpan = document.getElementById('userEmail');
 
-// ✅ Get email from localStorage (set during signup)
+//  Get email from localStorage (set during signup)
 const userEmail = localStorage.getItem('verificationEmail');
 
 // Redirect if no email found
@@ -68,7 +68,7 @@ otpInput.addEventListener('input', (e) => {
 });
 
 // ============================================
-// ✅ FIXED: Form submission with proper redirect
+//  FIXED: Form submission with proper redirect
 // ============================================
 form.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -102,18 +102,18 @@ form.addEventListener('submit', async (e) => {
         const verifyData = await verifyResponse.json();
 
         if (verifyResponse.ok && verifyData.success) {
-            // ✅ Email verified successfully!
+            //  Email verified successfully!
             verifyBtn.textContent = 'Verified! ✓';
             verifyBtn.style.background = '#10b981';
             
             // Clear verification email
             localStorage.removeItem('verificationEmail');
             
-            // ✅ STEP 2: Get the stored password (from signup)
+            //  STEP 2: Get the stored password (from signup)
             const signupPassword = localStorage.getItem('signupPassword');
             
             if (signupPassword) {
-                // ✅ STEP 3: Auto-login the user
+                //  STEP 3: Auto-login the user
                 verifyBtn.textContent = 'Logging in...';
                 
                 const loginResponse = await fetch(`${API_URL}/signin/login`, {
@@ -130,7 +130,7 @@ form.addEventListener('submit', async (e) => {
                 const loginData = await loginResponse.json();
 
             if (loginResponse.ok && loginData.success) {
-    // ✅ STEP 4: Build user object
+    //  STEP 4: Build user object
     const { token, user } = loginData.data;
 
     const dashboardUser = {
@@ -148,7 +148,7 @@ form.addEventListener('submit', async (e) => {
     verifyBtn.textContent = 'Success! Redirecting...';
 
     setTimeout(() => {
-        // ✅ Pass token + user via URL to React (fixes origin mismatch)
+        //  Pass token + user via URL to React (fixes origin mismatch)
         const encodedUser  = encodeURIComponent(JSON.stringify(dashboardUser));
         const encodedToken = encodeURIComponent(token);
        window.location.href = `https://rentlee-cloud.vercel.app/auth-callback?token=${encodedToken}&user=${encodedUser}`;

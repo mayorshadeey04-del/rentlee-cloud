@@ -24,7 +24,7 @@ export const auth = async (req, res, next) => {
     // Verify token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    // ✅ UPDATED: Get user with deleted_at field
+    //  UPDATED: Get user with deleted_at field
     const result = await db.query(
       'SELECT id, email, first_name, last_name, phone, role, landlord_id, is_active, deleted_at FROM users WHERE id = $1',
       [decoded.userId]
@@ -39,7 +39,7 @@ export const auth = async (req, res, next) => {
 
     const user = result.rows[0];
 
-    // ✅ NEW: Check if user is soft deleted
+    //  NEW: Check if user is soft deleted
     if (user.deleted_at) {
       return res.status(401).json({
         success: false,
@@ -55,7 +55,7 @@ export const auth = async (req, res, next) => {
       });
     }
 
-    // ✅ NEW: For tenants, check tenant status
+    //  NEW: For tenants, check tenant status
     if (user.role === 'tenant') {
       const tenantResult = await db.query(
         'SELECT status FROM tenants WHERE user_id = $1',

@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { useAuth } from '../context/AuthContext'
-import SubmitButton from './SubmitButton' // ✅ Imported Pro Button
+import SubmitButton from './SubmitButton' //  Imported Pro Button
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
 
-// ✅ ADDED MIGRATION FIELDS TO STATE
+//  ADDED MIGRATION FIELDS TO STATE
 const EMPTY_FORM = {
   firstName: '', lastName: '', phone: '', idNumber: '', email: '',
   propertyId: '', propertyName: '', unitId: '', unitNumber: '',
@@ -19,7 +19,7 @@ export default function TenantWizard({ isOpen, onClose, onSuccess, properties })
   const [form, setForm] = useState(EMPTY_FORM)
   const [vacantUnits, setVacantUnits] = useState([])
   const [loadingUnits, setLoadingUnits] = useState(false)
-  const [isSubmitting, setIsSubmitting] = useState(false) // ✅ Shared loading state
+  const [isSubmitting, setIsSubmitting] = useState(false) //  Shared loading state
   const [error, setError] = useState('')
 
   // Reset wizard and lock body scroll when opened
@@ -114,10 +114,10 @@ export default function TenantWizard({ isOpen, onClose, onSuccess, properties })
 
   // LIVE API CALL FOR SUBMITTING
   async function submitWizard() {
-    // ✅ NEW VALIDATION FOR MIGRATION
+    //  NEW VALIDATION FOR MIGRATION
     if (form.isExisting && !form.historicalDeposit) return setError('Please enter the historical deposit amount paid.')
     
-    setIsSubmitting(true) // ✅ Spinner ON
+    setIsSubmitting(true) //  Spinner ON
     setError('')
     
     try {
@@ -133,7 +133,7 @@ export default function TenantWizard({ isOpen, onClose, onSuccess, properties })
           propertyId: form.propertyId,
           unitId: form.unitId,
           depositAmount: Number(form.depositAmount),
-          // ✅ PASSING NEW MIGRATION DATA TO BACKEND
+          //  PASSING NEW MIGRATION DATA TO BACKEND
           isExisting: form.isExisting,
           historicalDeposit: form.historicalDeposit ? Number(form.historicalDeposit) : 0,
           currentArrears: form.currentArrears ? Number(form.currentArrears) : 0
@@ -150,7 +150,7 @@ export default function TenantWizard({ isOpen, onClose, onSuccess, properties })
     } catch (err) {
       setError(err.message)
     } finally {
-      setIsSubmitting(false) // ✅ Spinner OFF
+      setIsSubmitting(false) //  Spinner OFF
     }
   }
 
@@ -304,7 +304,7 @@ export default function TenantWizard({ isOpen, onClose, onSuccess, properties })
             {step < 3 ? (
               <button className="btn-primary" onClick={nextStep}>Next Step →</button>
             ) : (
-              /* ✅ Swapped Button */
+              /*  Swapped Button */
               <SubmitButton 
                 onClick={submitWizard} 
                 isSubmitting={isSubmitting} 

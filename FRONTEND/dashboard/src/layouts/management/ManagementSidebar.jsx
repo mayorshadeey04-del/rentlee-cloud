@@ -31,7 +31,7 @@ export default function ManagementSidebar({ collapsed, mobileOpen }) {
       label: 'Tenants',
       show: true,
     },
-    // ✅ DROPDOWN MENU FOR FINANCIALS
+    //  DROPDOWN MENU FOR FINANCIALS
     {
       id: 'financials',
       icon: 'fas fa-money-bill-wave',

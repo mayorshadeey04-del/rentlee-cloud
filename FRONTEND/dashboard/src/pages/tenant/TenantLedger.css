@@ -29,7 +29,7 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.75rem 1.5rem;
-  background: linear-gradient(135deg, var(--blue-500), var(--cyan-400)); /* ✅ Swapped to Blue */
+  background: linear-gradient(135deg, var(--blue-500), var(--cyan-400)); /*  Swapped to Blue */
   color: white;
   border: none;
   border-radius: 10px;
@@ -42,7 +42,7 @@
 
 .btn-download:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3); /* ✅ Swapped shadow to Blue */
+  box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3); /*  Swapped shadow to Blue */
 }
 
 .btn-download:disabled {

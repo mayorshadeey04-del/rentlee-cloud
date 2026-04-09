@@ -3,7 +3,7 @@ import { useAuth } from './context/AuthContext'
 
 import AuthCallback     from './pages/AuthCallback'
 
-// ✅ Platform Admin (NEW)
+//  Platform Admin (NEW)
 import PlatformLayout    from './layouts/platform/PlatformLayout'
 import PlatformDashboard from './pages/admin/PlatformDashboard'
 
@@ -44,7 +44,7 @@ function ProtectedRoute({ children, allowedRoles }) {
   }
   
   if (!allowedRoles.includes(user.role)) {
-    // ✅ Secure fallback: Bounce unauthorized users to their correct dashboard
+    //  Secure fallback: Bounce unauthorized users to their correct dashboard
     if (user.role === 'platform_admin') return <Navigate to="/platform/dashboard" replace />
     if (user.role === 'tenant') return <Navigate to="/tenant/dashboard" replace />
     return <Navigate to="/management/dashboard" replace />
@@ -61,7 +61,7 @@ function RootRedirect() {
     return null
   }
   
-  // ✅ Route users to their specific domains upon login
+  //  Route users to their specific domains upon login
   if (user.role === 'platform_admin') return <Navigate to="/platform/dashboard" replace />
   if (user.role === 'tenant') return <Navigate to="/tenant/dashboard" replace />
   return <Navigate to="/management/dashboard" replace />
@@ -79,7 +79,7 @@ export default function App() {
 
         <Route path="/" element={<RootRedirect />} />
 
-        {/* ── ✅ Platform Admin Routes ── */}
+        {/* ──  Platform Admin Routes ── */}
         <Route path="/platform"
           element={<ProtectedRoute allowedRoles={['platform_admin']}><PlatformLayout /></ProtectedRoute>}>
           <Route index element={<Navigate to="dashboard" replace />} />
