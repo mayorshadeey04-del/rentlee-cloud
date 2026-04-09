@@ -19,27 +19,21 @@ import adminRoutes from './routes/admin.routes.js';
 
 const app = express();
 
-const allowedOrigins = [
-  'https://rentlee-cloud-l6ur.vercel.app',
-  'https://rentlee-cloud.vercel.app'
-];
-
+// 1. CORS Middleware must be the first to handle preflight requests
 app.use(cors({
-  origin: function (origin, callback) {
-    if (!origin) return callback(null, true);
-    
-    if (allowedOrigins.includes(origin)) {
-      return callback(null, true);
-    } else {
-      return callback(new Error('Not allowed by CORS'), false);
-    }
-  },
+  origin: [
+    'https://rentlee-cloud-l6ur.vercel.app',
+    'https://rentlee-cloud.vercel.app'
+  ],
   credentials: true,
-  optionsSuccessStatus: 200
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
+// 2. Process JSON data after CORS check
 app.use(express.json());
 
+// API Routes
 app.use('/api/signup', signupRoutes);
 app.use('/api/signin', signinRoutes);
 app.use('/api/caretakers', caretakersRoutes);
