@@ -37,21 +37,24 @@ const exportToPDF = (title, columns, rows, propertyLabel = 'All Properties', use
       doc.text('Rentlee', 14, 20)
     }
 
-    // Report title
+   // Report title
     doc.setFont('helvetica', 'bold')
     doc.setFontSize(16)
     doc.setTextColor(15, 23, 42)
     doc.text(title, 14, 36)
 
-    // Property line (below title)
+    // Property line (below title) - UPGRADED TO BE OUTSTANDING
     doc.setFont('helvetica', 'normal')
-    doc.setFontSize(10)
+    doc.setFontSize(11) // Increased base size from 10 to 11
     doc.setTextColor(100, 116, 139)
-    doc.text('Property: ', 14, 46)
+    doc.text('Property: ', 14, 47) // Shifted down 1px to give the title breathing room
+    
     const propLabelWidth = doc.getTextWidth('Property: ')
+    
     doc.setFont('helvetica', 'bold')
-    doc.setTextColor(15, 23, 42)
-    doc.text(propertyLabel, 14 + propLabelWidth, 46)
+    doc.setFontSize(14) // Increased from 10 to 14 to make the property name massive and clear
+    doc.setTextColor(15, 23, 42) // Deep dark navy for maximum contrast
+    doc.text(propertyLabel, 14 + propLabelWidth, 47)
 
     // Right side: Generated on
     doc.setFont('helvetica', 'normal')
