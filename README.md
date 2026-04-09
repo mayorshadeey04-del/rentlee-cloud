@@ -4,6 +4,15 @@
 
 ---
 
+## Live Links
+
+| | URL |
+|---|---|
+| Landing Page | [rentlee-cloud-l6ur.vercel.app](https://rentlee-cloud-l6ur.vercel.app) |
+| Dashboard | [rentlee-cloud.vercel.app](https://rentlee-cloud.vercel.app) |
+
+---
+
 ## Overview
 
 Rentlee Cloud is a full-stack property management platform that streamlines operations across all stakeholders. Landlords manage properties and financials, tenants handle payments and maintenance, and platform administrators maintain global oversight — all through secure, role-specific portals.
