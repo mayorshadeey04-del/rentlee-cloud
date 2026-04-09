@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
-import { can, isAssigned } from '../../utils/permissions'
+import { can } from '../../utils/permissions' // Removed isAssigned, we don't need it here anymore!
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import './Dashboard.css'
 
@@ -16,6 +16,9 @@ export default function Dashboard() {
   const [error,           setError]           = useState(null)
 
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
+
+  // Identify if user is a Caretaker
+  const isCaretaker = user?.role === 'caretaker';
 
   const formatCurrency = (amount) => {
     if (!amount || amount === 0) return 'Ksh 0'
@@ -35,7 +38,7 @@ export default function Dashboard() {
         setLoading(true)
         setError(null)
 
-        // 1. GET Stats
+        // 1. GET Stats (Backend already scopes this based on role)
         const statsRes = await fetch(`${API_URL}/dashboard/stats`, { headers: authHeaders() })
         if (!statsRes.ok) {
           if (statsRes.status === 401) {
@@ -63,7 +66,7 @@ export default function Dashboard() {
           });
         }
 
-        // 2. GET Properties
+        // 2. GET Properties (Backend already scopes this for Caretakers)
         const propsRes = await fetch(`${API_URL}/properties`, { headers: authHeaders() })
         if (!propsRes.ok) throw new Error('Failed to fetch properties')
 
@@ -102,14 +105,15 @@ export default function Dashboard() {
     if (user) loadDashboard()
   }, [navigate, user])
 
-  const visibleProperties = user?.role === 'caretaker'
-    ? properties.filter(p => isAssigned(user.assignedPropertyIds, p.propertyId))
-    : properties
+  // 👇 FIX: Since the backend already filters the properties, we just pass the array directly! No frontend filtering needed.
+  const visibleProperties = properties;
 
   const quickLinks = [
-    { icon: 'fas fa-building', title: 'Add Property', desc: 'Register new property', path: '/management/properties', show: can(user?.role, 'properties', 'create') },
-    { icon: 'fas fa-user-plus', title: 'Add Tenant', desc: 'Register new tenant', path: '/management/tenants', show: can(user?.role, 'tenants', 'create') },
-    { icon: 'fas fa-comment-dots', title: 'Send Notice', desc: 'Bulk SMS / Email', path: '/management/tenants', show: can(user?.role, 'tenants', 'create') },
+    // strictly hide "Add Property" from caretakers
+    { icon: 'fas fa-building', title: 'Add Property', desc: 'Register new property', path: '/management/properties', show: !isCaretaker },
+    // Caretakers can still manage tenants
+    { icon: 'fas fa-user-plus', title: 'Add Tenant', desc: 'Register new tenant', path: '/management/tenants', show: true },
+    { icon: 'fas fa-comment-dots', title: 'Send Notice', desc: 'Bulk SMS / Email', path: '/management/tenants', show: true },
   ].filter(l => l.show)
 
   const pieData = maintenanceData ? [
@@ -118,16 +122,13 @@ export default function Dashboard() {
     { name: 'Complete', value: maintenanceData.complete || 0, color: '#22c55e' }
   ].filter(d => d.value > 0) : [];
 
-  // 👇 The Premium Skeleton Loader
   if (loading) {
     return (
       <>
         <section className="stats-grid">
           {[1, 2, 3, 4].map(i => (
             <div key={i} className="stat-card" style={{ border: '2px solid var(--slate-100)', boxShadow: 'none' }}>
-              <div className="stat-card-header">
-                <div className="skeleton skeleton-icon"></div>
-              </div>
+              <div className="stat-card-header"><div className="skeleton skeleton-icon"></div></div>
               <div className="skeleton skeleton-text" style={{ width: '50%' }}></div>
               <div className="skeleton skeleton-value"></div>
             </div>
@@ -147,9 +148,7 @@ export default function Dashboard() {
 
         <section className="properties-table-card" style={{ border: '2px solid var(--slate-100)' }}>
           <div className="skeleton skeleton-title" style={{ width: '25%' }}></div>
-          <div style={{ marginTop: '2rem' }}>
-            {[1, 2, 3].map(i => <div key={i} className="skeleton skeleton-table-row"></div>)}
-          </div>
+          <div style={{ marginTop: '2rem' }}>{[1, 2, 3].map(i => <div key={i} className="skeleton skeleton-table-row"></div>)}</div>
         </section>
       </>
     )
@@ -162,19 +161,22 @@ export default function Dashboard() {
       <section className="stats-grid">
         <div className="stat-card blue">
           <div className="stat-card-header"><div className="stat-card-icon"><i className="fas fa-building"></i></div></div>
-          <div className="stat-card-label">Total Properties</div>
+          <div className="stat-card-label">{isCaretaker ? 'Assigned Properties' : 'Total Properties'}</div>
           <div className="stat-card-value">{stats?.totalProperties ?? 0}</div>
         </div>
+
         <div className="stat-card emerald">
           <div className="stat-card-header"><div className="stat-card-icon"><i className="fas fa-money-bill-wave"></i></div></div>
           <div className="stat-card-label">Monthly Rent</div>
           <div className="stat-card-value">{formatCurrency(stats?.monthlyRent)}</div>
         </div>
+
         <div className="stat-card amber">
           <div className="stat-card-header"><div className="stat-card-icon"><i className="fas fa-users"></i></div></div>
           <div className="stat-card-label">Active Tenants</div>
           <div className="stat-card-value">{stats?.activeTenants ?? 0}</div>
         </div>
+        
         <div className="stat-card rose">
           <div className="stat-card-header"><div className="stat-card-icon"><i className="fas fa-wrench"></i></div></div>
           <div className="stat-card-label">Open Requests</div>
@@ -190,9 +192,7 @@ export default function Dashboard() {
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie data={pieData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={110} stroke="none">
-                    {pieData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
+                    {pieData.map((entry, index) => <Cell key={`cell-${index}`} fill={entry.color} />)}
                   </Pie>
                   <Tooltip />
                   <Legend verticalAlign="bottom" height={36} iconType="rect" />
@@ -223,7 +223,7 @@ export default function Dashboard() {
 
       <section className="properties-table-card">
         <div className="dashboard-card-header">
-          <h2 className="dashboard-card-title">Properties Overview</h2>
+          <h2 className="dashboard-card-title">{isCaretaker ? 'Assigned Properties' : 'Properties Overview'}</h2>
           <Link to="/management/properties" className="dashboard-view-all">Manage all <i className="fas fa-arrow-right"></i></Link>
         </div>
         {visibleProperties.length === 0 ? (
