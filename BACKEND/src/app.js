@@ -1,8 +1,6 @@
-import express from 'express'
-import cors from 'cors'
+import express from 'express';
+import cors from 'cors';
 
-// Import routes here later
-// import userRoutes from "./modules/user/user.routes.js";
 import signupRoutes from './routes/signup.routes.js';
 import signinRoutes from './routes/signin.routes.js';
 import caretakersRoutes from './routes/caretakers.routes.js';
@@ -19,32 +17,29 @@ import reportsRoutes from './routes/reports.routes.js';
 import profileRoutes from './routes/profile.routes.js';
 import adminRoutes from './routes/admin.routes.js';
 
-
 const app = express();
 
-// Global Middleware
-app.use(express.json());
-// app.use(cors());
 const allowedOrigins = [
-  'https://rentlee-cloud-l6ur.vercel.app', // Cloud Landing Page
-  'https://rentlee-cloud.vercel.app'      // Cloud Dashboard
+  'https://rentlee-cloud-l6ur.vercel.app',
+  'https://rentlee-cloud.vercel.app'
 ];
 
 app.use(cors({
   origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or Postman)
     if (!origin) return callback(null, true);
     
-    if (allowedOrigins.indexOf(origin) === -1) {
-      const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
-      return callback(new Error(msg), false);
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    } else {
+      return callback(new Error('Not allowed by CORS'), false);
     }
-    return callback(null, true);
   },
-  credentials: true
+  credentials: true,
+  optionsSuccessStatus: 200
 }));
-// Routes (example)
-// app.use("/api/users", userRoutes);
+
+app.use(express.json());
+
 app.use('/api/signup', signupRoutes);
 app.use('/api/signin', signinRoutes);
 app.use('/api/caretakers', caretakersRoutes);
@@ -61,31 +56,8 @@ app.use('/api/reports', reportsRoutes);
 app.use('/api/profile', profileRoutes);
 app.use('/api/admin', adminRoutes);
 
-// Health check route
 app.get("/", (req, res) => {
   res.json({ message: "Rentlee API is running" });
 });
 
 export default app;
-
-
-
-// import express from 'express';
-
-// import propertiesRoutes from './routes/properties.routes.js';
-// import unitsRoutes from './routes/units.routes.js';
-// import tenantsRoutes from './routes/tenants.routes.js';
-// import caretakersRoutes from './routes/caretakers.routes.js';
-// import maintenanceRoutes from './routes/maintenance.routes.js';
-// import dashboardRoutes from './routes/dashboard.routes.js';
-
-// const app = express();
-
-// app.use('/api/properties', propertiesRoutes);
-// app.use('/api/units', unitsRoutes);
-// app.use('/api/tenants', tenantsRoutes);
-// app.use('/api/caretakers', caretakersRoutes);
-// app.use('/api/maintenance', maintenanceRoutes);
-// app.use('/api/dashboard', dashboardRoutes);
-
-// export default app;
