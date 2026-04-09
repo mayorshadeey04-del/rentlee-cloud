@@ -14,7 +14,6 @@ export const getUnits = async (req, res) => {
     let query;
     let params;
 
-    // ✅ FIXED: Using unit_types and unit_type_id
     const selectClause = `
       SELECT u.id, u.unit_number, u.status, u.property_id, u.unit_type_id as room_type_id,
              ut.name as type_name, ut.default_rent as rent,
@@ -34,6 +33,21 @@ export const getUnits = async (req, res) => {
         params = [propertyId, userId];
       } else {
         query = `${selectClause} WHERE p.landlord_id = $1 ORDER BY p.name, u.unit_number`;
+        params = [userId];
+      }
+    } else if (role === 'caretaker') {
+      // 👇 NEW LOGIC: Caretaker is allowed, but only for their assigned properties
+      if (propertyId) {
+        query = `${selectClause} 
+                 JOIN caretaker_properties cp ON p.id = cp.property_id 
+                 WHERE u.property_id = $1 AND cp.caretaker_id = $2 AND cp.status = 'active' 
+                 ORDER BY u.unit_number`;
+        params = [propertyId, userId];
+      } else {
+        query = `${selectClause} 
+                 JOIN caretaker_properties cp ON p.id = cp.property_id 
+                 WHERE cp.caretaker_id = $1 AND cp.status = 'active' 
+                 ORDER BY p.name, u.unit_number`;
         params = [userId];
       }
     } else {
@@ -79,7 +93,21 @@ export const getUnit = async (req, res) => {
     if (result.rows.length === 0) return res.status(404).json({ success: false, message: 'Unit not found' });
     const unit = result.rows[0];
 
-    if (role === 'landlord' && unit.landlord_id !== userId) return res.status(403).json({ success: false, message: 'Access denied' });
+    // Check Landlord Security
+    if (role === 'landlord' && unit.landlord_id !== userId) {
+      return res.status(403).json({ success: false, message: 'Access denied' });
+    }
+
+    // 👇 NEW LOGIC: Check Caretaker Security
+    if (role === 'caretaker') {
+      const accessCheck = await db.query(
+        `SELECT id FROM caretaker_properties WHERE caretaker_id = $1 AND property_id = $2 AND status = 'active'`,
+        [userId, unit.property_id]
+      );
+      if (accessCheck.rows.length === 0) {
+        return res.status(403).json({ success: false, message: 'Access denied to this property' });
+      }
+    }
 
     res.json({ success: true, data: unit });
   } catch (error) {
@@ -100,7 +128,6 @@ export const createUnit = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Property ID, unit number, and room type are required' });
     }
 
-    // 👇 NEW LOGIC: Check if property has reached its maximum registered units
     const propertyCheck = await db.query('SELECT total_units FROM properties WHERE id = $1', [propertyId]);
     if (propertyCheck.rows.length === 0) {
       return res.status(404).json({ success: false, message: 'Property not found' });
@@ -117,7 +144,6 @@ export const createUnit = async (req, res) => {
         message: `Limit reached! This property is only registered for a maximum of ${maxUnits} units.` 
       });
     }
-    // 👆 END OF NEW LOGIC
 
     const typeCheck = await db.query('SELECT id FROM unit_types WHERE id = $1 AND property_id = $2', [roomTypeId, propertyId]);
     if (typeCheck.rows.length === 0) return res.status(400).json({ success: false, message: 'Invalid room type for this property' });
