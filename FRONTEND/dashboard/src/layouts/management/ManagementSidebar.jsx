@@ -4,7 +4,7 @@ import { useAuth } from '../../context/AuthContext'
 import { can } from '../../utils/permissions'
 import './ManagementSidebar.css'
 
-export default function ManagementSidebar({ collapsed }) {
+export default function ManagementSidebar({ collapsed, mobileOpen }) {
   const { user } = useAuth()
   const location = useLocation()
   
@@ -63,7 +63,7 @@ export default function ManagementSidebar({ collapsed }) {
   ]
 
   return (
-    <aside className={`management-sidebar ${collapsed ? 'collapsed' : ''}`}>
+    <aside className={`management-sidebar ${collapsed ? 'collapsed' : ''} ${mobileOpen ? 'mobile-open' : ''}`}>
 
       {/* Logo */}
       <div className="sidebar-logo">
