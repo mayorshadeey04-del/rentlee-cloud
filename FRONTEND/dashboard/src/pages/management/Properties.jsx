@@ -80,7 +80,7 @@ export default function Properties() {
       setProperties(propertiesList)
       
     } catch (err) {
-      console.error('❌ Error fetching properties:', err)
+      console.error('Error fetching properties:', err)
       setPageError('Unable to connect to server. Please check your connection.')
     } finally {
       setLoading(false)
@@ -304,7 +304,7 @@ export default function Properties() {
           borderRadius: '8px', marginBottom: '20px', display: 'flex',
           justifyContent: 'space-between', alignItems: 'center', color: '#991b1b'
         }}>
-          <span>⚠️ {pageError}</span>
+          <span> {pageError}</span>
           <div>
             <button onClick={fetchProperties} style={{ marginRight: '10px', padding: '6px 12px', background: '#dc2626', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
               Retry
@@ -336,7 +336,7 @@ export default function Properties() {
             {!loading && pageError && <tr><td colSpan="6" className="table-empty">Unable to load properties. Please try again.</td></tr>}
             
             {properties.map(prop => {
-              // 🧮 Calculate Vacant Units
+              //  Calculate Vacant Units
               const vacantUnits = prop.totalUnits - prop.occupiedUnits;
               
               return (

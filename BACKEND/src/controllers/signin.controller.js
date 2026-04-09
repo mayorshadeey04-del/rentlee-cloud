@@ -339,7 +339,7 @@ export const changeEmail = async (req, res) => {
 
    //  SEND EMAIL ASYNCHRONOUSLY (don't wait for it)
     sendEmailChangeVerification(newEmail, code, req.user.first_name).catch(err => {
-      console.error('❌ Background email send failed:', err);
+      console.error('Background email send failed:', err);
     });
 
     //  RESPOND IMMEDIATELY to pop open the modal

@@ -249,7 +249,7 @@ const handleWizardSuccess = (newTenant) => {
     setConfirm({
       id, isInactive,
       message: isInactive 
-        ? `⚠️ PERMANENT DELETE: This will completely erase "${tenant?.firstName} ${tenant?.lastName}". This cannot be undone.`
+        ? ` PERMANENT DELETE: This will completely erase "${tenant?.firstName} ${tenant?.lastName}". This cannot be undone.`
         : `Are you sure you want to deactivate "${tenant?.firstName} ${tenant?.lastName}"?`
     })
   }
@@ -330,7 +330,7 @@ const handleWizardSuccess = (newTenant) => {
 
       {pageError && (
         <div style={{ padding: '12px 20px', background: '#fee2e2', border: '1px solid #fca5a5', borderRadius: '8px', marginBottom: '20px', color: '#991b1b' }}>
-          ⚠️ {pageError}
+           {pageError}
         </div>
       )}
 

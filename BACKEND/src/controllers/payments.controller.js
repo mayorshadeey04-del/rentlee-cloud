@@ -244,13 +244,13 @@ export const mpesaCallback = async (req, res) => {
       if (detailsRes.rows.length > 0) {
         const d = detailsRes.rows[0];
 
-        // 🔔 1. NOTIFY THE ADMIN/LANDLORD
+        //  1. NOTIFY THE ADMIN/LANDLORD
         await db.query(
           `INSERT INTO notifications (user_id, title, message, type) VALUES ($1, $2, $3, 'payment')`,
           [payInfo.landlord_id, 'New Payment Received', `${d.first_name} ${d.last_name} paid Ksh ${Number(payInfo.amount).toLocaleString()} for ${d.prop_name} (Unit ${d.unit_number}). Ref: ${mpesaRef}`]
         );
 
-        // 🔔 2. NOTIFY THE TENANT
+        //  2. NOTIFY THE TENANT
         await db.query(
           `INSERT INTO notifications (user_id, title, message, type) VALUES ($1, $2, $3, 'payment')`,
           [d.tenant_user_id, 'Payment Successful', `Your payment of Ksh ${Number(payInfo.amount).toLocaleString()} was received successfully. Ref: ${mpesaRef}`]
@@ -385,7 +385,7 @@ export const generateRentInvoices = async (req, res) => {
       return res.status(403).json({ success: false, message: 'Not authorized to generate rent invoices.' });
     }
 
-    // 👇 NEW LOGIC: Dynamic property scoping based on role
+    //  NEW LOGIC: Dynamic property scoping based on role
     const authCondition = role === 'landlord' 
       ? 'p.landlord_id = $3' 
       : 'p.id IN (SELECT property_id FROM caretaker_properties WHERE caretaker_id = $3 AND status = \'active\')';
@@ -413,7 +413,7 @@ export const generateRentInvoices = async (req, res) => {
 
     const result = await db.query(query, [periodName, dueDate, userId]);
 
-    // 🔔 NOTIFY ALL AFFECTED TENANTS
+    //  NOTIFY ALL AFFECTED TENANTS
     if (result.rows.length > 0) {
       try {
         const tenantIds = result.rows.map(r => r.tenant_id);
@@ -454,7 +454,7 @@ export const reverseRentInvoices = async (req, res) => {
     if (!periodName) return res.status(400).json({ success: false, message: 'Period Name is required.' });
     if (role !== 'landlord' && role !== 'caretaker') return res.status(403).json({ success: false, message: 'Not authorized to reverse invoices.' });
 
-    // 👇 NEW LOGIC: Dynamic property scoping based on role
+    //  NEW LOGIC: Dynamic property scoping based on role
     const authCondition = role === 'landlord' 
       ? 'p.landlord_id = $2' 
       : 'p.id IN (SELECT property_id FROM caretaker_properties WHERE caretaker_id = $2 AND status = \'active\')';

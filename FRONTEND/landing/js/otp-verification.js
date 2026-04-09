@@ -103,7 +103,7 @@ form.addEventListener('submit', async (e) => {
 
         if (verifyResponse.ok && verifyData.success) {
             //  Email verified successfully!
-            verifyBtn.textContent = 'Verified! ✓';
+            verifyBtn.textContent = 'Verified! ';
             verifyBtn.style.background = '#10b981';
             
             // Clear verification email

@@ -98,7 +98,7 @@ export default function TenantMyUnit() {
     return (
       <div className="tenant-my-unit">
         <div style={{ padding: '2rem', color: '#ef4444', textAlign: 'center', background: '#fee2e2', borderRadius: '12px', border: '1px solid #fca5a5' }}>
-          ⚠️ {error}
+           {error}
         </div>
       </div>
     )

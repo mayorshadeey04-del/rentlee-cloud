@@ -267,7 +267,7 @@ export default function TenantDashboard() {
             {info?.balance != null ? `Ksh ${Number(info.balance).toLocaleString()}` : '—'}
           </div>
           <div className="tenant-stat-sub">
-            {info?.balance <= 0 ? 'All paid ✓' : `Due: ${info?.nextDueDate ?? '—'}`}
+            {info?.balance <= 0 ? 'All paid ' : `Due: ${info?.nextDueDate ?? '—'}`}
           </div>
         </div>
 

@@ -80,7 +80,7 @@ async function handlePasswordSubmission() {
         const data = await response.json();
 
         if (response.ok) {
-            submitBtn.textContent = 'Success! ✓';
+            submitBtn.textContent = 'Success! ';
             submitBtn.style.background = '#10b981';
             alert('Password updated successfully! Redirecting to login...');
             setTimeout(() => { window.location.href = 'login.html'; }, 1500);

@@ -95,7 +95,7 @@ export default function Units() {
         setProperties(propsList)
 
       } catch (err) {
-        console.error('❌ Fetch error:', err)
+        console.error('Fetch error:', err)
         showToast('error', 'Error', 'Failed to load units')
       } finally {
         setLoading(false)
@@ -202,7 +202,7 @@ function handleChange(e) {
       showToast('success', 'Unit Added', `Unit ${created.unitNumber} has been created successfully.`)
 
     } catch (err) {
-      console.error('❌ Create error:', err)
+      console.error('Create error:', err)
       setError(err.message || 'Failed to create unit')
     }
   }
@@ -250,7 +250,7 @@ function handleChange(e) {
       showToast('success', 'Unit Updated', `Unit ${form.unitNumber} has been updated successfully.`)
 
     } catch (err) {
-      console.error('❌ Update error:', err)
+      console.error('Update error:', err)
       setError(err.message || 'Failed to update unit')
     }
   }
@@ -280,7 +280,7 @@ function handleChange(e) {
       showToast('success', 'Unit Deleted', `Unit ${unit?.unitNumber} has been removed successfully.`)
 
     } catch (err) {
-      console.error('❌ Delete error:', err)
+      console.error('Delete error:', err)
       showToast('error', 'Error', err.message || 'Failed to delete unit')
     }
   }

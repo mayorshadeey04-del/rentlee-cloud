@@ -123,7 +123,7 @@ export default function TenantLedger() {
 
       {error && (
         <div className="ledger-error">
-          ⚠️ {error}
+           {error}
         </div>
       )}
 

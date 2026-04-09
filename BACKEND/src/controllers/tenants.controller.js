@@ -226,7 +226,7 @@ export const createTenant = async (req, res) => {
       if (existingRecord.status === 'pending') {
          // The user dropped off or email failed. Delete the old unverified record completely.
          // Since your DB has ON DELETE CASCADE for foreign keys, deleting the user wipes the pending tenant, tenancies, and tokens.
-         console.log(`♻️ Found pending tenant for ${email}. Deleting old record to start fresh.`);
+         console.log(` Found pending tenant for ${email}. Deleting old record to start fresh.`);
          await db.query('DELETE FROM users WHERE id = $1', [existingRecord.user_id]);
       } else {
          // They are 'active' or 'inactive', which means they successfully registered previously. Block them.

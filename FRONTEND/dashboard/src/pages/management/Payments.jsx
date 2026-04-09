@@ -231,7 +231,7 @@ export default function Payments() {
 
       {pageError && (
         <div style={{ padding: '12px 20px', background: '#fee2e2', border: '1px solid #fca5a5', borderRadius: '8px', marginBottom: '20px', color: '#991b1b' }}>
-          ⚠️ {pageError}
+           {pageError}
         </div>
       )}
 

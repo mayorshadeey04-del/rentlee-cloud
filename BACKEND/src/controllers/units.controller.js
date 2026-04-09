@@ -36,7 +36,7 @@ export const getUnits = async (req, res) => {
         params = [userId];
       }
     } else if (role === 'caretaker') {
-      // 👇 NEW LOGIC: Caretaker is allowed, but only for their assigned properties
+      //  NEW LOGIC: Caretaker is allowed, but only for their assigned properties
       if (propertyId) {
         query = `${selectClause} 
                  JOIN caretaker_properties cp ON p.id = cp.property_id 
@@ -98,7 +98,7 @@ export const getUnit = async (req, res) => {
       return res.status(403).json({ success: false, message: 'Access denied' });
     }
 
-    // 👇 NEW LOGIC: Check Caretaker Security
+    //  NEW LOGIC: Check Caretaker Security
     if (role === 'caretaker') {
       const accessCheck = await db.query(
         `SELECT id FROM caretaker_properties WHERE caretaker_id = $1 AND property_id = $2 AND status = 'active'`,

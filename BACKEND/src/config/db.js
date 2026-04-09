@@ -20,12 +20,12 @@ if (!isProduction) {
 const db = new pg.Pool(
     isProduction
         ? {
-              // ☁️ CLOUD: Use the Supabase URL and turn on SSL
+              //  CLOUD: Use the Supabase URL and turn on SSL
               connectionString: process.env.DATABASE_URL,
               ssl: { rejectUnauthorized: false } 
           }
         : {
-              // 💻 LOCAL: Use your 5 specific variables
+              //  LOCAL: Use your 5 specific variables
               user: process.env.DB_USER,
               host: process.env.DB_HOST,
               database: process.env.DB_NAME,

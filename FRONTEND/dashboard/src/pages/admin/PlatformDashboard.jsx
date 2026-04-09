@@ -124,7 +124,7 @@ export default function PlatformDashboard() {
         </div>
       </div>
 
-      {error && <div className="platform-error">⚠️ {error}</div>}
+      {error && <div className="platform-error"> {error}</div>}
 
       {/* Global Stats Cards */}
       <div className="platform-summary">

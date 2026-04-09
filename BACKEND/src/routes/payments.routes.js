@@ -39,7 +39,7 @@ router.get('/:id', authorize('landlord', 'caretaker'), getPayment);
 // Initiate STK Push payment
 router.post('/initiate', authorize('tenant'), initiatePayment);
 
-// 👇 FIXED: Added caretaker authorization
+//  FIXED: Added caretaker authorization
 router.post('/generate-rent', authorize('landlord', 'caretaker'), generateRentInvoices);
 
 // Reverse rent

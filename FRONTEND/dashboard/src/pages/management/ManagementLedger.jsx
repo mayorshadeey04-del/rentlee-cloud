@@ -178,7 +178,7 @@ export default function ManagementLedger() {
         </div>
       </div>
 
-      {error && <div className="ledger-error">⚠️ {error}</div>}
+      {error && <div className="ledger-error"> {error}</div>}
 
       <div className="ledger-table-container">
         <table className="ledger-table">

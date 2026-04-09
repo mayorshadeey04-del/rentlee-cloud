@@ -331,7 +331,7 @@ export default function PropertyDetails() {
 
       {pageError && (
         <div style={{ padding: '12px 20px', background: '#fee2e2', border: '1px solid #fca5a5', borderRadius: '8px', marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', color: '#991b1b' }}>
-          <span>⚠️ {pageError}</span>
+          <span> {pageError}</span>
         </div>
       )}
 
@@ -341,7 +341,7 @@ export default function PropertyDetails() {
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
             <p style={{ color: 'var(--slate-500)', fontSize: '0.938rem' }}>Manage the individual doors and occupancy in this building.</p>
             {canManageUnits && (
-              // 👇 NEW LOGIC: Check if property is full before enabling the button
+              //  NEW LOGIC: Check if property is full before enabling the button
               (() => {
                 const isFull = property && units.length >= property.total_units;
                 
@@ -359,7 +359,7 @@ export default function PropertyDetails() {
                   </button>
                 );
               })()
-              // 👆 END OF NEW LOGIC
+              //  END OF NEW LOGIC
             )}
           </div>
 

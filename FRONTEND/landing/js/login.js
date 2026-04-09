@@ -49,7 +49,7 @@ async function loginUser() {
             password: password.value
         };
 
-        console.log('🔐 Attempting login for:', credentials.email);
+        console.log(' Attempting login for:', credentials.email);
 
         //  Call backend login endpoint
         const response = await fetch(`${API_URL}/signin/login`, {
@@ -61,7 +61,7 @@ async function loginUser() {
         });
 
         const data = await response.json();
-        console.log('📥 Login response:', data);
+        console.log(' Login response:', data);
 
         if (response.ok && data.success) {
             //  LOGIN SUCCESSFUL
@@ -82,7 +82,7 @@ const dashboardUser = {
     assignedPropertyIds: []
 };
 
-console.log('💾 User data ready:', dashboardUser);
+console.log(' User data ready:', dashboardUser);
 
 //  Show success message
 submitBtn.textContent = 'Success! Redirecting...';
@@ -90,16 +90,16 @@ submitBtn.style.background = '#10b981';
 
 //  Pass token + user via URL to React (fixes origin mismatch)
 setTimeout(() => {
-    console.log('🚀 Redirecting to dashboard...');
+    console.log(' Redirecting to dashboard...');
     const encodedUser  = encodeURIComponent(JSON.stringify(dashboardUser));
     const encodedToken = encodeURIComponent(token);
    window.location.href = `https://rentlee-cloud.vercel.app/auth-callback?token=${encodedToken}&user=${encodedUser}`;
 }, 1000);
 
         } else {
-            // ❌ LOGIN FAILED
+            // LOGIN FAILED
             const errorMessage = data.message || 'Invalid email or password';
-            console.error('❌ Login failed:', errorMessage);
+            console.error('Login failed:', errorMessage);
             
             showErrorPopup('Login Failed', errorMessage);
 
@@ -111,7 +111,7 @@ setTimeout(() => {
         }
 
     } catch (error) {
-        console.error('❌ Login error:', error);
+        console.error('Login error:', error);
         
         showErrorPopup('Connection Error', 'Unable to connect to the server. Please make sure the backend is running.');
 

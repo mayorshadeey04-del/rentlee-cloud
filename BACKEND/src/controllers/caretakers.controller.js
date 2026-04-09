@@ -149,7 +149,7 @@ export const createCaretaker = async (req, res) => {
       if (existingUser.is_active === false) {
         // Delete the old pending record to start fresh. 
         // ON DELETE CASCADE will handle caretaker_properties and password_tokens automatically.
-        console.log(`♻️ Found pending caretaker for ${email}. Deleting old record to start fresh.`);
+        console.log(` Found pending caretaker for ${email}. Deleting old record to start fresh.`);
         await db.query('DELETE FROM users WHERE id = $1', [existingUser.id]);
       } else {
         // User is active and verified, block creation

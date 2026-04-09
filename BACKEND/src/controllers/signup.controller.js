@@ -68,7 +68,7 @@ export const registerLandlord = async (req, res) => {
         [userId]
       );
 
-      console.log(`♻️ Overwriting unverified account for ${email}`);
+      console.log(` Overwriting unverified account for ${email}`);
 
     } else {
       // CASE C: Brand New User -> INSERT
@@ -89,10 +89,10 @@ export const registerLandlord = async (req, res) => {
 
     //  SEND VERIFICATION EMAIL ASYNCHRONOUSLY
     sendVerificationEmail(email, code, firstName).catch(err => {
-      console.error('❌ Background email send failed (non-blocking):', err);
+      console.error('Background email send failed (non-blocking):', err);
     });
 
-    console.log(`📧 Verification email queued for ${email} (Code: ${code})`); // Useful for testing in Render logs!
+    console.log(` Verification email queued for ${email} (Code: ${code})`); // Useful for testing in Render logs!
 
     //  RESPOND IMMEDIATELY
     res.status(201).json({
@@ -242,7 +242,7 @@ export const resendVerification = async (req, res) => {
 
    //  SEND VERIFICATION EMAIL ASYNCHRONOUSLY
 sendVerificationEmail(email, code, user.first_name).catch(err => {
-  console.error('❌ Background email resend failed:', err);
+  console.error('Background email resend failed:', err);
 });
 
 //  RESPOND IMMEDIATELY

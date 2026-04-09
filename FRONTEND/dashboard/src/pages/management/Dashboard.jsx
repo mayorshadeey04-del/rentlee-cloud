@@ -105,7 +105,7 @@ export default function Dashboard() {
     if (user) loadDashboard()
   }, [navigate, user])
 
-  // 👇 FIX: Since the backend already filters the properties, we just pass the array directly! No frontend filtering needed.
+  //  FIX: Since the backend already filters the properties, we just pass the array directly! No frontend filtering needed.
   const visibleProperties = properties;
 
   const quickLinks = [

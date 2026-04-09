@@ -75,7 +75,7 @@ export default function MaintenanceDetail() {
   }
 
   if (loading) return <div className="detail-loading"><i className="fas fa-spinner fa-spin"></i> Loading request details...</div>
-  if (pageError) return <div className="detail-loading" style={{color: '#ef4444'}}>⚠️ {pageError}</div>
+  if (pageError) return <div className="detail-loading" style={{color: '#ef4444'}}> {pageError}</div>
   if (!request) return <div className="detail-loading">Request not found.</div>
 
   const statusMeta = STATUS_MAP[request.status] || STATUS_MAP['open']
