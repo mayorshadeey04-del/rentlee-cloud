@@ -10,13 +10,13 @@ const NAV_ITEMS = [
   { path: '/tenant/profile',      icon: 'fas fa-user',            label: 'Profile'      },
 ]
 
-export default function TenantSidebar({ collapsed }) {
+export default function TenantSidebar({ collapsed, mobileOpen }) {
   const location = useLocation();
   const isFinancialActive = location.pathname.includes('/tenant/payments') || location.pathname.includes('/tenant/ledger');
   const [financialsOpen, setFinancialsOpen] = useState(isFinancialActive);
 
   return (
-    <aside className={`tenant-sidebar ${collapsed ? 'collapsed' : ''}`}>
+    <aside className={`tenant-sidebar ${collapsed ? 'collapsed' : ''} ${mobileOpen ? 'mobile-open' : ''}`}>
 
       {/* Logo */}
       <div className="sidebar-logo">

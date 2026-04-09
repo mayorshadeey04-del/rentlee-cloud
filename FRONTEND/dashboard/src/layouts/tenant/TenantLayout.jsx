@@ -10,8 +10,14 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
 export default function TenantLayout() {
   const { authHeaders } = useAuth()
   const [collapsed, setCollapsed] = useState(false)
+  const [mobileOpen, setMobileOpen] = useState(false) // ✅ NEW: Mobile state
   const [isLocked, setIsLocked] = useState(null) // null = loading
   const location = useLocation()
+
+  // ✅ Auto-close the mobile sidebar whenever the user navigates to a new page
+  useEffect(() => {
+    setMobileOpen(false)
+  }, [location.pathname])
 
   // 1. GLOBAL GATEWAY CHECK
   useEffect(() => {
@@ -71,14 +77,31 @@ export default function TenantLayout() {
     )
   }
 
+  // ✅ Handle Toggle for both Desktop and Mobile
+  const handleToggleSidebar = () => {
+    if (window.innerWidth <= 768) {
+      setMobileOpen(!mobileOpen)
+    } else {
+      setCollapsed(!collapsed)
+    }
+  }
+
   // =========================================================
   // NORMAL VIEW: Full Access
   // =========================================================
   return (
     <div className="tenant-layout">
-      <TenantSidebar collapsed={collapsed} />
+      
+      {/* ✅ Dark overlay for mobile when sidebar is open */}
+      {mobileOpen && (
+        <div className="sidebar-overlay" onClick={() => setMobileOpen(false)}></div>
+      )}
+
+      {/* ✅ Passed mobileOpen prop */}
+      <TenantSidebar collapsed={collapsed} mobileOpen={mobileOpen} />
+      
       <div className={`tenant-main ${collapsed ? 'expanded' : ''}`}>
-        <TenantNavbar onToggleSidebar={() => setCollapsed(c => !c)} />
+        <TenantNavbar onToggleSidebar={handleToggleSidebar} />
         <main className="tenant-content">
           <Outlet />
         </main>

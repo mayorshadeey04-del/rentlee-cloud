@@ -91,3 +91,43 @@
 .sidebar-nav-link.sub-link.active {
     box-shadow: none; /* Sub-links don't need the heavy drop shadow */
 }
+
+/* =========================================================
+   MOBILE RESPONSIVENESS
+   ========================================================= */
+@media (max-width: 768px) {
+    .tenant-sidebar {
+        transform: translateX(-100%);
+        width: 260px; /* Slightly wider on mobile for easier tapping */
+        padding: 2rem 1.25rem;
+        box-shadow: none;
+    }
+
+    .tenant-sidebar.mobile-open {
+        transform: translateX(0);
+        box-shadow: 4px 0 24px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Override desktop collapsed styles when on mobile */
+    .tenant-sidebar.collapsed {
+        width: 260px;
+        padding: 2rem 1.25rem;
+    }
+
+    .tenant-sidebar.collapsed .sidebar-logo-text-wrapper {
+        opacity: 1;
+        width: auto;
+        display: flex;
+    }
+
+    .tenant-sidebar.collapsed .sidebar-nav-text {
+        opacity: 1;
+        width: auto;
+        display: inline-block;
+    }
+
+    .tenant-sidebar.collapsed .sidebar-nav-link {
+        justify-content: flex-start;
+        padding: 0.875rem 1.125rem;
+    }
+}

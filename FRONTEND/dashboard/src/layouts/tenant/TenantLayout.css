@@ -30,3 +30,18 @@ body {
 @media (max-width: 768px) {
     .tenant-main { margin-left: 0 !important; }
 }
+
+/* ── Overlay for mobile ── */
+.sidebar-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(10, 22, 40, 0.6);
+    z-index: 90;
+    opacity: 1;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
