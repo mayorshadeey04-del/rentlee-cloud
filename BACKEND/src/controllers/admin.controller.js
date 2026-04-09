@@ -38,11 +38,27 @@ export const getPlatformDashboard = async (req, res) => {
     `;
     const landlordsRes = await db.query(landlordsQuery);
 
+    // 3. ✅ THE FIX: Dynamic Audit Logs using UNION ALL
+    const logsQuery = `
+      SELECT 'user' AS type, 'New ' || role || ' account registered: ' || first_name || ' ' || last_name AS text, created_at
+      FROM users
+      UNION ALL
+      SELECT 'property' AS type, 'New property added to platform: ' || name AS text, created_at
+      FROM properties
+      UNION ALL
+      SELECT 'payment' AS type, 'Rent payment processed via M-Pesa: Ksh ' || amount AS text, created_at
+      FROM payments WHERE status = 'confirmed'
+      ORDER BY created_at DESC
+      LIMIT 15
+    `;
+    const logsRes = await db.query(logsQuery);
+
     res.json({
       success: true,
       data: {
         stats: statsRes.rows[0],
-        landlords: landlordsRes.rows
+        landlords: landlordsRes.rows,
+        logs: logsRes.rows // Send the logs to the frontend
       }
     });
 

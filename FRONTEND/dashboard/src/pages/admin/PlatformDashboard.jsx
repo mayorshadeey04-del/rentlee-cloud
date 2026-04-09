@@ -6,24 +6,26 @@ import './PlatformDashboard.css'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
 
-// Mock Data for the presentation
-const MOCK_LOGS = [
-  { id: 1, type: 'warning', icon: 'fas fa-exclamation-triangle', color: '#f59e0b', text: 'Failed login attempt (IP: 197.232.45.12)', time: '12 mins ago' },
-  { id: 2, type: 'danger',  icon: 'fas fa-shield-alt',           color: '#ef4444', text: 'Multiple failed logins from unknown IP', time: '1 hour ago' },
-  { id: 3, type: 'info',    icon: 'fas fa-database',             color: '#3b82f6', text: 'Automated system database backup completed', time: '3 hours ago' },
-  { id: 4, type: 'success', icon: 'fas fa-check-circle',         color: '#10b981', text: 'System security patch v1.4.2 deployed', time: '1 day ago' },
-  { id: 5, type: 'info',    icon: 'fas fa-envelope',             color: '#3b82f6', text: 'Monthly invoice batch processing finished', time: '2 days ago' },
-]
+// ✅ Helper to format timestamps dynamically
+function timeAgo(dateStr) {
+  if (!dateStr) return '';
+  const diff = Math.floor((Date.now() - new Date(dateStr)) / 1000);
+  if (diff < 60)    return 'Just now';
+  if (diff < 3600)  return `${Math.floor(diff / 60)}m ago`;
+  if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
+  return `${Math.floor(diff / 86400)}d ago`;
+}
 
 export default function PlatformDashboard() {
   const { authHeaders } = useAuth()
   const [stats, setStats] = useState({ total_landlords: 0, total_properties: 0, total_tenants: 0 })
   const [landlords, setLandlords] = useState([])
+  const [logs, setLogs] = useState([]) // ✅ NEW: Logs state
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   
   // UI States
-  const [activeTab, setActiveTab] = useState('landlords') // NEW: Tab state
+  const [activeTab, setActiveTab] = useState('landlords')
   const [searchQuery, setSearchQuery] = useState('')
   const [toasts, setToasts] = useState([])
   const [confirm, setConfirm] = useState(null)
@@ -48,6 +50,7 @@ export default function PlatformDashboard() {
       
       setStats(data.data.stats)
       setLandlords(data.data.landlords)
+      setLogs(data.data.logs || []) // ✅ Save dynamic logs to state
     } catch (err) {
       setError(err.message || 'Failed to load platform data')
     } finally {
@@ -274,24 +277,36 @@ export default function PlatformDashboard() {
           </div>
         )}
 
-        {/* TAB 3: System Audit Logs */}
+        {/* TAB 3: System Audit Logs (NOW 100% REAL DATA) */}
         {activeTab === 'logs' && (
           <div className="audit-card fade-in">
             <div className="audit-header">
               <h3><i className="fas fa-shield-alt" style={{ color: 'var(--rose-500)', marginRight: '0.5rem' }}></i> System Audit Logs</h3>
             </div>
             <ul className="audit-list">
-              {MOCK_LOGS.map(log => (
-                <li key={log.id} className="audit-item">
-                  <div className="audit-icon-wrap" style={{ background: `${log.color}15`, color: log.color }}>
-                    <i className={log.icon}></i>
-                  </div>
-                  <div className="audit-content">
-                    <div className="audit-title" style={{ fontSize: '0.9rem' }}>{log.text}</div>
-                  </div>
-                  <div className="audit-time">{log.time}</div>
-                </li>
-              ))}
+              {logs.length === 0 && <li className="audit-item"><span className="audit-text">No system logs available.</span></li>}
+              
+              {logs.map((log, i) => {
+                // Dynamically assign icons and colors based on event type
+                let icon = 'fas fa-info-circle';
+                let color = '#64748b'; // default slate
+                
+                if (log.type === 'user') { icon = 'fas fa-user-check'; color = '#3b82f6'; } // blue
+                if (log.type === 'property') { icon = 'fas fa-building'; color = '#10b981'; } // emerald
+                if (log.type === 'payment') { icon = 'fas fa-money-bill-wave'; color = '#f59e0b'; } // amber
+
+                return (
+                  <li key={i} className="audit-item">
+                    <div className="audit-icon-wrap" style={{ background: `${color}15`, color: color }}>
+                      <i className={icon}></i>
+                    </div>
+                    <div className="audit-content">
+                      <div className="audit-title" style={{ fontSize: '0.9rem' }}>{log.text}</div>
+                    </div>
+                    <div className="audit-time">{timeAgo(log.created_at)}</div>
+                  </li>
+                )
+              })}
             </ul>
           </div>
         )}
