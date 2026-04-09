@@ -11,18 +11,15 @@ const YEARS = []
 for (let y = currentYear; y >= 2020; y--) { YEARS.push(String(y)) }
 
 // ─── Generic PDF Exporter ──────────────────────────────────────────────────────
-// rows can contain plain values OR objects: { value, color, bold }
-// e.g. { value: '5', color: [22,163,74], bold: true }
-const exportToPDF = (title, columns, rows, propertyLabel = 'All Properties', userName = '') => {
+// Added summaryStats array to inject the top cards into the PDF
+const exportToPDF = (title, columns, rows, propertyLabel = 'All Properties', userName = '', summaryStats = []) => {
   const doExport = (logoDataUrl) => {
     const doc = new jsPDF()
     const pageWidth = doc.internal.pageSize.width
 
     // ── Header area ─────────────────────────────────────────────────────────
-    // Left col: logo (y=8-22), property line (y=28), title (y=36)
-    // Right col: GENERATED ON label (y=14), date (y=21), PREPARED FOR (y=30), name (y=37)
-    // Header ends at y=44, divider at y=44, table starts at y=52
-    const headerHeight = 44
+    // ✅ INCREASED FONT SIZES & REPOSITIONED FOR BETTER READABILITY
+    const headerHeight = 54
 
     doc.setFillColor(255, 255, 255)
     doc.rect(0, 0, pageWidth, headerHeight, 'F')
@@ -32,54 +29,82 @@ const exportToPDF = (title, columns, rows, propertyLabel = 'All Properties', use
 
     // Logo (top left)
     if (logoDataUrl) {
-      doc.addImage(logoDataUrl, 'PNG', 12, 6, 34, 13)
+      doc.addImage(logoDataUrl, 'PNG', 14, 8, 38, 15)
     } else {
-      doc.setFontSize(16)
+      doc.setFontSize(20)
       doc.setTextColor(29, 78, 216)
       doc.setFont('helvetica', 'bold')
-      doc.text('Rentlee', 14, 18)
+      doc.text('Rentlee', 14, 20)
     }
-
-    // Property line (below logo)
-    doc.setFont('helvetica', 'normal')
-    doc.setFontSize(8.5)
-    doc.setTextColor(100, 116, 139)
-    doc.text('Property: ', 14, 26)
-    const propLabelWidth = doc.getTextWidth('Property: ')
-    doc.setFont('helvetica', 'bold')
-    doc.setTextColor(15, 23, 42)
-    doc.text(propertyLabel, 14 + propLabelWidth, 26)
 
     // Report title
     doc.setFont('helvetica', 'bold')
-    doc.setFontSize(11)
+    doc.setFontSize(16)
     doc.setTextColor(15, 23, 42)
-    doc.text(title, 14, 37)
+    doc.text(title, 14, 36)
+
+    // Property line (below title)
+    doc.setFont('helvetica', 'normal')
+    doc.setFontSize(10)
+    doc.setTextColor(100, 116, 139)
+    doc.text('Property: ', 14, 46)
+    const propLabelWidth = doc.getTextWidth('Property: ')
+    doc.setFont('helvetica', 'bold')
+    doc.setTextColor(15, 23, 42)
+    doc.text(propertyLabel, 14 + propLabelWidth, 46)
 
     // Right side: Generated on
     doc.setFont('helvetica', 'normal')
-    doc.setFontSize(7.5)
+    doc.setFontSize(9)
     doc.setTextColor(100, 116, 139)
-    doc.text('GENERATED ON', pageWidth - 14, 12, { align: 'right' })
-    doc.setFontSize(8.5)
+    doc.text('GENERATED ON', pageWidth - 14, 16, { align: 'right' })
+    doc.setFontSize(11)
     doc.setFont('helvetica', 'bold')
     doc.setTextColor(15, 23, 42)
-    doc.text(new Date().toLocaleString('en-KE', { dateStyle: 'medium', timeStyle: 'short' }), pageWidth - 14, 19, { align: 'right' })
+    doc.text(new Date().toLocaleString('en-KE', { dateStyle: 'medium', timeStyle: 'short' }), pageWidth - 14, 23, { align: 'right' })
 
     // Prepared for
     if (userName) {
       doc.setFont('helvetica', 'normal')
-      doc.setFontSize(7.5)
+      doc.setFontSize(9)
       doc.setTextColor(100, 116, 139)
-      doc.text('PREPARED FOR', pageWidth - 14, 29, { align: 'right' })
-      doc.setFontSize(8.5)
+      doc.text('PREPARED FOR', pageWidth - 14, 38, { align: 'right' })
+      doc.setFontSize(11)
       doc.setFont('helvetica', 'bold')
       doc.setTextColor(15, 23, 42)
-      doc.text(userName, pageWidth - 14, 36, { align: 'right' })
+      doc.text(userName, pageWidth - 14, 45, { align: 'right' })
+    }
+
+    let currentY = headerHeight + 8
+
+    // ── Summary Stats Block (NEW: Prints the web cards onto the PDF) ─────────
+    if (summaryStats && summaryStats.length > 0) {
+      const statsXStart = 14
+      let currentX = statsXStart
+
+      // Draw a light grey background rect for stats
+      doc.setFillColor(248, 250, 252)
+      doc.roundedRect(14, currentY, pageWidth - 28, 22, 3, 3, 'F')
+
+      summaryStats.forEach(stat => {
+        doc.setFont('helvetica', 'bold')
+        doc.setFontSize(8.5)
+        doc.setTextColor(100, 116, 139)
+        doc.text(stat.label.toUpperCase(), currentX + 5, currentY + 8)
+
+        doc.setFont('helvetica', 'bold')
+        doc.setFontSize(12)
+        doc.setTextColor(15, 23, 42)
+        if (stat.color) doc.setTextColor(...stat.color)
+        doc.text(String(stat.value), currentX + 5, currentY + 16)
+
+        currentX += (pageWidth - 28) / summaryStats.length // Evenly space stats based on how many there are
+      })
+
+      currentY += 32 // Push the table down to make room for the stats block
     }
 
     // ── Table ────────────────────────────────────────────────────────────────
-    // Separate plain rows from cell-style metadata
     const plainRows = rows.map(row =>
       row.map(cell => (cell && typeof cell === 'object' ? cell.value : cell))
     )
@@ -97,17 +122,16 @@ const exportToPDF = (title, columns, rows, propertyLabel = 'All Properties', use
     })
 
    autoTable(doc, {
-      startY: headerHeight + 8,
+      startY: currentY,
       head: [columns],
       body: plainRows,
       theme: 'grid',
-      // ✅ CHANGED: Blue background with white text!
       headStyles: {
-        fillColor: [59, 130, 246], // Rentlee Blue (#3B82F6)
-        textColor: [255, 255, 255], // White Text
+        fillColor: [59, 130, 246], // Rentlee Blue
+        textColor: [255, 255, 255],
         fontStyle: 'bold',
         fontSize: 9,
-        lineWidth: 0, // Removed header borders for a cleaner, modern look
+        lineWidth: 0,
         cellPadding: { top: 7, bottom: 7, left: 5, right: 5 }
       },
       alternateRowStyles: { fillColor: [248, 250, 252] },
@@ -205,7 +229,14 @@ function TenantStatement({ properties }) {
         ? [r.tenantName, r.propertyName, r.unitId, balCell]
         : [r.tenantName, r.unitId, balCell]
     })
-    exportToPDF('Tenant Balances Statement', columns, data, propLabel, userName)
+    
+    // ✅ ADD STATS FOR PDF
+    const pdfStats = [
+      { label: 'Total Tenants', value: filtered.length },
+      { label: 'Total Arrears', value: `Ksh ${filtered.reduce((sum, r) => sum + Number(r.balance), 0).toLocaleString()}`, color: [225, 29, 72] }
+    ]
+    
+    exportToPDF('Tenant Balances Statement', columns, data, propLabel, userName, pdfStats)
   }
 
   return (
@@ -309,7 +340,14 @@ function PropertyStatement({ properties }) {
       { value: String(r.vacantUnits), color: r.vacantUnits > 0 ? [225, 29, 72] : [15, 23, 42], bold: Number(r.vacantUnits) > 0 },
       r.caretaker
     ])
-    exportToPDF('Property Occupancy Statement', columns, data, 'All Properties', userName)
+    
+    // ✅ ADD STATS FOR PDF
+    const pdfStats = [
+      { label: 'Total Properties', value: rows.length },
+      { label: 'Overall Occupancy', value: `${rows.length > 0 ? Math.round((rows.reduce((sum, r) => sum + Number(r.occupiedUnits), 0) / rows.reduce((sum, r) => sum + Number(r.totalUnits), 0)) * 100) : 0}%`, color: [5, 150, 105] }
+    ]
+    
+    exportToPDF('Property Occupancy Statement', columns, data, 'All Properties', userName, pdfStats)
   }
 
   return (
@@ -412,7 +450,15 @@ function UnitStatusReport({ properties }) {
         ? [r.propertyName, r.unitId, r.roomType, `Ksh ${Number(r.rent).toLocaleString()}`, statusCell]
         : [r.unitId, r.roomType, `Ksh ${Number(r.rent).toLocaleString()}`, statusCell]
     })
-    exportToPDF('Unit Status Report', columns, data, propLabel, userName)
+    
+    // ✅ ADD STATS FOR PDF
+    const pdfStats = [
+      { label: 'Total Units', value: filtered.length },
+      { label: 'Occupied', value: filtered.filter(r => r.status === 'occupied').length, color: [5, 150, 105] },
+      { label: 'Vacant', value: filtered.filter(r => r.status === 'vacant').length, color: [225, 29, 72] }
+    ]
+    
+    exportToPDF('Unit Status Report', columns, data, propLabel, userName, pdfStats)
   }
 
   return (
@@ -524,7 +570,13 @@ function TenantDirectoryReport({ properties }) {
       ? [{ value: r.tenantName, bold: true }, r.propertyName, r.unitId, r.phone, r.email]
       : [{ value: r.tenantName, bold: true }, r.unitId, r.phone, r.email]
     )
-    exportToPDF('Tenant Directory', columns, data, propLabel, userName)
+    
+    // ✅ ADD STATS FOR PDF
+    const pdfStats = [
+      { label: 'Total Tenants Found', value: rows.length }
+    ]
+    
+    exportToPDF('Tenant Directory', columns, data, propLabel, userName, pdfStats)
   }
 
   return (
@@ -642,7 +694,15 @@ function RevenueReport({ properties }) {
       ]
       return isAllProps ? [r.propertyName, ...cells] : cells
     })
-    exportToPDF(title, columns, data, propLabel, userName)
+    
+    // ✅ ADD STATS FOR PDF
+    const pdfStats = [
+      { label: 'Total Expected', value: `Ksh ${rows.reduce((sum, r) => sum + Number(r.expectedRevenue), 0).toLocaleString()}` },
+      { label: 'Total Collected', value: `Ksh ${rows.reduce((sum, r) => sum + Number(r.collectedRevenue), 0).toLocaleString()}`, color: [5, 150, 105] },
+      { label: 'Outstanding', value: `Ksh ${rows.reduce((sum, r) => sum + Number(r.outstandingAmount), 0).toLocaleString()}`, color: [225, 29, 72] }
+    ]
+    
+    exportToPDF(title, columns, data, propLabel, userName, pdfStats)
   }
 
   return (
@@ -774,7 +834,15 @@ function MaintenanceReport({ properties }) {
       ]
       return isAllProps ? [r.propertyName, ...cells] : cells
     })
-    exportToPDF('Maintenance Overview Report', columns, data, propLabel, userName)
+    
+    // ✅ ADD STATS FOR PDF
+    const pdfStats = [
+      { label: 'Total Tickets', value: rows.reduce((sum, r) => sum + Number(r.totalTickets), 0) },
+      { label: 'Open / In Progress', value: rows.reduce((sum, r) => sum + Number(r.open) + Number(r.inProgress), 0), color: [225, 29, 72] },
+      { label: 'Completed', value: rows.reduce((sum, r) => sum + Number(r.completed), 0), color: [5, 150, 105] }
+    ]
+    
+    exportToPDF('Maintenance Overview Report', columns, data, propLabel, userName, pdfStats)
   }
 
   return (
@@ -850,6 +918,12 @@ export default function Reports() {
   const [activeTab, setActiveTab]   = useState('tenant-statement')
   const [properties, setProperties] = useState([])
 
+  // ✅ FIXED: Hide the "Property Overview" tab from Caretakers
+  const availableTabs = REPORT_TABS.filter(tab => {
+    if (tab.key === 'property-statement' && user?.role === 'caretaker') return false;
+    return true;
+  });
+
   useEffect(() => {
     async function fetchProps() {
       try {
@@ -875,7 +949,7 @@ export default function Reports() {
   return (
     <div className="reports-page">
       <div className="reports-tabs">
-        {REPORT_TABS.map(tab => (
+        {availableTabs.map(tab => (
           <button
             key={tab.key}
             className={`report-tab ${activeTab === tab.key ? 'active' : ''}`}
