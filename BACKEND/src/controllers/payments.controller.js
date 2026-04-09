@@ -369,7 +369,7 @@ export const initiatePayment = async (req, res) => {
 // ============================================
 // @desc    Generate bulk rent invoices
 // @route   POST /api/payments/generate-rent
-// @access  Private (Landlord)
+// @access  Private (Landlord, Caretaker)
 // ============================================
 export const generateRentInvoices = async (req, res) => {
   try {
@@ -381,9 +381,14 @@ export const generateRentInvoices = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Period Name and Due Date are required.' });
     }
 
-    if (role !== 'landlord') {
-      return res.status(403).json({ success: false, message: 'Only landlords can generate bulk rent invoices.' });
+    if (role !== 'landlord' && role !== 'caretaker') {
+      return res.status(403).json({ success: false, message: 'Not authorized to generate rent invoices.' });
     }
+
+    // 👇 NEW LOGIC: Dynamic property scoping based on role
+    const authCondition = role === 'landlord' 
+      ? 'p.landlord_id = $3' 
+      : 'p.id IN (SELECT property_id FROM caretaker_properties WHERE caretaker_id = $3 AND status = \'active\')';
 
     const query = `
       INSERT INTO rent_periods (tenancy_id, tenant_id, period_name, amount_due, due_date, status)
@@ -398,7 +403,7 @@ export const generateRentInvoices = async (req, res) => {
       JOIN tenancies tc ON tc.tenant_id = t.id AND tc.status = 'active'
       JOIN properties p ON t.property_id = p.id
       WHERE t.status = 'active' 
-        AND p.landlord_id = $3
+        AND ${authCondition} 
         AND NOT EXISTS (
           SELECT 1 FROM rent_periods rp 
           WHERE rp.tenant_id = t.id AND rp.period_name = $1::VARCHAR
@@ -438,7 +443,7 @@ export const generateRentInvoices = async (req, res) => {
 // ============================================
 // @desc    Reverse (Undo) bulk rent invoices
 // @route   POST /api/payments/reverse-rent
-// @access  Private (Landlord)
+// @access  Private (Landlord, Caretaker)
 // ============================================
 export const reverseRentInvoices = async (req, res) => {
   try {
@@ -447,9 +452,13 @@ export const reverseRentInvoices = async (req, res) => {
     const role   = req.user.role;
 
     if (!periodName) return res.status(400).json({ success: false, message: 'Period Name is required.' });
-    if (role !== 'landlord') return res.status(403).json({ success: false, message: 'Only landlords can reverse invoices.' });
+    if (role !== 'landlord' && role !== 'caretaker') return res.status(403).json({ success: false, message: 'Not authorized to reverse invoices.' });
 
-    // ✅ Deletes ONLY 'unpaid' invoices for this specific period
+    // 👇 NEW LOGIC: Dynamic property scoping based on role
+    const authCondition = role === 'landlord' 
+      ? 'p.landlord_id = $2' 
+      : 'p.id IN (SELECT property_id FROM caretaker_properties WHERE caretaker_id = $2 AND status = \'active\')';
+
     const query = `
       DELETE FROM rent_periods 
       WHERE period_name = $1 
@@ -458,7 +467,7 @@ export const reverseRentInvoices = async (req, res) => {
           SELECT tc.id FROM tenancies tc
           JOIN tenants t ON tc.tenant_id = t.id
           JOIN properties p ON t.property_id = p.id
-          WHERE p.landlord_id = $2
+          WHERE ${authCondition}
         )
       RETURNING id;
     `;
