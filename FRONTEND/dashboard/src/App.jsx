@@ -12,7 +12,6 @@ import ManagementLayout from './layouts/management/ManagementLayout'
 import Dashboard        from './pages/management/Dashboard'
 import Properties       from './pages/management/Properties'
 import PropertyDetails  from './pages/management/PropertyDetails'
-import Units            from './pages/management/Units'
 import Tenants          from './pages/management/Tenants'
 import Payments         from './pages/management/Payments'
 import Maintenance      from './pages/management/Maintenance'
@@ -93,7 +92,6 @@ export default function App() {
           <Route path="dashboard"     element={<Dashboard />} />
           <Route path="properties"    element={<Properties />} />
           <Route path="properties/Propertydetails" element={<PropertyDetails />} />
-          <Route path="units"         element={<Units />} />
           <Route path="tenants"       element={<Tenants />} />
           <Route path="payments"      element={<Payments />} />
           <Route path="/management/ledger" element={<ManagementLedger />} />
