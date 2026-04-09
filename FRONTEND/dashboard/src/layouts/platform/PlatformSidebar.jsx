@@ -1,9 +1,9 @@
 import { NavLink } from 'react-router-dom'
 import './PlatformSidebar.css'
 
-export default function PlatformSidebar({ collapsed }) {
+export default function PlatformSidebar({ collapsed, mobileOpen }) {
   return (
-    <aside className={`platform-sidebar ${collapsed ? 'collapsed' : ''}`}>
+    <aside className={`platform-sidebar ${collapsed ? 'collapsed' : ''} ${mobileOpen ? 'mobile-open' : ''}`}>
       {/* Logo */}
       <div className="sidebar-logo">
         <svg className="sidebar-logo-icon" viewBox="0 0 98 89" fill="none" xmlns="http://www.w3.org/2000/svg">
